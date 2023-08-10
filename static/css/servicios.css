@@ -1,0 +1,54 @@
+/* servicios.css */
+
+/* Estilo para el cuerpo de la página */
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* Estilo para el encabezado */
+h1,
+h2 {
+  color: #333;
+}
+
+/* Estilo para el texto del encabezado */
+p {
+  color: #777;
+}
+
+/* Estilo para las imágenes de los servicios */
+.img-service {
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  transition: transform 0.2s;
+}
+.img-service:hover {
+  transform: scale(1.05);
+}
+
+/* Estilo para centrar los servicios */
+.row.justify-content-center {
+  margin-top: 40px; /* Espacio entre el encabezado y los servicios */
+}
+
+/* Estilo para el pie de página */
+#footer {
+  background-color: #f8f8f8;
+  padding: 20px 0;
+  text-align: center;
+}
+
+/* Estilo para los enlaces del pie de página */
+#footer a {
+  color: #555;
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+/* Estilo para el enlace del logo en el pie de página */
+#footer a.logo {
+  color: #333;
+  font-weight: bold;
+}

@@ -1,0 +1,137 @@
+{% include 'sitio/cabecera.html' %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/inicio.css') }}"
+/>
+
+<div
+  id="carouselExampleIndicators"
+  class="carousel slide"
+  data-bs-ride="carousel"
+>
+  <ol class="carousel-indicators">
+    <li
+      data-bs-target="#carouselExampleIndicators"
+      data-bs-slide-to="0"
+      class="active"
+    ></li>
+    <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></li>
+    <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></li>
+  </ol>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img
+        src="{{ url_for('static', filename='img/carousel/image1.png') }}"
+        class="d-block w-100"
+        alt="Image 1"
+      />
+    </div>
+    <div class="carousel-item">
+      <img
+        src="{{ url_for('static', filename='img/carousel/image2.png') }}"
+        class="d-block w-100"
+        alt="Image 2"
+      />
+    </div>
+    <div class="carousel-item">
+      <img
+        src="{{ url_for('static', filename='img/carousel/image3.png') }}"
+        class="d-block w-100"
+        alt="Image 3"
+      />
+    </div>
+  </div>
+  <a
+    class="carousel-control-prev"
+    href="#carouselExampleIndicators"
+    role="button"
+    data-bs-slide="prev"
+  >
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </a>
+  <a
+    class="carousel-control-next"
+    href="#carouselExampleIndicators"
+    role="button"
+    data-bs-slide="next"
+  >
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </a>
+</div>
+<div class="bg-light py-5" id="contacto">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 offset-md-3 text-center">
+        <h2 class="mb-4">Contáctanos</h2>
+        <p>
+          Si deseas conocer más sobre nuestros servicios o solicitar una
+          cotización, no dudes en ponerte en contacto con nosotros. Estamos aquí
+          para ayudarte.
+        </p>
+        <p class="mt-4">
+          <a href="mailto:dh2ovpar@gmail.com" class="btn btn-primary"
+            >Enviar Correo</a
+          >
+          <a href="tel:+573157484662" class="btn btn-secondary">Llamar</a>
+          <a
+            href="https://www.google.com/maps/dir/10.4719593,-73.2680704/DH2OCOL/@10.4732798,-73.2875719,15z/data=!3m1!4b1!4m9!4m8!1m1!4e1!1m5!1m1!1s0xa4044469be25a3f:0x3fbc9b7e79b68a75!2m2!1d-73.2864739!2d10.4711401?hl=es&entry=ttu"
+            class="btn btn-success"
+            target="_blank"
+            >Ver en Google Maps</a
+          >
+        </p>
+        <p class="mt-4">
+          <a
+            href="https://api.whatsapp.com/message/F6MZTY5TX4F4C1?autoload=1&app_absent=0"
+            class="btn btn-success"
+            target="_blank"
+          >
+            <img
+              src="{{ url_for('static', filename='img/whatsapp-icon.png') }}"
+              alt="WhatsApp"
+              class="icon"
+              style="width: 20px; height: 20px"
+            />
+            WhatsApp
+          </a>
+          <a
+            href="https://www.facebook.com/dh2ocol/"
+            class="btn btn-info"
+            target="_blank"
+          >
+            <img
+              src="{{ url_for('static', filename='img/facebook-icon.png') }}"
+              alt="Facebook"
+              class="icon"
+              style="width: 20px; height: 20px"
+            />
+            Facebook
+          </a>
+          <a
+            href="https://www.instagram.com/dh2ocol/"
+            class="btn btn-warning"
+            target="_blank"
+          >
+            <img
+              src="{{ url_for('static', filename='img/instagram-icon.png') }}"
+              alt="Instagram"
+              class="icon"
+              style="width: 20px; height: 20px"
+            />
+            Instagram
+          </a>
+        </p>
+        <p class="contact-info mt-4">
+          Dirección: Cra 43F # 11-86 (Valledupar - Cesar)<br />
+          Correo: servicioalcliente@dh2o.com<br />
+          PBX:315 7484662
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include 'sitio/pie.html' %}

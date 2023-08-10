@@ -1,0 +1,42 @@
+{% include 'sitio/cabecera.html' %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/mision_vision.css') }}"
+/>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="mission-vision-card">
+        <h2>Misión</h2>
+        <p>
+          Ofrecer servicios de mantenimiento y limpieza de tanques de
+          almacenamiento de agua de residencias familiares en la ciudad de
+          Valledupar, garantizando salud y bienestar para la población.
+        </p>
+      </div>
+      <div class="mission-vision-card">
+        <h2>Visión</h2>
+        <p>
+          Ser en el año 2030 una empresa líder en prestación de servicios de
+          limpieza de tanques de almacenamiento, creciendo rentablemente para
+          posicionarnos en todo el departamento del Cesar, ampliando el
+          portafolio de productos mediante alianzas con empresas reconocidas a
+          nivel nacional.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mission-vision-image">
+        <img
+          src="{{ url_for('static', filename='img/mision_vision.png') }}"
+          alt="Misión y Visión"
+          class="img-fluid align-middle"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include 'sitio/pie.html' %}

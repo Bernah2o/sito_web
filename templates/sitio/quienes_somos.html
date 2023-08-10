@@ -1,0 +1,34 @@
+{% include 'sitio/cabecera.html' %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/quienes_somos.css') }}"
+/>
+
+<div class="container my-5">
+  <div class="row align-items-center">
+    <div class="col-md-6">
+      <h2 class="mb-4">Quienes Somos</h2>
+      <p>
+        D'H2O ofrece servicios integrales para el cuidado y mantenimiento de
+        tanques elevados de agua potable. Nuestro compromiso es garantizar la
+        salud y bienestar de las personas al brindar soluciones confiables y
+        efectivas.
+      </p>
+      <p>
+        Nuestro equipo altamente capacitado se encarga del lavado, desinfección,
+        reparación e instalación de tanques, asegurando la pureza del agua y la
+        funcionalidad óptima de los sistemas.
+      </p>
+    </div>
+    <div class="col-md-6 order-md-last">
+      <img
+        src="{{ url_for('static', filename='img/nosotros.png') }}"
+        alt="Nosotros"
+        class="img-fluid rounded-circle shadow float-md-end"
+      />
+    </div>
+  </div>
+</div>
+      
+{% include 'sitio/pie.html' %}

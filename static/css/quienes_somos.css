@@ -1,0 +1,106 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    margin-top: 50px;
+  }
+  
+  /* Estilos para la sección Quienes Somos */
+  .row.align-items-center {
+    padding: 50px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+  }
+  
+  .col-md-6 h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #0a0a0a;
+    margin-bottom: 20px;
+  }
+  
+  .col-md-6 p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #333;
+  }
+  
+  .col-md-6:last-child {
+    text-align: center;
+  }
+  
+  .img-fluid {
+    max-width: 70%;
+    height: auto;
+    border-radius: 50%;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .img-fluid:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Estilos para el pie de página */
+  footer {
+    background-color: #f7f7f7;
+    padding: 50px 0;
+    text-align: center;
+  }
+  
+  footer p {
+    margin-bottom: 0;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #525b60;
+    border-color: #525b60;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+  
+  .btn-success:hover {
+    background-color: #1c7430;
+    border-color: #1c7430;
+  }
+  
+  .btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+  }
+  
+  .btn-info:hover {
+    background-color: #0f6a74;
+    border-color: #0f6a74;
+  }
+  
+  .btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+  }
+  
+  .btn-warning:hover {
+    background-color: #d39e00;
+    border-color: #d39e00;
+  }
+  

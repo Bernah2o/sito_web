@@ -1,0 +1,84 @@
+/* Estilo para el fondo del jumbotron */
+.jumbotron {
+    background-image: url('ruta-de-tu-imagen.jpg');
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+}
+
+/* Estilo para el encabezado del jumbotron */
+.jumbotron h1 {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+/* Estilo para el texto del jumbotron */
+.jumbotron p {
+    font-size: 1.5rem;
+}
+
+/* Estilo para los botones del jumbotron */
+.jumbotron .btn {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+}
+
+/* Estilo para los bloques de contenido */
+.bg-primary {
+    background-color: #007bff;
+}
+
+.bg-light {
+    background-color: #f8f9fa;
+}
+
+.rounded-3 {
+    border-radius: 0.3rem;
+}
+
+/* Estilo para los bloques de texto */
+.text-white {
+    color: #fff;
+}
+
+.text-primary {
+    color: #007bff;
+}
+
+/* Estilo para los botones */
+.btn-outline-light {
+    border-color: #fff;
+    color: #fff;
+}
+
+/* Estilo para los botones principales */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+/* Estilo para el padding interno */
+.p-5 {
+    padding: 3rem;
+}
+
+/* Estilo para el margen inferior */
+.mb-0 {
+    margin-bottom: 0;
+}
+
+/* Estilo para los botones de enlace */
+.btn-link {
+    color: #007bff;
+}
+
+/* Estilo para el tamaño del texto en los bloques de contenido */
+.display-4 {
+    font-size: 2.5rem;
+}
+
+.lead {
+    font-size: 1.25rem;
+}
+
+/* Otros estilos específicos que puedas necesitar */
