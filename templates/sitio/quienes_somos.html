@@ -9,26 +9,49 @@
   <div class="row align-items-center">
     <div class="col-md-6">
       <h2 class="mb-4">Quienes Somos</h2>
-      <p>
-        D'H2O ofrece servicios integrales para el cuidado y mantenimiento de
-        tanques elevados de agua potable. Nuestro compromiso es garantizar la
-        salud y bienestar de las personas al brindar soluciones confiables y
-        efectivas.
-      </p>
-      <p>
-        Nuestro equipo altamente capacitado se encarga del lavado, desinfección,
-        reparación e instalación de tanques, asegurando la pureza del agua y la
-        funcionalidad óptima de los sistemas.
-      </p>
+      <div class="quienes-somos-paragraphs">
+        <!-- Agregado: Contenedor de párrafos -->
+        <p>
+          D'H2O ofrece servicios integrales para el cuidado y mantenimiento de
+          tanques elevados de agua potable. Nuestro compromiso es garantizar la
+          salud y bienestar de las personas al brindar soluciones confiables y
+          efectivas.
+        </p>
+        <p>
+          Nuestro equipo altamente capacitado se encarga del lavado,
+          desinfección, reparación e instalación de tanques, asegurando la
+          pureza del agua y la funcionalidad óptima de los sistemas.
+        </p>
+      </div>
     </div>
-    <div class="col-md-6 order-md-last">
-      <img
-        src="{{ url_for('static', filename='img/nosotros.png') }}"
-        alt="Nosotros"
-        class="img-fluid rounded-circle shadow float-md-end"
-      />
+    <div class="col-md-6">
+      <!-- Historia -->
+      <h3 class="mt-4">Nuestra Historia</h3>
+      <p class="text-justify" style="text-align: justify">
+        <!-- Aplicar clase text-justify -->
+        En 2021, nació D'H2O en Valledupar, con la visión de llenar un vacío en
+        la comunidad. Nos especializamos en limpieza, desinfección, reparación e
+        instalación de tanques elevados de agua, un servicio inexistente en la
+        región. Con un equipo profesional y apasionado, nos esforzamos por
+        elevar los estándares de higiene y calidad de vida en Valledupar. Cada
+        tarea, desde la limpieza minuciosa hasta la instalación experta, refleja
+        nuestro compromiso con la excelencia. Conectados con nuestra comunidad,
+        buscamos marcar la diferencia y contribuir al bienestar de todos. D'H2O
+        es tu aliado confiable para asegurar agua potable segura y un entorno
+        saludable en Valledupar. Únete a nosotros en esta misión. Bienvenidos a
+        D'H2O.
+      </p>
+      <!-- Compromiso Ambiental -->
+      <h3 class="mt-4">Compromiso Ambiental</h3>
+      <p class="text-justify" style="text-align: justify">
+        <!-- Aplicar clase text-justify -->
+        En D'H2O, estamos dedicados a minimizar nuestro impacto en el medio
+        ambiente. Nos esforzamos por adoptar prácticas sostenibles en cada etapa
+        de nuestro trabajo y fomentar la conciencia ambiental en nuestra
+        comunidad.
+      </p>
     </div>
   </div>
 </div>
-      
+
 {% include 'sitio/pie.html' %}

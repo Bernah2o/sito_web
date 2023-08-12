@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <title>Title</title>
-    <!-- Required meta tags -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/cabecera.css') }}"
+    />
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -27,7 +30,8 @@
             width="100"
           />
         </a>
-        <button
+        <script src="{{ url_for('static', filename='js/descuento.js') }}"></script>
+          <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
@@ -57,17 +61,29 @@
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="/DH2O/servicios">Servicios</a>
-                <a class="dropdown-item" href="/DH2O/quienes_somos">Quiénes Somos</a>
-                <a class="dropdown-item" href="/DH2O/mision_vision">Misión y visión</a>
+                <a class="dropdown-item" href="/DH2O/quienes_somos"
+                  >Quiénes Somos</a
+                >
+                <a class="dropdown-item" href="/DH2O/mision_vision"
+                  >Misión y visión</a
+                >
+                <a class="dropdown-item" href="/DH2O/principios_coorporativos"
+                  >Principios coorporativos</a
+                >
+                <a
+                  class="dropdown-item"
+                  href="/DH2O/politica_de_tratamiento_de_datos"
+                  >Politica de tratamientos de datos</a
+                >
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="/DH2O">Ver todo</a>
               </div>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/servicios">Servicios</a>
+              <a class="nav-link" href="/productos">PRODUCTOS</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/nosotros">Nosotros</a>
+              <span id="descuento-message" class="navbar-text text-success"></span>
             </li>
           </ul>
         </div>
@@ -83,4 +99,12 @@
       </div>
     </div>
   </body>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Calcula el descuento y muestra el mensaje
+      const descuento = calcularDescuento(); // Define tu lógica para calcular el descuento
+      const mensaje = `¡Obtén un ${descuento}% de descuento en todos nuestros servicios!`;
+      document.getElementById('descuento-message').textContent = mensaje;
+    });
+  </script>
 </html>

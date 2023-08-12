@@ -1,3 +1,11 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  margin-top: 50px;
+}
 /* Estilo para los bloques de misión y visión */
 .mission-vision-card {
   background-color: #f8f9fa;

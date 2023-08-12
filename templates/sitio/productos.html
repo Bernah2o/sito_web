@@ -1,0 +1,35 @@
+{% include 'sitio/cabecera.html' %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/productos.css') }}"
+/>
+<div class="container mt-5">
+  <h2>Nuestros Productos</h2>
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="producto">
+        <img src="{{ url_for('static', filename='img/productos/producto1.jpg') }}" alt="Producto 1" class="img-fluid producto-img">
+        <h3>VALVULA FLOTADORA BRONCE 1PG CON BOLA PLASTICA</h3>
+        <p class="producto-precio">$25.00</p>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="producto">
+        <img src="{{ url_for('static', filename='img/producto2.jpg') }}" alt="Producto 2" class="img-fluid producto-img">
+        <h3>VALVULA FLOTADORA BRONCE MEDIA PG BOLA PLASTICA</h3>
+        <p class="producto-precio">$18.00</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-4">
+    <div class="producto">
+      <img src="{{ url_for('static', filename='img/producto3.jpg') }}" alt="Producto 3" class="img-fluid producto-img">
+      <h3>CHEQUE</h3>
+      <p class="producto-precio">$18.00</p>
+    </div>
+  </div>
+    <!-- Agrega más productos aquí -->
+  </div>
+</div>
+{% include 'sitio/pie.html' %}

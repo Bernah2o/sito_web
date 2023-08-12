@@ -1,61 +1,69 @@
-/* Estilo para el pie de página */
-.bg-light.py-5 {
-  background-color: #f8f9fa;
-  padding: 60px 0;
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
 }
 
-.text-center {
+.container {
+  margin-top: 50px;
+}
+
+/* Estilos para el pie de página */
+footer {
+  background-color: #f7f7f7;
+  padding: 50px 0;
   text-align: center;
 }
 
-/* Estilo para los botones de contacto */
-.btn-contact {
-  font-size: 1rem;
-  padding: 10px 20px;
-  margin: 5px;
-  border: none;
-  border-radius: 5px;
-  transition: background-color 0.3s, color 0.3s;
+footer p {
+  margin-bottom: 0;
 }
 
-.btn-contact:hover {
+.btn-primary {
   background-color: #007bff;
-  color: white;
+  border-color: #007bff;
 }
 
-/* Estilo para los íconos de redes sociales */
-.icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 5px;
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
 }
 
-/* Estilo para el ícono de WhatsApp */
-.btn-whatsapp {
-  background-color: #25d366;
-  color: white;
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
 }
 
-.btn-whatsapp:hover {
-  background-color: #128c7e;
+.btn-secondary:hover {
+  background-color: #525b60;
+  border-color: #525b60;
 }
 
-/* Estilo para el ícono de Facebook */
-.btn-facebook {
-  background-color: #1877f2;
-  color: white;
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
 }
 
-.btn-facebook:hover {
-  background-color: #1156a6;
+.btn-success:hover {
+  background-color: #1c7430;
+  border-color: #1c7430;
 }
 
-/* Estilo para el ícono de Instagram */
-.btn-instagram {
-  background-color: #c32aa3;
-  color: white;
+.btn-info {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
 }
 
-.btn-instagram:hover {
-  background-color: #a12b8b;
+.btn-info:hover {
+  background-color: #0f6a74;
+  border-color: #0f6a74;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
+.btn-warning:hover {
+  background-color: #d39e00;
+  border-color: #d39e00;
 }

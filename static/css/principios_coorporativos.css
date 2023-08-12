@@ -1,0 +1,58 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  margin-top: 50px;
+}
+
+/* Estilos para los principios corporativos */
+.row {
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.principio {
+  text-align: center;
+  padding: 20px;
+  background-color: #f7f7f7;
+  border-radius: 10px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+}
+
+.principio h2 {
+  font-size: 1.8rem;
+  color: #0a0a0a;
+  margin-top: 20px;
+  margin-bottom: 20px; /* Agregado para separar del siguiente elemento */
+}
+
+.principio p {
+  text-align: justify;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 20px; /* Agregado para separar del siguiente elemento */
+}
+
+.principio img {
+  max-width: 100px;
+  height: auto;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto 10px;
+  transition: transform 0.3s ease-in-out, border-color 0.3s ease-in-out,
+    background-color 0.3s ease-in-out;
+  border: 2px solid #ccc; /* Agregado: borde inicial */
+}
+
+.principio img:hover {
+  transform: scale(1.1);
+  border-color: #ff9900; /* Agregado: color de borde en hover */
+  background-color: #f0f0f0; /* Agregado: color de fondo en hover */
+}
+
+
+
+
