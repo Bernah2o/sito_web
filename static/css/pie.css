@@ -7,6 +7,31 @@ body {
   margin-top: 50px;
 }
 
+/* Estilos para los botones del pie de página */
+.btn {
+  background-color: transparent;
+  border-color: transparent;
+}
+/* Estilo para los íconos en el pie de página */
+.icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+.icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.icon:hover {
+  transform: scale(1.2);
+}
 /* Estilos para el pie de página */
 footer {
   background-color: #f7f7f7;
@@ -18,52 +43,3 @@ footer p {
   margin-bottom: 0;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  border-color: #6c757d;
-}
-
-.btn-secondary:hover {
-  background-color: #525b60;
-  border-color: #525b60;
-}
-
-.btn-success {
-  background-color: #28a745;
-  border-color: #28a745;
-}
-
-.btn-success:hover {
-  background-color: #1c7430;
-  border-color: #1c7430;
-}
-
-.btn-info {
-  background-color: #17a2b8;
-  border-color: #17a2b8;
-}
-
-.btn-info:hover {
-  background-color: #0f6a74;
-  border-color: #0f6a74;
-}
-
-.btn-warning {
-  background-color: #ffc107;
-  border-color: #ffc107;
-}
-
-.btn-warning:hover {
-  background-color: #d39e00;
-  border-color: #d39e00;
-}
