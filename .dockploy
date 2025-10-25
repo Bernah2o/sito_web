@@ -1,0 +1,9 @@
+{
+  "dockerfile": "Dockerfile",
+  "port": 5000,
+  "healthcheck": "/health",
+  "buildArgs": {},
+  "buildOptions": {
+    "noCache": true
+  }
+}
