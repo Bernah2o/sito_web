@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     default-libmysqlclient-dev \
     pkg-config \
     curl \
+    dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 # Establecer directorio de trabajo
@@ -26,7 +27,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar script de entrada y darle permisos
 COPY docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh && \
+    dos2unix docker-entrypoint.sh || true
 
 # Copiar código de la aplicación
 COPY . .
