@@ -107,17 +107,22 @@ def main():
     # Crear aplicación
     app = create_app(env)
     
-    print("🚀 Iniciando DH2OCOL...")
-    print("=" * 50)
-    print(f"🌐 Entorno: {env}")
-    print(f"📊 Base de datos: MySQL")
-    print(f"🔧 Debug: {app.config['DEBUG']}")
-    print("=" * 50)
-    print("📋 URLs disponibles:")
-    print("   • Sitio web: http://localhost:5000")
-    print("   • Panel admin: http://localhost:5000/admin")
-    print("   • Credenciales: admin / admin123")
-    print("=" * 50)
+    # Solo mostrar información detallada en desarrollo
+    if env == 'development':
+        print("🚀 Iniciando DH2OCOL...")
+        print("=" * 50)
+        print(f"🌐 Entorno: {env}")
+        print(f"📊 Base de datos: MySQL")
+        print(f"🔧 Debug: {app.config['DEBUG']}")
+        print("=" * 50)
+        print("📋 URLs disponibles:")
+        print("   • Sitio web: http://localhost:5000")
+        print("   • Panel admin: http://localhost:5000/admin")
+        print("   • Credenciales: admin / admin123")
+        print("=" * 50)
+    else:
+        # En producción, solo un mensaje simple
+        print(f"🚀 DH2OCOL iniciado en modo {env}")
     
     # Ejecutar aplicación
     app.run(
