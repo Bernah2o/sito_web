@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel de Administración - DH2OCOL{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">DH2OCOL</h4>
+                        <small class="text-white-50">Panel Admin</small>
+                    </div>
+                    
+                    {% if session.nombre %}
+                    <div class="text-center mb-3">
+                        <small class="text-white-50">Bienvenido,</small><br>
+                        <strong class="text-white">{{ session.nombre }}</strong>
+                    </div>
+                    {% endif %}
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.servicios') }}">
+                                <i class="fas fa-tools me-2"></i>
+                                Servicios
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.productos') }}">
+                                <i class="fas fa-box me-2"></i>
+                                Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.contactos') }}">
+                                <i class="fas fa-envelope me-2"></i>
+                                Contactos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.testimonios') }}">
+                                <i class="fas fa-star me-2"></i>
+                                Testimonios
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.medios') }}">
+                                <i class="fas fa-photo-video me-2"></i>
+                                Medios
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.quiz') }}">
+                                <i class="fas fa-question-circle me-2"></i>
+                                Quiz EducAgua
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.chatbot') }}">
+                                <i class="fas fa-robot me-2"></i>
+                                TanquiBot
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.configuracion') }}">
+                                <i class="fas fa-cog me-2"></i>
+                                Configuración
+                            </a>
+                        </li>
+                        <hr class="text-white-50">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}" target="_blank">
+                                <i class="fas fa-external-link-alt me-2"></i>
+                                Ver Sitio Web
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.logout') }}">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                Cerrar Sesión
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="pt-3 pb-2 mb-3">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación Reutilizable -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Confirmar Acción
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmModalMessage">¿Estás seguro de que quieres realizar esta acción?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmModalAction">
+                        <i class="fas fa-check me-2"></i>Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sistema de confirmación profesional
+        class ConfirmDialog {
+            constructor() {
+                this.modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                this.messageElement = document.getElementById('confirmModalMessage');
+                this.actionButton = document.getElementById('confirmModalAction');
+                this.titleElement = document.getElementById('confirmModalLabel');
+            }
+
+            show(options = {}) {
+                return new Promise((resolve) => {
+                    const {
+                        title = 'Confirmar Acción',
+                        message = '¿Estás seguro de que quieres realizar esta acción?',
+                        confirmText = 'Confirmar',
+                        confirmClass = 'btn-danger',
+                        icon = 'fas fa-exclamation-triangle text-warning'
+                    } = options;
+
+                    // Configurar contenido del modal
+                    this.titleElement.innerHTML = `<i class="${icon} me-2"></i>${title}`;
+                    this.messageElement.textContent = message;
+                    this.actionButton.innerHTML = `<i class="fas fa-check me-2"></i>${confirmText}`;
+                    this.actionButton.className = `btn ${confirmClass}`;
+
+                    // Configurar eventos
+                    const handleConfirm = () => {
+                        this.modal.hide();
+                        resolve(true);
+                        cleanup();
+                    };
+
+                    const handleCancel = () => {
+                        this.modal.hide();
+                        resolve(false);
+                        cleanup();
+                    };
+
+                    const cleanup = () => {
+                        this.actionButton.removeEventListener('click', handleConfirm);
+                        document.getElementById('confirmModal').removeEventListener('hidden.bs.modal', handleCancel);
+                    };
+
+                    this.actionButton.addEventListener('click', handleConfirm);
+                    document.getElementById('confirmModal').addEventListener('hidden.bs.modal', handleCancel, { once: true });
+
+                    this.modal.show();
+                });
+            }
+        }
+
+        // Instancia global del diálogo de confirmación
+        window.confirmDialog = new ConfirmDialog();
+
+        // Función helper para reemplazar confirm()
+        window.showConfirm = function(message, options = {}) {
+            return window.confirmDialog.show({
+                message: message,
+                ...options
+            });
+        };
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

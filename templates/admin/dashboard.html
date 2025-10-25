@@ -1,0 +1,158 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard - Panel de Administración DH2OCOL{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Exportar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Servicios Activos</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.servicios }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-tools fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Productos</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.productos }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-box fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Contactos Nuevos</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.contactos_nuevos }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-envelope fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Testimonios</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.testimonios }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-star fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Últimos contactos -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Últimos Contactos</h5>
+            </div>
+            <div class="card-body">
+                {% if ultimos_contactos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Servicio de Interés</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contacto in ultimos_contactos %}
+                            <tr>
+                                <td>{{ contacto[0] }}</td>
+                                <td>{{ contacto[1] }}</td>
+                                <td>{{ contacto[2] or 'No especificado' }}</td>
+                                <td>{{ contacto[3].strftime('%d/%m/%Y %H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center">
+                    <a href="{{ url_for('admin.contactos') }}" class="btn btn-primary btn-sm">Ver Todos los Contactos</a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No hay contactos recientes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin.nuevo_servicio') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus me-2"></i>Nuevo Servicio
+                    </a>
+                    <a href="{{ url_for('admin.productos') }}" class="btn btn-outline-success">
+                        <i class="fas fa-box me-2"></i>Gestionar Productos
+                    </a>
+                    <a href="{{ url_for('admin.contactos') }}" class="btn btn-outline-info">
+                        <i class="fas fa-envelope me-2"></i>Ver Contactos
+                    </a>
+                    <a href="{{ url_for('admin.configuracion') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-cog me-2"></i>Configuración
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Sistema</h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-2">Versión: 2.0.0</p>
+                <p class="small text-muted mb-2">Última actualización: {{ fecha_actual.strftime('%d/%m/%Y') }}</p>
+                <p class="small text-muted mb-0">Estado: <span class="text-success">Operativo</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

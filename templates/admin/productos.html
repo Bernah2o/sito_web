@@ -1,0 +1,229 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Gestión de Productos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-box me-2"></i>Gestión de Productos</h2>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-warning" onclick="handleReprocessImages()" disabled title="Función temporalmente deshabilitada">
+            <i class="fas fa-sync-alt me-2"></i>Reprocesar Imágenes
+        </button>
+        <a href="{{ url_for('admin.nuevo_producto') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nuevo Producto
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if productos %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.id if producto.id else producto[0] }}</td>
+                        <td>{{ producto.nombre if producto.nombre else producto[1] }}</td>
+                        <td>
+                            {% set categoria = producto.categoria if producto.categoria else producto[4] %}
+                            <span class="badge bg-info">{{ categoria }}</span>
+                        </td>
+                        <td>
+                            {% set descripcion = producto.descripcion if producto.descripcion else producto[2] %}
+                            {{ descripcion[:40] + '...' if descripcion|length > 40 else descripcion }}
+                        </td>
+                        <td>${{ "{:,.0f}".format(producto.precio if producto.precio else producto[3]) }}</td>
+                        <td>
+                            {% set activo = producto.activo if producto.activo is defined else producto[5] %}
+                            {% if activo %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ producto.fecha_creacion if producto.fecha_creacion else producto[6] }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" title="Editar" 
+                                        data-bs-toggle="modal" data-bs-target="#editModal"
+                                        onclick="editProduct({{ producto.id if producto.id else producto[0] }}, '{{ producto.nombre if producto.nombre else producto[1] }}', '{{ producto.categoria if producto.categoria else producto[4] }}', '{{ producto.descripcion if producto.descripcion else producto[2] }}', {{ producto.precio if producto.precio else producto[3] }}, '{{ producto.imagen if producto.imagen else (producto[7] if producto|length > 7 else '') }}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar"
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                        onclick="setDeleteProduct({{ producto.id if producto.id else producto[0] }}, '{{ producto.nombre if producto.nombre else producto[1] }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-box fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No hay productos registrados</h5>
+            <p class="text-muted">Comienza agregando tu primer producto</p>
+            <a href="{{ url_for('admin.nuevo_producto') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Crear Primer Producto
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Edición -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">
+                    <i class="fas fa-edit me-2"></i>Editar Producto
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editForm" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editNombre" class="form-label">Nombre del Producto *</label>
+                            <input type="text" class="form-control" id="editNombre" name="nombre" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editCategoria" class="form-label">Categoría *</label>
+                            <select class="form-select" id="editCategoria" name="categoria" required>
+                                <option value="">Seleccionar categoría</option>
+                                <option value="tanques">Tanques</option>
+                                <option value="accesorios">Accesorios</option>
+                                <option value="servicios">Servicios</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescripcion" class="form-label">Descripción *</label>
+                        <textarea class="form-control" id="editDescripcion" name="descripcion" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPrecio" class="form-label">Precio *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="editPrecio" name="precio" min="0" step="1000" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editImagen" class="form-label">Imagen del Producto</label>
+                        <input type="file" class="form-control" id="editImagen" name="imagen" accept="image/*">
+                        <div class="form-text">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</div>
+                        <div id="currentImagePreview" class="mt-2" style="display: none;">
+                            <small class="text-muted">Imagen actual:</small>
+                            <div class="mt-1">
+                                <img id="currentImage" src="" alt="Imagen actual" style="max-width: 150px; max-height: 150px; object-fit: cover;" class="border rounded">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">¿Estás seguro de que deseas eliminar el siguiente producto?</p>
+                <div class="alert alert-warning">
+                    <strong id="deleteProductName"></strong>
+                </div>
+                <p class="text-muted small">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Eliminar Producto
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editProduct(id, nombre, categoria, descripcion, precio, imagen) {
+    document.getElementById('editNombre').value = nombre;
+    document.getElementById('editCategoria').value = categoria;
+    document.getElementById('editDescripcion').value = descripcion;
+    document.getElementById('editPrecio').value = precio;
+    document.getElementById('editForm').action = '/admin/productos/editar/' + id;
+    
+    // Manejar la imagen actual
+    const currentImagePreview = document.getElementById('currentImagePreview');
+    const currentImage = document.getElementById('currentImage');
+    
+    if (imagen && imagen.trim() !== '') {
+        currentImage.src = '/static/img/' + categoria.toLowerCase() + '/' + imagen;
+        currentImagePreview.style.display = 'block';
+    } else {
+        currentImagePreview.style.display = 'none';
+    }
+    
+    // Limpiar el input de archivo
+    document.getElementById('editImagen').value = '';
+}
+
+function setDeleteProduct(id, nombre) {
+    document.getElementById('deleteProductName').textContent = nombre;
+    document.getElementById('deleteForm').action = '/admin/productos/eliminar/' + id;
+}
+
+async function handleReprocessImages() {
+    const confirmed = await showConfirm(
+        '¿Estás seguro de que quieres reprocesar todas las imágenes? Esto puede tomar unos minutos.',
+        {
+            title: 'Reprocesar Imágenes',
+            confirmText: 'Reprocesar',
+            confirmClass: 'btn-warning',
+            icon: 'fas fa-sync-alt text-warning'
+        }
+    );
+    
+    if (confirmed) {
+        window.location.href = "{{ url_for('admin.reprocess_images') }}";
+    }
+}
+</script>
+
+{% endblock %}

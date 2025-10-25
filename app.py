@@ -1,42 +1,130 @@
-from flask import Flask, send_file
-from flask import render_template
+#!/usr/bin/env python3
+"""
+Aplicación principal de DH2OCOL
+Sistema web profesional para gestión de servicios de tanques de agua
+"""
 
-app = Flask(__name__)
+import os
+import pymysql
+from datetime import datetime
+from flask import Flask, g
+from flask_mail import Mail
+from dotenv import load_dotenv
+from config import config
 
-@app.route('/')
-def index():
-    return render_template('sitio/index.html')
+# Cargar variables de entorno
+load_dotenv()
 
-@app.route('/DH2O/servicios/')
-def servicios():
-    return render_template('sitio/servicios.html')
+# Inicializar Flask-Mail
+mail = Mail()
 
-@app.route('/DH2O/quienes_somos/')
-def quienes_somos():
-    return render_template('sitio/quienes_somos.html')
+def create_app(config_name='development'):
+    """Factory para crear la aplicación Flask"""
+    # Asegurar que las variables de entorno estén cargadas
+    load_dotenv()
+    
+    app = Flask(__name__)
+    
+    # Cargar configuración
+    app.config.from_object(config[config_name])
+    
+    # Inicializar Flask-Mail
+    mail.init_app(app)
+    
+    # Configurar base de datos
+    init_db_connection(app)
+    
+    # Registrar Blueprints
+    from blueprints.main import main_bp
+    from blueprints.admin import admin_bp
+    
+    app.register_blueprint(main_bp)
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    
+    # Health check endpoint para Docker
+    @app.route('/health')
+    def health_check():
+        """Endpoint de verificación de salud para Docker"""
+        try:
+            # Verificar conexión a base de datos
+            db = get_db()
+            cursor = db.cursor()
+            cursor.execute("SELECT 1")
+            cursor.close()
+            
+            return {
+                'status': 'healthy',
+                'timestamp': datetime.now().isoformat(),
+                'database': 'connected',
+                'version': '1.0.0'
+            }, 200
+        except Exception as e:
+            return {
+                'status': 'unhealthy',
+                'timestamp': datetime.now().isoformat(),
+                'error': str(e)
+            }, 503
+    
+    # Crear directorio de uploads si no existe
+    upload_dir = os.path.join(app.root_path, app.config['UPLOAD_FOLDER'])
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    return app
 
-@app.route('/DH2O/mision_vision/')
-def mision_vision():
-    return render_template('sitio/mision_vision.html')
+def init_db_connection(app):
+    """Inicializar conexión a base de datos"""
+    
+    def get_db():
+        """Obtener conexión a la base de datos"""
+        if 'db' not in g:
+            g.db = pymysql.connect(
+                host=app.config['DB_HOST'],
+                user=app.config['DB_USER'],
+                password=app.config['DB_PASSWORD'],
+                database=app.config['DB_NAME'],
+                charset='utf8mb4',
+                cursorclass=pymysql.cursors.DictCursor
+            )
+        return g.db
+    
+    def close_db(error):
+        """Cerrar conexión a la base de datos"""
+        db = g.pop('db', None)
+        if db is not None:
+            db.close()
+    
+    # Registrar funciones en el contexto de la aplicación
+    app.teardown_appcontext(close_db)
+    
+    # Hacer get_db disponible globalmente
+    app.get_db = get_db
 
-@app.route('/DH2O/principios_coorporativos/')
-def principios_coorporativos():
-    return render_template('sitio/principios_coorporativos.html')
-
-@app.route('/DH2O/politica_de_tratamiento_de_datos/')
-def politica_de_tratamiento_de_datos():
-    pdf_filename = 'Política de tratamiento de datos.pdf'
-    return send_file(pdf_filename, as_attachment=True)
-
-@app.route('/contacto')
-def contacto():
-    return render_template('sitio/contacto.html')
-
-@app.route('/productos')
-def productos():
-    return render_template('sitio/productos.html')
-
-
+def main():
+    """Función principal para ejecutar la aplicación"""
+    # Determinar entorno
+    env = os.environ.get('FLASK_ENV', 'development')
+    
+    # Crear aplicación
+    app = create_app(env)
+    
+    print("🚀 Iniciando DH2OCOL...")
+    print("=" * 50)
+    print(f"🌐 Entorno: {env}")
+    print(f"📊 Base de datos: MySQL")
+    print(f"🔧 Debug: {app.config['DEBUG']}")
+    print("=" * 50)
+    print("📋 URLs disponibles:")
+    print("   • Sitio web: http://localhost:5000")
+    print("   • Panel admin: http://localhost:5000/admin")
+    print("   • Credenciales: admin / admin123")
+    print("=" * 50)
+    
+    # Ejecutar aplicación
+    app.run(
+        debug=app.config['DEBUG'],
+        host='0.0.0.0',
+        port=5000
+    )
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    main()

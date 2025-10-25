@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog: Mantenimiento de Tanques de Agua | DH2OCOL</title>
+    <meta name="description" content="Guía completa sobre mantenimiento de tanques de agua en Valledupar. Consejos profesionales de DH2OCOL para mantener tu agua limpia y segura.">
+    <meta name="keywords" content="mantenimiento tanques agua, Valledupar, DH2OCOL, limpieza tanques, agua potable">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+    
+    <!-- reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfYourSiteKey"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary-gradient fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="DH2OCOL" height="40" class="me-2">
+                DH2OCOL
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}#servicios">Servicios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}#productos">Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.contacto') }}">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-accent text-white px-3 ms-2" href="{{ url_for('main.redirect_app') }}">
+                            <i class="fas fa-mobile-alt me-1"></i> App DH2OCOL
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section bg-primary-gradient text-white">
+        <div class="container">
+            <div class="row align-items-center min-vh-50">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-4 fw-bold mb-4">Mantenimiento de Tanques de Agua en Valledupar</h1>
+                    <p class="lead mb-4">Guía completa para mantener tu tanque de agua en óptimas condiciones y garantizar agua limpia y segura para tu familia.</p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <span class="badge bg-accent fs-6 px-3 py-2">
+                            <i class="fas fa-calendar me-1"></i> Actualizado 2025
+                        </span>
+                        <span class="badge bg-secondary fs-6 px-3 py-2">
+                            <i class="fas fa-clock me-1"></i> 8 min lectura
+                        </span>
+                        <span class="badge bg-success fs-6 px-3 py-2">
+                            <i class="fas fa-user-check me-1"></i> Expertos DH2OCOL
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Content -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <!-- Introducción -->
+                    <div class="card shadow-sm mb-5">
+                        <div class="card-body p-5">
+                            <h2 class="text-primary mb-4">¿Por qué es importante el mantenimiento de tanques?</h2>
+                            <p class="lead">En Valledupar, donde las altas temperaturas y la calidad del agua pueden afectar nuestros sistemas de almacenamiento, el mantenimiento regular de los tanques de agua es fundamental para garantizar la salud de tu familia.</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="fas fa-shield-alt text-primary me-3 mt-1"></i>
+                                        <div>
+                                            <h5>Protección de la salud</h5>
+                                            <p class="mb-0">Evita la proliferación de bacterias y microorganismos dañinos.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="fas fa-tint text-primary me-3 mt-1"></i>
+                                        <div>
+                                            <h5>Calidad del agua</h5>
+                                            <p class="mb-0">Mantiene el sabor, olor y color del agua en condiciones óptimas.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Frecuencia de mantenimiento -->
+                    <div class="card shadow-sm mb-5">
+                        <div class="card-body p-5">
+                            <h2 class="text-primary mb-4">Frecuencia de mantenimiento recomendada</h2>
+                            
+                            <div class="row">
+                                <div class="col-md-4 text-center mb-4">
+                                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-calendar-week text-primary fs-2"></i>
+                                    </div>
+                                    <h4>Cada 6 meses</h4>
+                                    <p>Limpieza profunda y desinfección completa del tanque.</p>
+                                </div>
+                                <div class="col-md-4 text-center mb-4">
+                                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-search text-accent fs-2"></i>
+                                    </div>
+                                    <h4>Mensual</h4>
+                                    <p>Inspección visual del estado del tanque y sus componentes.</p>
+                                </div>
+                                <div class="col-md-4 text-center mb-4">
+                                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-tools text-secondary fs-2"></i>
+                                    </div>
+                                    <h4>Anual</h4>
+                                    <p>Mantenimiento preventivo de válvulas y accesorios.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pasos del mantenimiento -->
+                    <div class="card shadow-sm mb-5">
+                        <div class="card-body p-5">
+                            <h2 class="text-primary mb-4">Pasos para el mantenimiento profesional</h2>
+                            
+                            <div class="timeline">
+                                <div class="timeline-item mb-4">
+                                    <div class="timeline-marker bg-primary text-white">1</div>
+                                    <div class="timeline-content">
+                                        <h5>Vaciado del tanque</h5>
+                                        <p>Se cierra la válvula de entrada y se drena completamente el agua del tanque.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item mb-4">
+                                    <div class="timeline-marker bg-primary text-white">2</div>
+                                    <div class="timeline-content">
+                                        <h5>Limpieza física</h5>
+                                        <p>Remoción de sedimentos, algas y cualquier material acumulado en el fondo y paredes.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item mb-4">
+                                    <div class="timeline-marker bg-primary text-white">3</div>
+                                    <div class="timeline-content">
+                                        <h5>Desinfección</h5>
+                                        <p>Aplicación de productos desinfectantes aprobados para tanques de agua potable.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item mb-4">
+                                    <div class="timeline-marker bg-primary text-white">4</div>
+                                    <div class="timeline-content">
+                                        <h5>Enjuague y llenado</h5>
+                                        <p>Enjuague completo y llenado con agua limpia para su uso normal.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Señales de alerta -->
+                    <div class="card shadow-sm mb-5 border-primary">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h3 class="mb-0 text-white"><i class="fas fa-exclamation-triangle me-2"></i>Señales de que necesitas mantenimiento urgente</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2"><i class="fas fa-times-circle text-danger me-2"></i>Agua con mal olor</li>
+                                        <li class="mb-2"><i class="fas fa-times-circle text-danger me-2"></i>Sabor extraño en el agua</li>
+                                        <li class="mb-2"><i class="fas fa-times-circle text-danger me-2"></i>Color turbio o amarillento</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-2"><i class="fas fa-times-circle text-danger me-2"></i>Presencia de algas o limo</li>
+                                        <li class="mb-2"><i class="fas fa-times-circle text-danger me-2"></i>Sedimentos en el fondo</li>
+                                        <li class="mb-2"><i class="fas fa-times-circle text-danger me-2"></i>Fugas en el tanque</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CTA -->
+                    <div class="card bg-primary-gradient text-white text-center">
+                        <div class="card-body p-5">
+                            <h3 class="mb-3">¿Necesitas mantenimiento profesional?</h3>
+                            <p class="lead mb-4">En DH2OCOL somos expertos en mantenimiento de tanques de agua en Valledupar. Contamos con más de 10 años de experiencia y personal certificado.</p>
+                            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                                <a href="{{ url_for('main.contacto') }}" class="btn btn-accent btn-lg">
+                                    <i class="fas fa-phone me-2"></i>Solicitar Servicio
+                                </a>
+                                <a href="https://api.whatsapp.com/message/F6MZTY5TX4F4C1?autoload=1&app_absent=0" class="btn btn-success btn-lg" target="_blank">
+                                    <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white mb-3">DH2OCOL</h5>
+                    <p class="text-white">Especialistas en tratamiento y mantenimiento de agua en Valledupar y toda la región Caribe.</p>
+                    <div class="d-flex gap-3">
+                        <a href="{{ url_for('main.redirect_facebook') }}" class="text-white text-decoration-none"><i class="fab fa-facebook fs-4"></i></a>
+                        <a href="{{ url_for('main.redirect_instagram') }}" class="text-white text-decoration-none"><i class="fab fa-instagram fs-4"></i></a>
+                        <a href="{{ url_for('main.redirect_youtube') }}" class="text-white text-decoration-none"><i class="fab fa-youtube fs-4"></i></a>
+                        <a href="{{ url_for('main.redirect_tiktok') }}" class="text-white text-decoration-none"><i class="fab fa-tiktok fs-4"></i></a>
+                        <a href="{{ url_for('main.redirect_whatsapp') }}" class="text-white text-decoration-none"><i class="fab fa-whatsapp fs-4"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white mb-3">Enlaces útiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none"><i class="fas fa-home me-2"></i>Inicio</a></li>
+                        <li><a href="{{ url_for('main.limpieza_tanques_elevados') }}" class="text-white text-decoration-none"><i class="fas fa-tint me-2"></i>Limpieza de Tanques</a></li>
+                        <li><a href="{{ url_for('main.accesorios_tanques') }}" class="text-white text-decoration-none"><i class="fas fa-tools me-2"></i>Accesorios</a></li>
+                        <li><a href="{{ url_for('main.educagua') }}" class="text-white text-decoration-none"><i class="fas fa-graduation-cap me-2"></i>EducAgua</a></li>
+                        <li><a href="{{ url_for('main.politica_tratamiento_datos') }}" class="text-white text-decoration-none" target="_blank"><i class="fas fa-shield-alt me-2"></i>Política de Tratamiento de Datos</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white mb-3">Contacto</h5>
+                    <p class="text-white"><i class="fas fa-map-marker-alt me-2"></i>{{ configuracion.direccion or 'Valledupar, Cesar' }}</p>
+                    <p class="text-white"><i class="fas fa-phone me-2"></i>{{ configuracion.telefono or '+57 315 748 4662' }}</p>
+                    <p class="text-white"><i class="fas fa-envelope me-2"></i>{{ configuracion.email or 'contacto@dh2ocol.com' }}</p>
+                </div>
+            </div>
+            <hr class="my-4 text-white">
+            <div class="text-center">
+                <p class="text-white">&copy; 2025 DH2OCOL. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary-color);
+        }
+        
+        .timeline-item {
+            position: relative;
+        }
+        
+        .timeline-marker {
+            position: absolute;
+            left: -3rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-left: 1rem;
+        }
+        
+        /* Fix para iconos de redes sociales */
+        .fab {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: inline-block !important;
+        }
+        
+        footer .d-flex a {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transition: opacity 0.3s ease;
+        }
+        
+        footer .d-flex a:hover {
+            opacity: 0.8 !important;
+        }
+    </style>
+    
+    <!-- TanquiBot Chatbot -->
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+</html>

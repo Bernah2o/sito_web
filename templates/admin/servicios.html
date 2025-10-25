@@ -1,0 +1,212 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Gestión de Servicios{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tools me-2"></i>Gestión de Servicios</h2>
+    <a href="{{ url_for('admin.nuevo_servicio') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Nuevo Servicio
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if servicios %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio Base</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for servicio in servicios %}
+                    <tr>
+                        <td>{{ servicio.id if servicio.id else servicio[0] }}</td>
+                        <td>{{ servicio.nombre if servicio.nombre else servicio[1] }}</td>
+                        <td>
+                            {% set descripcion = servicio.descripcion if servicio.descripcion else servicio[2] %}
+                            {{ descripcion[:50] + '...' if descripcion|length > 50 else descripcion }}
+                        </td>
+                        <td>${{ "{:,.0f}".format(servicio.precio_base if servicio.precio_base else servicio[3]) }}</td>
+                        <td>
+                            {% set activo = servicio.activo if servicio.activo is defined else servicio[4] %}
+                            {% if activo %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ servicio.fecha_creacion if servicio.fecha_creacion else servicio[5] }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                        onclick="editarServicio({{ servicio.id if servicio.id else servicio[0] }}, '{{ servicio.nombre if servicio.nombre else servicio[1] }}', '{{ servicio.descripcion if servicio.descripcion else servicio[2] }}', {{ servicio.precio_base if servicio.precio_base else servicio[3] }}, {{ 'true' if (servicio.activo if servicio.activo is defined else servicio[4]) else 'false' }})" 
+                                        title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-warning" 
+                                        onclick="toggleEstado({{ servicio.id if servicio.id else servicio[0] }})" 
+                                        title="Cambiar Estado">
+                                    <i class="fas fa-toggle-{{ 'on' if (servicio.activo if servicio.activo is defined else servicio[4]) else 'off' }}"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        onclick="eliminarServicio({{ servicio.id if servicio.id else servicio[0] }}, '{{ servicio.nombre if servicio.nombre else servicio[1] }}')" 
+                                        title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No hay servicios registrados</h5>
+            <p class="text-muted">Comienza agregando tu primer servicio</p>
+            <a href="{{ url_for('admin.nuevo_servicio') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Crear Primer Servicio
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Edición -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarModalLabel">Editar Servicio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editarForm" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editNombre" class="form-label">Nombre del Servicio</label>
+                        <input type="text" class="form-control" id="editNombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="editDescripcion" name="descripcion" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPrecio" class="form-label">Precio Base</label>
+                        <input type="number" class="form-control" id="editPrecio" name="precio_base" step="0.01" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editActivo" name="activo">
+                            <label class="form-check-label" for="editActivo">
+                                Servicio Activo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar el servicio <strong id="servicioNombre"></strong>?</p>
+                <p class="text-muted">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="eliminarForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Cambio de Estado -->
+<div class="modal fade" id="toggleModal" tabindex="-1" aria-labelledby="toggleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="toggleModalLabel">Cambiar Estado del Servicio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas cambiar el estado del servicio <strong id="toggleServicioNombre"></strong>?</p>
+                <p class="text-muted" id="toggleEstadoTexto"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="toggleForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-warning" id="toggleButton">Cambiar Estado</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editarServicio(id, nombre, descripcion, precio, activo) {
+    document.getElementById('editNombre').value = nombre;
+    document.getElementById('editDescripcion').value = descripcion;
+    document.getElementById('editPrecio').value = precio;
+    document.getElementById('editActivo').checked = activo;
+    
+    document.getElementById('editarForm').action = `/admin/servicios/editar/${id}`;
+    
+    var modal = new bootstrap.Modal(document.getElementById('editarModal'));
+    modal.show();
+}
+
+function eliminarServicio(id, nombre) {
+    document.getElementById('servicioNombre').textContent = nombre;
+    document.getElementById('eliminarForm').action = `/admin/servicios/eliminar/${id}`;
+    
+    var modal = new bootstrap.Modal(document.getElementById('eliminarModal'));
+    modal.show();
+}
+
+function toggleEstado(id) {
+    // Obtener información del servicio desde la fila de la tabla
+    var fila = event.target.closest('tr');
+    var nombre = fila.cells[1].textContent;
+    var estadoActual = fila.querySelector('.badge').textContent.trim();
+    
+    document.getElementById('toggleServicioNombre').textContent = nombre;
+    document.getElementById('toggleForm').action = `/admin/servicios/toggle/${id}`;
+    
+    // Actualizar el texto según el estado actual
+    if (estadoActual === 'Activo') {
+        document.getElementById('toggleEstadoTexto').textContent = 'El servicio pasará de ACTIVO a INACTIVO.';
+        document.getElementById('toggleButton').innerHTML = '<i class="fas fa-toggle-off me-2"></i>Desactivar';
+    } else {
+        document.getElementById('toggleEstadoTexto').textContent = 'El servicio pasará de INACTIVO a ACTIVO.';
+        document.getElementById('toggleButton').innerHTML = '<i class="fas fa-toggle-on me-2"></i>Activar';
+    }
+    
+    var modal = new bootstrap.Modal(document.getElementById('toggleModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

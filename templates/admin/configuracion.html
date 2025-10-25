@@ -1,0 +1,257 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Configuración del Sitio{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-cog me-2"></i>Configuración del Sitio</h2>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Información General</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.configuracion') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombre_empresa" class="form-label">Nombre de la Empresa</label>
+                                <input type="text" class="form-control" id="nombre_empresa" name="nombre_empresa" 
+                                       value="{{ config.nombre_empresa if config and config.nombre_empresa else (config[1] if config else 'DH2OCOL') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label">Teléfono Principal</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono" 
+                                       value="{{ config.telefono if config and config.telefono else (config[2] if config else '') }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Principal</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ config.email if config and config.email else (config[3] if config else '') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="whatsapp" class="form-label">WhatsApp</label>
+                                <input type="tel" class="form-control" id="whatsapp" name="whatsapp" 
+                                       value="{{ config.whatsapp if config and config.whatsapp else (config[4] if config else '') }}"
+                                       placeholder="Ej: +573001234567">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección</label>
+                        <textarea class="form-control" id="direccion" name="direccion" rows="2">{{ config.direccion if config and config.direccion else (config[5] if config else '') }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción de la Empresa</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="4">{{ config.descripcion if config and config.descripcion else (config[6] if config else '') }}</textarea>
+                        <div class="form-text">Esta descripción aparecerá en la página principal del sitio web.</div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="mb-3">Información Adicional</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="horarios" class="form-label">Horarios de Atención</label>
+                                <input type="text" class="form-control" id="horarios" name="horarios" 
+                                       value="{{ config.horarios if config and config.horarios else '' }}"
+                                       placeholder="Ej: Lun - Vie: 8:00 AM - 6:00 PM">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="app_url" class="form-label">URL de la App</label>
+                                <input type="url" class="form-control" id="app_url" name="app_url" 
+                                       value="{{ config.app_url if config and config.app_url else '' }}"
+                                       placeholder="https://app.dh2o.com.co">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="mb-3">Redes Sociales</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="facebook" class="form-label">Facebook</label>
+                                <input type="url" class="form-control" id="facebook" name="facebook" 
+                                       value="{{ config.facebook if config and config.facebook else (config[7] if config else '') }}"
+                                       placeholder="https://facebook.com/tu-pagina">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="instagram" class="form-label">Instagram</label>
+                                <input type="url" class="form-control" id="instagram" name="instagram" 
+                                       value="{{ config.instagram if config and config.instagram else (config[8] if config else '') }}"
+                                       placeholder="https://instagram.com/tu-cuenta">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="youtube" class="form-label">YouTube</label>
+                                <input type="url" class="form-control" id="youtube" name="youtube" 
+                                       value="{{ config.youtube if config and config.youtube else (config[9] if config else '') }}"
+                                       placeholder="https://youtube.com/tu-canal">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="mb-3">Configuración SEO</h6>
+                    <div class="mb-3">
+                        <label for="meta_description" class="form-label">Meta Descripción</label>
+                        <textarea class="form-control" id="meta_description" name="meta_description" rows="2" maxlength="160">{{ config.meta_description if config and config.meta_description else (config[11] if config else '') }}</textarea>
+                        <div class="form-text">Máximo 160 caracteres. Esta descripción aparecerá en los resultados de búsqueda.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="palabras_clave" class="form-label">Palabras Clave</label>
+                        <input type="text" class="form-control" id="palabras_clave" name="palabras_clave" 
+                               value="{{ config.palabras_clave if config and config.palabras_clave else (config[12] if config else '') }}"
+                               placeholder="agua, tratamiento, purificación, filtros">
+                        <div class="form-text">Separa las palabras clave con comas.</div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Configuración
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Información del Sistema</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Versión del Sistema</small>
+                    <div class="fw-bold">v1.0.0</div>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Base de Datos</small>
+                    <div class="fw-bold">MySQL</div>
+                </div>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Última Actualización</small>
+                    <div class="fw-bold">{{ config.fecha_actualizacion if config and config.fecha_actualizacion else (config[13] if config else 'No disponible') }}</div>
+                </div>
+                
+                <hr>
+                
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-info btn-sm" onclick="limpiarCache()">
+                        <i class="fas fa-broom me-2"></i>Limpiar Caché
+                    </button>
+                    
+                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="exportarDatos()">
+                        <i class="fas fa-download me-2"></i>Exportar Datos
+                    </button>
+                    
+                    <a href="{{ url_for('admin.backup_db') }}" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-database me-2"></i>Backup BD
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Estadísticas Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <div class="h4 mb-0 text-primary">{{ stats.servicios if stats else '0' }}</div>
+                            <small class="text-muted">Servicios</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="h4 mb-0 text-success">{{ stats.productos if stats else '0' }}</div>
+                        <small class="text-muted">Productos</small>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <div class="h4 mb-0 text-warning">{{ stats.contactos if stats else '0' }}</div>
+                            <small class="text-muted">Contactos</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="h4 mb-0 text-info">{{ stats.testimonios if stats else '0' }}</div>
+                        <small class="text-muted">Testimonios</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function limpiarCache() {
+    const confirmed = await showConfirm(
+        '¿Estás seguro de limpiar el caché del sistema? Esta acción puede afectar temporalmente el rendimiento.',
+        {
+            title: 'Limpiar Caché',
+            confirmText: 'Limpiar',
+            confirmClass: 'btn-warning',
+            icon: 'fas fa-broom text-warning'
+        }
+    );
+    
+    if (confirmed) {
+        // Aquí iría la lógica para limpiar caché
+        alert('Caché limpiado exitosamente');
+    }
+}
+
+async function exportarDatos() {
+    const confirmed = await showConfirm(
+        '¿Deseas exportar todos los datos del sistema? Este proceso puede tomar varios minutos.',
+        {
+            title: 'Exportar Datos',
+            confirmText: 'Exportar',
+            confirmClass: 'btn-primary',
+            icon: 'fas fa-download text-primary'
+        }
+    );
+    
+    if (confirmed) {
+        // Aquí iría la lógica para exportar datos
+        alert('Exportación iniciada. Recibirás un email cuando esté lista.');
+    }
+}
+</script>
+{% endblock %}

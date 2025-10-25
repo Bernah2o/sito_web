@@ -1,0 +1,275 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Gestión del Chatbot - TanquiBot{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-robot me-2"></i>Gestión del Chatbot - TanquiBot
+                </h1>
+            </div>
+
+            <!-- Configuración del Chatbot -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-cog me-2"></i>Configuración del Chatbot
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.configuracion_chatbot') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nombre_bot" class="form-label">Nombre del Bot</label>
+                                    <input type="text" class="form-control" id="nombre_bot" name="nombre_bot" 
+                                           value="{{ configuracion[1] if configuracion else 'TanquiBot' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="recaptcha_site_key" class="form-label">reCAPTCHA Site Key</label>
+                                    <input type="text" class="form-control" id="recaptcha_site_key" name="recaptcha_site_key" 
+                                           value="{{ configuracion[4] if configuracion else '' }}" 
+                                           placeholder="Clave pública de reCAPTCHA">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mensaje_bienvenida" class="form-label">Mensaje de Bienvenida</label>
+                                    <textarea class="form-control" id="mensaje_bienvenida" name="mensaje_bienvenida" 
+                                              rows="3" required>{{ configuracion[2] if configuracion else '¡Hola! Soy TanquiBot, tu asistente virtual de DH2OCOL Colombia. ¿En qué puedo ayudarte hoy?' }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="recaptcha_secret_key" class="form-label">reCAPTCHA Secret Key</label>
+                                    <input type="password" class="form-control" id="recaptcha_secret_key" name="recaptcha_secret_key" 
+                                           value="{{ configuracion[5] if configuracion else '' }}" 
+                                           placeholder="Clave secreta de reCAPTCHA">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mensaje_no_entendido" class="form-label">Mensaje cuando no entiende</label>
+                            <textarea class="form-control" id="mensaje_no_entendido" name="mensaje_no_entendido" 
+                                      rows="2" required>{{ configuracion[3] if configuracion else 'Lo siento, no entiendo tu consulta. ¿Podrías reformularla o elegir una de las opciones disponibles?' }}</textarea>
+                        </div>
+                        
+                        <!-- Configuración de OpenAI GPT -->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="openai_api_key" class="form-label">
+                                        <i class="fas fa-robot me-2"></i>OpenAI API Key
+                                    </label>
+                                    <input type="password" class="form-control" id="openai_api_key" name="openai_api_key" 
+                                           value="{{ configuracion[7] if configuracion and configuracion|length > 7 else '' }}" 
+                                           placeholder="sk-...">
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Obtén tu API key en <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="usar_gpt" class="form-label">Usar ChatGPT</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="usar_gpt" name="usar_gpt" 
+                                               {{ 'checked' if configuracion and configuracion|length > 8 and configuracion[8] else '' }}>
+                                        <label class="form-check-label" for="usar_gpt">
+                                            Activar respuestas inteligentes con GPT
+                                        </label>
+                                    </div>
+                                    <div class="form-text">
+                                        <i class="fas fa-lightbulb me-1"></i>
+                                        Si está activado, el bot usará GPT cuando no encuentre respuestas predefinidas
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Configuración
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Agregar Nueva Pregunta -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">
+                        <i class="fas fa-plus me-2"></i>Agregar Nueva Pregunta
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.nueva_pregunta_chatbot') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nueva_pregunta" class="form-label">Pregunta</label>
+                                    <input type="text" class="form-control" id="nueva_pregunta" name="pregunta" 
+                                           placeholder="¿Cuál es el precio de...?" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nueva_respuesta" class="form-label">Respuesta</label>
+                                    <textarea class="form-control" id="nueva_respuesta" name="respuesta" 
+                                              rows="3" placeholder="La respuesta que dará el bot..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="nueva_activo" name="activo" checked>
+                                <label class="form-check-label" for="nueva_activo">
+                                    Pregunta activa
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>Agregar Pregunta
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de Preguntas -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-list me-2"></i>Preguntas del Chatbot
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if preguntas %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Pregunta</th>
+                                        <th>Respuesta</th>
+                                        <th>Estado</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pregunta in preguntas %}
+                                    <tr>
+                                        <td>{{ pregunta[0] }}</td>
+                                        <td>
+                                            <div class="pregunta-text" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
+                                                {{ pregunta[1] }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="respuesta-text" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                                                {{ pregunta[2] }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if pregunta[3] %}
+                                                <span class="badge bg-success">Activa</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inactiva</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ pregunta[4] }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                        onclick="editarPregunta({{ pregunta[0] }}, '{{ pregunta[1]|replace("'", "\\'") }}', '{{ pregunta[2]|replace("'", "\\'") }}', {{ pregunta[3] }})">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <form method="POST" action="{{ url_for('admin.toggle_pregunta_chatbot', pregunta_id=pregunta[0]) }}" 
+                                                      style="display: inline;">
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning">
+                                                        <i class="fas fa-toggle-{% if pregunta[3] %}on{% else %}off{% endif %}"></i>
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="{{ url_for('admin.eliminar_pregunta_chatbot', pregunta_id=pregunta[0]) }}" 
+                                                      style="display: inline;" 
+                                                      onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta pregunta?')">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-robot fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay preguntas configuradas para el chatbot.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Pregunta -->
+<div class="modal fade" id="editarPreguntaModal" tabindex="-1" aria-labelledby="editarPreguntaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarPreguntaModalLabel">Editar Pregunta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editarPreguntaForm" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editar_pregunta" class="form-label">Pregunta</label>
+                        <input type="text" class="form-control" id="editar_pregunta" name="pregunta" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editar_respuesta" class="form-label">Respuesta</label>
+                        <textarea class="form-control" id="editar_respuesta" name="respuesta" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editar_activo" name="activo">
+                            <label class="form-check-label" for="editar_activo">
+                                Pregunta activa
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editarPregunta(id, pregunta, respuesta, activo) {
+    document.getElementById('editar_pregunta').value = pregunta;
+    document.getElementById('editar_respuesta').value = respuesta;
+    document.getElementById('editar_activo').checked = activo;
+    
+    const form = document.getElementById('editarPreguntaForm');
+    form.action = "{{ url_for('admin.editar_pregunta_chatbot', pregunta_id=0) }}".replace('0', id);
+    
+    const modal = new bootstrap.Modal(document.getElementById('editarPreguntaModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

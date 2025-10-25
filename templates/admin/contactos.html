@@ -1,0 +1,144 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Gestión de Contactos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-envelope me-2"></i>Gestión de Contactos</h2>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-primary active" onclick="filtrarContactos('todos')">
+            Todos
+        </button>
+        <button type="button" class="btn btn-outline-warning" onclick="filtrarContactos('nuevo')">
+            Nuevos
+        </button>
+        <button type="button" class="btn btn-outline-success" onclick="filtrarContactos('leido')">
+            Leídos
+        </button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if contactos %}
+        <div class="table-responsive">
+            <table class="table table-striped" id="tablaContactos">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Empresa</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contacto in contactos %}
+                    <tr data-estado="{{ contacto.estado if contacto.estado else contacto[6] }}">
+                        <td>{{ contacto.id if contacto.id else contacto[0] }}</td>
+                        <td>{{ contacto.nombre if contacto.nombre else contacto[1] }}</td>
+                        <td>
+                            <a href="mailto:{{ contacto.email if contacto.email else contacto[2] }}">
+                                {{ contacto.email if contacto.email else contacto[2] }}
+                            </a>
+                        </td>
+                        <td>
+                            {% set telefono = contacto.telefono if contacto.telefono else contacto[3] %}
+                            {% if telefono %}
+                                <a href="tel:{{ telefono }}">{{ telefono }}</a>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ contacto.empresa if contacto.empresa else contacto[4] or '-' }}</td>
+                        <td>
+                            {% set estado = contacto.estado if contacto.estado else contacto[6] %}
+                            {% if estado == 'nuevo' %}
+                                <span class="badge bg-warning">Nuevo</span>
+                            {% elif estado == 'leido' %}
+                                <span class="badge bg-success">Leído</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ estado }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ contacto.fecha_creacion if contacto.fecha_creacion else contacto[7] }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                        onclick="verMensaje('{{ contacto.id if contacto.id else contacto[0] }}', '{{ contacto.nombre if contacto.nombre else contacto[1] }}', '{{ contacto.mensaje if contacto.mensaje else contacto[5] }}')"
+                                        title="Ver mensaje">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                {% set estado = contacto.estado if contacto.estado else contacto[6] %}
+                                {% if estado == 'nuevo' %}
+                                <form method="POST" action="{{ url_for('admin.marcar_contacto_leido', contacto_id=contacto.id if contacto.id else contacto[0]) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Marcar como leído">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-envelope fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No hay contactos registrados</h5>
+            <p class="text-muted">Los mensajes de contacto aparecerán aquí</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para ver mensaje -->
+<div class="modal fade" id="modalMensaje" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mensaje de <span id="nombreContacto"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="mensajeContacto" class="p-3 bg-light rounded"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filtrarContactos(estado) {
+    const filas = document.querySelectorAll('#tablaContactos tbody tr');
+    const botones = document.querySelectorAll('.btn-group .btn');
+    
+    // Actualizar botones activos
+    botones.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Filtrar filas
+    filas.forEach(fila => {
+        const estadoFila = fila.getAttribute('data-estado');
+        if (estado === 'todos' || estadoFila === estado) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+}
+
+function verMensaje(id, nombre, mensaje) {
+    document.getElementById('nombreContacto').textContent = nombre;
+    document.getElementById('mensajeContacto').textContent = mensaje;
+    new bootstrap.Modal(document.getElementById('modalMensaje')).show();
+}
+</script>
+{% endblock %}

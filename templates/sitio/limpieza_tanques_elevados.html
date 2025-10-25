@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpieza de Tanques Elevados en Valledupar | DH2OCOL Colombia</title>
+    <meta name="description" content="Servicio profesional de limpieza de tanques elevados en Valledupar. DH2OCOL Colombia ofrece limpieza, desinfección y mantenimiento especializado.">
+    <meta name="keywords" content="limpieza tanques elevados, Valledupar, DH2OCOL, desinfección tanques, mantenimiento tanques agua">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+    
+    <!-- reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfYourSiteKey"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary-gradient fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="DH2OCOL" height="40" class="me-2">
+                DH2OCOL
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}#servicios">Servicios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}#productos">Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.contacto') }}">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-accent text-white px-3 ms-2" href="{{ url_for('main.redirect_app') }}">
+                            <i class="fas fa-mobile-alt me-1"></i> App DH2OCOL
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section bg-primary-gradient text-white">
+        <div class="container">
+            <div class="row justify-content-center text-center min-vh-60">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-4">Limpieza de Tanques Elevados en Valledupar</h1>
+                    <p class="lead mb-4">Servicio profesional especializado en limpieza, desinfección y mantenimiento de tanques elevados. Garantizamos agua limpia y segura para tu hogar o empresa.</p>
+                    <div class="d-flex gap-3 flex-wrap justify-content-center">
+                        <a href="https://wa.me/573157484662?text=Hola%20DH2OCOL,%20me%20interesa%20cotizar%20el%20servicio%20de%20limpieza%20de%20tanques%20elevados" class="btn btn-outline-light btn-lg" target="_blank">
+                            <i class="fas fa-phone me-2"></i>Cotizar Ahora
+                        </a>
+                        <a href="#galeria" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-images me-2"></i>Ver Galería
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Características del servicio -->
+    <section id="equipos" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold text-primary">¿Por qué elegir DH2OCOL?</h2>
+                <p class="lead">Somos líderes en Valledupar con más de 4 años de experiencia</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-certificate text-white fs-2"></i>
+                            </div>
+                            <h4 class="text-primary">Personal Certificado</h4>
+                            <p>Técnicos especializados con certificaciones en limpieza y desinfección de tanques, garantizando agua potable segura.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-shield-alt text-white fs-2"></i>
+                            </div>
+                            <h4 class="text-primary">Garantía de Calidad</h4>
+                            <p>Ofrecemos garantía en todos nuestros servicios y seguimiento post-servicio.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-info rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-helicopter text-white fs-2"></i>
+                            </div>
+                            <h4 class="text-primary">Inspección con Drones</h4>
+                            <p>Utilizamos tecnología de drones para inspecciones detalladas de tanques elevados, garantizando seguridad y precisión en el diagnóstico.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servicios detallados -->
+    <section id="servicios" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold text-primary">Nuestros Servicios</h2>
+                <p class="lead">Servicios completos para tanques elevados</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card border-primary h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0 text-white"><i class="fas fa-spray-can me-2"></i>Limpieza Profunda</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Vaciado completo del tanque</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Remoción de sedimentos y algas</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Limpieza de paredes y fondo</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Lavado con equipos de presión</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Inspección de estructura</li>
+                            </ul>
+                            <div class="text-center mt-3">
+                                <span class="badge bg-primary fs-6 px-3 py-2">Desde $50.000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="card border-accent h-100">
+                        <div class="card-header bg-accent text-white">
+                            <h4 class="mb-0 text-white"><i class="fas fa-virus-slash me-2"></i>Desinfección Especializada</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Aplicación de desinfectantes certificados</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Eliminación de bacterias y virus</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Tratamiento anti-algas</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Enjuague completo</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Certificado de desinfección</li>
+                            </ul>
+                            <div class="text-center mt-3">
+                                <span class="badge bg-accent fs-6 px-3 py-2">Desde $120.000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="card border-secondary h-100">
+                        <div class="card-header bg-secondary text-white">
+                            <h4 class="mb-0 text-white"><i class="fas fa-wrench me-2"></i>Mantenimiento Preventivo</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Revisión de válvulas y accesorios</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Verificación de niveles</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Inspección de tuberías</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Ajuste de flotadores</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Reporte técnico detallado</li>
+                            </ul>
+                            <div class="text-center mt-3">
+                                <span class="badge bg-secondary fs-6 px-3 py-2">Desde $80.000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="card border-success h-100">
+                        <div class="card-header bg-success text-white">
+                            <h4 class="mb-0 text-white"><i class="fas fa-tools me-2"></i>Reparaciones</h4>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Reparación de fugas</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Cambio de válvulas</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Soldadura especializada</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Reemplazo de accesorios</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Garantía en reparaciones</li>
+                            </ul>
+                            <div class="text-center mt-3">
+                                <a href="https://api.whatsapp.com/send?phone={{ configuracion.whatsapp or '573157484662' }}&text=Hola, necesito una cotización personalizada para reparación de tanques elevados" 
+                                   class="badge bg-success fs-6 px-3 py-2 text-decoration-none text-white" 
+                                   target="_blank">
+                                    <i class="fab fa-whatsapp me-2"></i>Cotización personalizada
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galería de Medios -->
+    <section id="galeria" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="display-5 fw-bold text-primary">Galería de Trabajos</h2>
+                    <p class="lead text-muted">Conoce nuestros trabajos realizados y procesos de limpieza</p>
+                </div>
+            </div>
+            
+            {% if medios %}
+            <div class="row">
+                <!-- Filtros de galería -->
+                <div class="col-12 text-center mb-4">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary active" data-filter="all">Todos</button>
+                        <button type="button" class="btn btn-outline-primary" data-filter="image">Imágenes</button>
+                        <button type="button" class="btn btn-outline-primary" data-filter="video">Videos</button>
+                    </div>
+                </div>
+                
+                <!-- Grid de medios -->
+                <div class="col-12">
+                    <div class="row g-4" id="mediaGrid">
+                        {% for medio in medios %}
+                        <div class="col-md-6 col-lg-4 media-item" data-type="{{ medio.tipo }}">
+                            <div class="card h-100 shadow-sm">
+                                {% if medio.tipo == 'image' %}
+                                <img src="{{ medio.ruta if 'firebase' in medio.ruta else url_for('static', filename=medio.ruta) }}" 
+                                     class="card-img-top" 
+                                     style="height: 250px; object-fit: cover; cursor: pointer;" 
+                                     alt="{{ medio.nombre }}"
+                                     data-bs-toggle="modal" 
+                                     data-bs-target="#mediaModal"
+                                     data-src="{{ medio.ruta if 'firebase' in medio.ruta else url_for('static', filename=medio.ruta) }}"
+                                     data-title="{{ medio.nombre }}"
+                                     data-description="{{ medio.descripcion }}"
+                                     data-type="image">
+                                {% elif medio.tipo == 'video' %}
+                                <div class="position-relative">
+                                    <video class="card-img-top" style="height: 250px; object-fit: cover;" controls>
+                                        <source src="{{ medio.ruta if 'firebase' in medio.ruta else url_for('static', filename=medio.ruta) }}" type="video/mp4">
+                                        Tu navegador no soporta el elemento video.
+                                    </video>
+                                    <div class="position-absolute top-50 start-50 translate-middle">
+                                        <i class="fas fa-play-circle fa-3x text-white opacity-75"></i>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ medio.nombre }}</h6>
+                                    {% if medio.descripcion %}
+                                    <p class="card-text text-muted small">{{ medio.descripcion }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="py-5">
+                        <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Galería en construcción</h5>
+                        <p class="text-muted">Pronto agregaremos imágenes y videos de nuestros trabajos</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Proceso de trabajo -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold text-primary">Nuestro Proceso de Trabajo</h2>
+                <p class="lead">Metodología profesional paso a paso</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="process-timeline">
+                        <div class="process-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Inspección Inicial</h4>
+                                <p>Evaluamos el estado del tanque y determinamos el tipo de servicio requerido.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Preparación</h4>
+                                <p>Cortamos el suministro de agua y preparamos los equipos necesarios.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Vaciado y Limpieza</h4>
+                                <p>Vaciamos el tanque completamente y realizamos la limpieza profunda.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Desinfección</h4>
+                                <p>Aplicamos productos desinfectantes certificados para agua potable.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="process-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Llenado y Entrega</h4>
+                                <p>Llenamos el tanque con agua limpia y entregamos el certificado de servicio.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonios -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold text-primary">Lo que dicen nuestros clientes</h2>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </div>
+                            <p class="fst-italic">"Excelente servicio, muy profesionales y puntuales. El agua quedó completamente limpia."</p>
+                            <h6 class="text-primary">María González</h6>
+                            <small class="text-muted">Residencial Los Alpes</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </div>
+                            <p class="fst-italic">"Llevamos 3 años con DH2OCOL, siempre cumplen con los tiempos y la calidad."</p>
+                            <h6 class="text-primary">Carlos Mendoza</h6>
+                            <small class="text-muted">Empresa Textil del Cesar</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                            </div>
+                            <p class="fst-italic">"Precios justos y trabajo de calidad. Recomendados al 100%."</p>
+                            <h6 class="text-primary">Ana Rodríguez</h6>
+                            <small class="text-muted">Conjunto Villa del Río</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Final -->
+    <section class="py-5 bg-primary-gradient text-white">
+        <div class="container text-center">
+            <h2 class="display-5 fw-bold mb-4">¿Listo para limpiar tu tanque elevado?</h2>
+            <p class="lead mb-4">Contáctanos hoy y recibe una cotización gratuita. Servicio en toda Valledupar y municipios aledaños.</p>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="d-flex justify-content-center gap-3 flex-wrap mb-4">
+                        <a href="{{ url_for('main.contacto') }}" class="btn btn-accent btn-lg">
+                            <i class="fas fa-phone me-2"></i>Llamar Ahora
+                        </a>
+                        <a href="{{ url_for('main.redirect_whatsapp') }}" class="btn btn-success btn-lg" target="_blank">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp
+                        </a>
+                        <a href="{{ url_for('main.redirect_app') }}" class="btn btn-light text-primary btn-lg">
+                            <i class="fas fa-mobile-alt me-2"></i>App DH2O
+                        </a>
+                    </div>
+                    
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h5><i class="fas fa-clock me-2"></i>Horarios</h5>
+                            <p>{{ configuracion.horarios or 'Lun - Sáb: 7:00 AM - 6:00 PM' }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5><i class="fas fa-map-marker-alt me-2"></i>Cobertura</h5>
+                            <p>Valledupar y municipios aledaños</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5><i class="fas fa-shield-alt me-2"></i>Garantía</h5>
+                            <p>6 meses en todos los servicios</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white mb-3">DH2OCOL Colombia</h5>
+                    <p class="text-white">Especialistas en limpieza y mantenimiento de tanques elevados. Comprometidos con la educación sobre el agua potable.</p>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white mb-3">Enlaces Útiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none"><i class="fas fa-home me-2"></i>Inicio</a></li>
+                        <li><a href="{{ url_for('main.educagua') }}" class="text-white text-decoration-none"><i class="fas fa-graduation-cap me-2"></i>EducAgua</a></li>
+                        <li><a href="{{ url_for('main.accesorios_tanques') }}" class="text-white text-decoration-none"><i class="fas fa-tools me-2"></i>Accesorios</a></li>
+                        <li><a href="{{ url_for('main.politica_tratamiento_datos') }}" class="text-white text-decoration-none" target="_blank"><i class="fas fa-shield-alt me-2"></i>Política de Tratamiento de Datos</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white mb-3">Contacto</h5>
+                    <p class="text-white"><i class="fas fa-phone me-2"></i> {{ configuracion.telefono or '+57 315 748 4662' }}</p>
+                    <p class="text-white"><i class="fas fa-envelope me-2"></i> {{ configuracion.email or 'contacto@dh2o.com.co' }}</p>
+                    <p class="text-white"><i class="fas fa-map-marker-alt me-2"></i> {{ configuracion.direccion or 'Valledupar, Cesar' }}</p>
+                    <div class="social-links mt-3">
+                        <a href="{{ url_for('main.redirect_facebook') }}" target="_blank" class="text-white me-3" title="Facebook">
+                            <i class="fab fa-facebook fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_youtube') }}" target="_blank" class="text-white me-3" title="YouTube">
+                            <i class="fab fa-youtube fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_instagram') }}" target="_blank" class="text-white me-3" title="Instagram">
+                            <i class="fab fa-instagram fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_tiktok') }}" target="_blank" class="text-white me-3" title="TikTok">
+                            <i class="fab fa-tiktok fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_whatsapp') }}" target="_blank" class="text-white" title="WhatsApp">
+                            <i class="fab fa-whatsapp fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr class="text-white my-4" />
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-white">&copy; 2025 DH2OCOL Colombia - EducAgua. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <style>
+        .process-timeline {
+            position: relative;
+        }
+        
+        .process-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .process-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 60px;
+            width: 2px;
+            height: 40px;
+            background: var(--primary-color);
+        }
+        
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 2rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .step-content h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+    
+    <!-- Modal para visualizar medios -->
+    <div class="modal fade" id="mediaModal" tabindex="-1" aria-labelledby="mediaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mediaModalLabel">Imagen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" class="img-fluid" alt="">
+                    <p id="modalDescription" class="mt-3 text-muted"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript para la galería -->
+    <script>
+        // Filtros de galería
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('[data-filter]');
+            const mediaItems = document.querySelectorAll('.media-item');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Actualizar botones activos
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filtrar elementos
+                    mediaItems.forEach(item => {
+                        const itemType = item.getAttribute('data-type');
+                        if (filter === 'all' || filter === itemType) {
+                            item.style.display = 'block';
+                            item.classList.add('fade-in');
+                        } else {
+                            item.style.display = 'none';
+                            item.classList.remove('fade-in');
+                        }
+                    });
+                });
+            });
+            
+            // Modal de imágenes
+            const mediaModal = document.getElementById('mediaModal');
+            if (mediaModal) {
+                mediaModal.addEventListener('show.bs.modal', function(event) {
+                    const trigger = event.relatedTarget;
+                    const src = trigger.getAttribute('data-src');
+                    const title = trigger.getAttribute('data-title');
+                    const description = trigger.getAttribute('data-description');
+                    
+                    const modalImage = document.getElementById('modalImage');
+                    const modalTitle = document.getElementById('mediaModalLabel');
+                    const modalDescription = document.getElementById('modalDescription');
+                    
+                    modalImage.src = src;
+                    modalTitle.textContent = title;
+                    modalDescription.textContent = description || '';
+                });
+            }
+        });
+    </script>
+
+    <!-- CSS adicional para animaciones -->
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .media-item {
+            transition: all 0.3s ease;
+        }
+        
+        .media-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+    </style>
+
+    <!-- Scroll suave para navegación -->
+    <script>
+        // Scroll suave para enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+
+
+
+    <!-- TanquiBot Chatbot -->
+    <script>
+        // Configuración del chatbot
+        const chatbotConfig = {
+            apiUrl: '/chatbot/mensaje',
+            welcomeMessage: 'Hola, soy TanquiBot 🤖💧 ¿En qué puedo ayudarte con tus tanques de agua?'
+        };
+    </script>
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+</html>

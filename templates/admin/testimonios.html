@@ -1,0 +1,233 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Gestión de Testimonios{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-star me-2"></i>Gestión de Testimonios</h2>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoTestimonio">
+        <i class="fas fa-plus me-2"></i>Nuevo Testimonio
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if testimonios %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Empresa</th>
+                        <th>Testimonio</th>
+                        <th>Calificación</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for testimonio in testimonios %}
+                    <tr>
+                        <td>{{ testimonio.id if testimonio.id else testimonio[0] }}</td>
+                        <td>{{ testimonio.nombre_cliente if testimonio.nombre_cliente else testimonio[1] }}</td>
+                        <td>{{ testimonio.empresa if testimonio.empresa else testimonio[2] or '-' }}</td>
+                        <td>
+                            {% set texto = testimonio.testimonio if testimonio.testimonio else testimonio[3] %}
+                            <span title="{{ texto }}">
+                                {{ texto[:100] }}{% if texto|length > 100 %}...{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% set calificacion = testimonio.calificacion if testimonio.calificacion else testimonio[4] %}
+                            <div class="text-warning">
+                                {% for i in range(1, 6) %}
+                                    {% if i <= calificacion %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <small class="text-muted">({{ calificacion }}/5)</small>
+                            </div>
+                        </td>
+                        <td>
+                            {% set activo = testimonio.activo if testimonio.activo is not none else testimonio[5] %}
+                            {% if activo %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ testimonio.fecha_creacion if testimonio.fecha_creacion else testimonio[6] }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                        onclick="editarTestimonio({{ testimonio.id if testimonio.id else testimonio[0] }}, '{{ testimonio.nombre_cliente if testimonio.nombre_cliente else testimonio[1] }}', '{{ testimonio.empresa if testimonio.empresa else testimonio[2] or '' }}', '{{ testimonio.testimonio if testimonio.testimonio else testimonio[3] }}', {{ testimonio.calificacion if testimonio.calificacion else testimonio[4] }}, {{ 'true' if (testimonio.activo if testimonio.activo is not none else testimonio[5]) else 'false' }})"
+                                        title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                {% set activo = testimonio.activo if testimonio.activo is not none else testimonio[5] %}
+                                <form method="POST" action="{{ url_for('admin.toggle_testimonio', testimonio_id=testimonio.id if testimonio.id else testimonio[0]) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-{{ 'warning' if activo else 'success' }}" 
+                                            title="{{ 'Desactivar' if activo else 'Activar' }}">
+                                        <i class="fas fa-{{ 'eye-slash' if activo else 'eye' }}"></i>
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar"
+                                        onclick="handleDeleteTestimonio({{ testimonio.id if testimonio.id else testimonio[0] }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-star fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No hay testimonios registrados</h5>
+            <p class="text-muted">Agrega testimonios de clientes satisfechos</p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoTestimonio">
+                <i class="fas fa-plus me-2"></i>Agregar Primer Testimonio
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para nuevo testimonio -->
+<div class="modal fade" id="modalNuevoTestimonio" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Testimonio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.nuevo_testimonio') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre_cliente" class="form-label">Nombre del Cliente *</label>
+                        <input type="text" class="form-control" id="nombre_cliente" name="nombre_cliente" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="empresa" class="form-label">Empresa</label>
+                        <input type="text" class="form-control" id="empresa" name="empresa">
+                    </div>
+                    <div class="mb-3">
+                        <label for="testimonio" class="form-label">Testimonio *</label>
+                        <textarea class="form-control" id="testimonio" name="testimonio" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="calificacion" class="form-label">Calificación *</label>
+                        <select class="form-select" id="calificacion" name="calificacion" required>
+                            <option value="">Seleccionar calificación</option>
+                            <option value="5">⭐⭐⭐⭐⭐ (5 estrellas)</option>
+                            <option value="4">⭐⭐⭐⭐ (4 estrellas)</option>
+                            <option value="3">⭐⭐⭐ (3 estrellas)</option>
+                            <option value="2">⭐⭐ (2 estrellas)</option>
+                            <option value="1">⭐ (1 estrella)</option>
+                        </select>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="activo" name="activo" checked>
+                        <label class="form-check-label" for="activo">
+                            Mostrar en el sitio web
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Testimonio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar testimonio -->
+<div class="modal fade" id="modalEditarTestimonio" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Testimonio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" id="formEditarTestimonio">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_nombre_cliente" class="form-label">Nombre del Cliente *</label>
+                        <input type="text" class="form-control" id="edit_nombre_cliente" name="nombre_cliente" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_empresa" class="form-label">Empresa</label>
+                        <input type="text" class="form-control" id="edit_empresa" name="empresa">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_testimonio" class="form-label">Testimonio *</label>
+                        <textarea class="form-control" id="edit_testimonio" name="testimonio" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_calificacion" class="form-label">Calificación *</label>
+                        <select class="form-select" id="edit_calificacion" name="calificacion" required>
+                            <option value="5">⭐⭐⭐⭐⭐ (5 estrellas)</option>
+                            <option value="4">⭐⭐⭐⭐ (4 estrellas)</option>
+                            <option value="3">⭐⭐⭐ (3 estrellas)</option>
+                            <option value="2">⭐⭐ (2 estrellas)</option>
+                            <option value="1">⭐ (1 estrella)</option>
+                        </select>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="edit_activo" name="activo">
+                        <label class="form-check-label" for="edit_activo">
+                            Mostrar en el sitio web
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Testimonio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editarTestimonio(id, nombre, empresa, testimonio, calificacion, activo) {
+    document.getElementById('edit_nombre_cliente').value = nombre;
+    document.getElementById('edit_empresa').value = empresa || '';
+    document.getElementById('edit_testimonio').value = testimonio;
+    document.getElementById('edit_calificacion').value = calificacion;
+    document.getElementById('edit_activo').checked = activo;
+    
+    document.getElementById('formEditarTestimonio').action = `/admin/testimonios/editar/${id}`;
+    
+    new bootstrap.Modal(document.getElementById('modalEditarTestimonio')).show();
+}
+
+async function handleDeleteTestimonio(id) {
+    const confirmed = await showConfirm(
+        '¿Estás seguro de eliminar este testimonio? Esta acción no se puede deshacer.',
+        {
+            title: 'Eliminar Testimonio',
+            confirmText: 'Eliminar',
+            confirmClass: 'btn-danger',
+            icon: 'fas fa-trash text-danger'
+        }
+    );
+    
+    if (confirmed) {
+        // Crear y enviar formulario para eliminar
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/testimonios/eliminar/${id}`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

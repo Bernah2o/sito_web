@@ -1,0 +1,105 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Nuevo Producto{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-plus me-2"></i>Nuevo Producto</h2>
+    <a href="{{ url_for('admin.productos') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Volver
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre del Producto *</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        <div class="form-text">Nombre descriptivo del producto</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="categoria" class="form-label">Categoría *</label>
+                        <select class="form-select" id="categoria" name="categoria" required>
+                            <option value="">Seleccionar categoría</option>
+                            <option value="Tanques">Tanques</option>
+                            <option value="Bombas">Bombas</option>
+                            <option value="Filtros">Filtros</option>
+                            <option value="Accesorios">Accesorios</option>
+                            <option value="Químicos">Químicos</option>
+                            <option value="Herramientas">Herramientas</option>
+                        </select>
+                        <div class="form-text">Categoría del producto</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción *</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required></textarea>
+                        <div class="form-text">Descripción detallada del producto</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="precio" class="form-label">Precio *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="precio" name="precio" min="0" step="1000" required>
+                        </div>
+                        <div class="form-text">Precio del producto en pesos colombianos</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="imagen" class="form-label">Imagen del Producto</label>
+                        <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
+                        <div class="form-text">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 5MB</div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin.productos') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información</h6>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">
+                    <strong>Consejos para crear productos:</strong>
+                </p>
+                <ul class="small text-muted">
+                    <li>Usa nombres descriptivos y claros</li>
+                    <li>Selecciona la categoría apropiada</li>
+                    <li>Incluye especificaciones técnicas</li>
+                    <li>El precio debe incluir IVA si aplica</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-tags me-2"></i>Categorías</h6>
+            </div>
+            <div class="card-body">
+                <div class="small text-muted">
+                    <strong>Tanques:</strong> Tanques de agua, cisternas<br>
+                    <strong>Bombas:</strong> Bombas de agua, motores<br>
+                    <strong>Filtros:</strong> Sistemas de filtración<br>
+                    <strong>Accesorios:</strong> Válvulas, conexiones<br>
+                    <strong>Químicos:</strong> Productos de tratamiento<br>
+                    <strong>Herramientas:</strong> Equipos de trabajo
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

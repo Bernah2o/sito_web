@@ -1,0 +1,337 @@
+"""
+Firebase Storage utilities for DH2OCOL application
+Handles file uploads, downloads, and management operations
+"""
+
+import os
+import json
+import uuid
+from datetime import datetime, timedelta
+from typing import Optional, Tuple, List
+import firebase_admin
+from firebase_admin import credentials, storage
+from werkzeug.datastructures import FileStorage
+from PIL import Image
+import io
+
+class FirebaseStorageManager:
+    """Manages Firebase Storage operations for the application"""
+    
+    def __init__(self):
+        self.bucket = None
+        self.initialized = False
+        self._initialize_firebase()
+    
+    def _initialize_firebase(self):
+        """Initialize Firebase Admin SDK"""
+        try:
+            # Check if we're in development mode without Firebase
+            if os.getenv('FLASK_ENV') == 'development' and not os.getenv('FIREBASE_PROJECT_ID'):
+                print("Running in development mode without Firebase - Firebase Storage disabled")
+                self.initialized = False
+                return
+            
+            # Check if Firebase is already initialized
+            if not firebase_admin._apps:
+                # Get Firebase credentials from environment variables
+                firebase_config = {
+                    "type": os.getenv('FIREBASE_TYPE'),
+                    "project_id": os.getenv('FIREBASE_PROJECT_ID'),
+                    "private_key_id": os.getenv('FIREBASE_PRIVATE_KEY_ID'),
+                    "private_key": os.getenv('FIREBASE_PRIVATE_KEY', '').replace('\\n', '\n'),
+                    "client_email": os.getenv('FIREBASE_CLIENT_EMAIL'),
+                    "client_id": os.getenv('FIREBASE_CLIENT_ID'),
+                    "auth_uri": os.getenv('FIREBASE_AUTH_URI'),
+                    "token_uri": os.getenv('FIREBASE_TOKEN_URI'),
+                    "auth_provider_x509_cert_url": os.getenv('FIREBASE_AUTH_PROVIDER_X509_CERT_URL'),
+                    "client_x509_cert_url": os.getenv('FIREBASE_CLIENT_X509_CERT_URL'),
+                    "universe_domain": os.getenv('FIREBASE_UNIVERSE_DOMAIN', 'googleapis.com')
+                }
+                
+                # Validate required fields
+                required_fields = ['type', 'project_id', 'private_key', 'client_email']
+                missing_fields = [field for field in required_fields if not firebase_config.get(field)]
+                
+                if missing_fields:
+                    print(f"Firebase configuration incomplete: {', '.join(missing_fields)}")
+                    print("Running without Firebase Storage - uploads will be disabled")
+                    self.initialized = False
+                    return
+                
+                # Initialize Firebase
+                cred = credentials.Certificate(firebase_config)
+                firebase_admin.initialize_app(cred, {
+                    'storageBucket': f"{firebase_config['project_id']}.appspot.com"
+                })
+            
+            # Get storage bucket
+            self.bucket = storage.bucket()
+            self.initialized = True
+            print("Firebase Storage initialized successfully")
+            
+        except Exception as e:
+            print(f"Error initializing Firebase Storage: {str(e)}")
+            print("Running without Firebase Storage - uploads will be disabled")
+            self.initialized = False
+    
+    def is_initialized(self) -> bool:
+        """Check if Firebase Storage is properly initialized"""
+        return self.initialized and self.bucket is not None
+    
+    def _generate_unique_filename(self, original_filename: str, folder: str = "") -> str:
+        """Generate a unique filename to avoid conflicts"""
+        # Get file extension
+        name, ext = os.path.splitext(original_filename)
+        
+        # Generate unique identifier
+        unique_id = str(uuid.uuid4())[:8]
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Create unique filename
+        unique_filename = f"{name}_{timestamp}_{unique_id}{ext}"
+        
+        # Add folder prefix if specified
+        if folder:
+            unique_filename = f"{folder}/{unique_filename}"
+        
+        return unique_filename
+    
+    def _optimize_image(self, file_data: bytes, max_size: Tuple[int, int] = (1200, 1200), quality: int = 85) -> bytes:
+        """Optimize image for web usage"""
+        try:
+            # Open image
+            image = Image.open(io.BytesIO(file_data))
+            
+            # Convert to RGB if necessary
+            if image.mode in ('RGBA', 'P'):
+                image = image.convert('RGB')
+            
+            # Resize if too large
+            image.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            # Save optimized image
+            output = io.BytesIO()
+            image.save(output, format='JPEG', quality=quality, optimize=True)
+            
+            return output.getvalue()
+        except Exception as e:
+            print(f"Error optimizing image: {str(e)}")
+            return file_data
+    
+    def upload_file(self, file: FileStorage, folder: str = "", optimize_image: bool = True) -> Optional[str]:
+        """
+        Upload a file to Firebase Storage
+        
+        Args:
+            file: FileStorage object from Flask
+            folder: Folder path in storage (e.g., 'productos', 'servicios')
+            optimize_image: Whether to optimize images before upload
+        
+        Returns:
+            Public URL of uploaded file or None if failed
+        """
+        if not self.is_initialized():
+            print("Firebase Storage not initialized")
+            return None
+        
+        if not file or not file.filename:
+            print("No file provided")
+            return None
+        
+        try:
+            # Generate unique filename
+            filename = self._generate_unique_filename(file.filename, folder)
+            
+            # Read file data
+            file_data = file.read()
+            
+            # Optimize image if it's an image file and optimization is enabled
+            if optimize_image and file.content_type and file.content_type.startswith('image/'):
+                file_data = self._optimize_image(file_data)
+            
+            # Upload to Firebase Storage
+            blob = self.bucket.blob(filename)
+            blob.upload_from_string(file_data, content_type=file.content_type)
+            
+            # Make the file publicly accessible
+            blob.make_public()
+            
+            # Return public URL
+            return blob.public_url
+            
+        except Exception as e:
+            print(f"Error uploading file: {str(e)}")
+            return None
+    
+    def delete_file(self, file_url: str) -> bool:
+        """
+        Delete a file from Firebase Storage using its public URL
+        
+        Args:
+            file_url: Public URL of the file to delete
+        
+        Returns:
+            True if deleted successfully, False otherwise
+        """
+        if not self.is_initialized():
+            return False
+        
+        try:
+            # Extract filename from URL
+            # Firebase Storage URLs have format: https://storage.googleapis.com/bucket-name/filename
+            if 'storage.googleapis.com' in file_url:
+                filename = file_url.split('/')[-1]
+                # URL decode the filename
+                import urllib.parse
+                filename = urllib.parse.unquote(filename)
+                
+                # Delete the file
+                blob = self.bucket.blob(filename)
+                blob.delete()
+                
+                return True
+            else:
+                print(f"Invalid Firebase Storage URL: {file_url}")
+                return False
+                
+        except Exception as e:
+            print(f"Error deleting file: {str(e)}")
+            return False
+    
+    def list_files(self, folder: str = "", limit: int = 100) -> List[dict]:
+        """
+        List files in a specific folder
+        
+        Args:
+            folder: Folder path to list files from
+            limit: Maximum number of files to return
+        
+        Returns:
+            List of file information dictionaries
+        """
+        if not self.is_initialized():
+            return []
+        
+        try:
+            files = []
+            blobs = self.bucket.list_blobs(prefix=folder, max_results=limit)
+            
+            for blob in blobs:
+                files.append({
+                    'name': blob.name,
+                    'url': blob.public_url,
+                    'size': blob.size,
+                    'created': blob.time_created,
+                    'updated': blob.updated,
+                    'content_type': blob.content_type
+                })
+            
+            return files
+            
+        except Exception as e:
+            print(f"Error listing files: {str(e)}")
+            return []
+    
+    def get_signed_url(self, filename: str, expiration_hours: int = 1) -> Optional[str]:
+        """
+        Generate a signed URL for private file access
+        
+        Args:
+            filename: Name of the file in storage
+            expiration_hours: Hours until the URL expires
+        
+        Returns:
+            Signed URL or None if failed
+        """
+        if not self.is_initialized():
+            return None
+        
+        try:
+            blob = self.bucket.blob(filename)
+            expiration = datetime.utcnow() + timedelta(hours=expiration_hours)
+            
+            signed_url = blob.generate_signed_url(expiration=expiration)
+            return signed_url
+            
+        except Exception as e:
+            print(f"Error generating signed URL: {str(e)}")
+            return None
+
+# Global instance
+firebase_storage = FirebaseStorageManager()
+
+# Utility functions for easy access
+def upload_file(file: FileStorage, folder: str = "", optimize_image: bool = True) -> Optional[str]:
+    """Upload a file to Firebase Storage"""
+    return firebase_storage.upload_file(file, folder, optimize_image)
+
+def delete_file(file_url: str) -> bool:
+    """Delete a file from Firebase Storage"""
+    return firebase_storage.delete_file(file_url)
+
+def list_files(folder: str = "", limit: int = 100) -> List[dict]:
+    """List files in Firebase Storage"""
+    return firebase_storage.list_files(folder, limit)
+
+def upload_file_from_path(local_file_path: str, folder: str = "", optimize_image: bool = True) -> Optional[str]:
+    """
+    Upload a file from local path to Firebase Storage
+    
+    Args:
+        local_file_path: Path to the local file
+        folder: Folder path in storage
+        optimize_image: Whether to optimize images before upload
+    
+    Returns:
+        Public URL of uploaded file or None if failed
+    """
+    if not firebase_storage.is_initialized():
+        print("Firebase Storage not initialized")
+        return None
+    
+    try:
+        import mimetypes
+        from pathlib import Path
+        
+        # Check if file exists
+        if not os.path.exists(local_file_path):
+            print(f"File not found: {local_file_path}")
+            return None
+        
+        # Get file info
+        file_path = Path(local_file_path)
+        filename = file_path.name
+        
+        # Determine content type
+        content_type, _ = mimetypes.guess_type(local_file_path)
+        if not content_type:
+            content_type = 'application/octet-stream'
+        
+        # Generate unique filename
+        unique_filename = firebase_storage._generate_unique_filename(filename, folder)
+        
+        # Read file data
+        with open(local_file_path, 'rb') as f:
+            file_data = f.read()
+        
+        # Optimize image if it's an image file and optimization is enabled
+        if optimize_image and content_type.startswith('image/'):
+            file_data = firebase_storage._optimize_image(file_data)
+        
+        # Upload to Firebase Storage
+        blob = firebase_storage.bucket.blob(unique_filename)
+        blob.upload_from_string(file_data, content_type=content_type)
+        
+        # Make the file publicly accessible
+        blob.make_public()
+        
+        # Return public URL
+        return blob.public_url
+        
+    except Exception as e:
+        print(f"Error uploading file from path: {str(e)}")
+        return None
+
+def is_firebase_available() -> bool:
+    """Check if Firebase Storage is available"""
+    return firebase_storage.is_initialized()

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accesorios para Tanques Elevados - DH2OCOL </title>
+    <meta name="description" content="Accesorios de alta calidad para tanques elevados en Valledupar. Válvulas, flotadores, tapas y más. DH2OCOL Colombia - Especialistas en agua potable.">
+    <meta name="keywords" content="accesorios tanques elevados, válvulas tanques, flotadores, tapas tanques, Valledupar, DH2OCOL Colombia">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/productos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+    
+    <!-- reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfYourSiteKey"></script>
+    
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white !important;
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .hero-section h1,
+        .hero-section .display-4 {
+            color: white !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero-section p,
+        .hero-section .lead {
+            color: white !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: #2a5298;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            color: #1e3c72;
+            font-weight: bold;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        .cta-section {
+            background: #f8f9fa;
+            padding: 60px 0;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="DH2OCOL Colombia" height="40">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}#servicios">Servicios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('main.accesorios_tanques') }}">Accesorios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.index') }}#contacto">Contacto</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h1 class="display-4 fw-bold mb-4">Accesorios para Tanques Elevados</h1>
+                    <p class="lead mb-4">Encuentra los mejores accesorios de alta calidad para tu tanque elevado. Válvulas, flotadores, tapas y más componentes esenciales para el óptimo funcionamiento de tu sistema de agua.</p>
+                    <a href="#productos" class="btn btn-light btn-lg">Ver Productos</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title">¿Por qué elegir nuestros accesorios?</h2>
+            <div class="row">
+                <div class="col-md-4 text-center mb-4">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Alta Calidad</h4>
+                    <p>Accesorios fabricados con materiales resistentes y duraderos, diseñados para soportar las condiciones climáticas de la región.</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <div class="feature-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h4>Fácil Instalación</h4>
+                    <p>Productos diseñados para una instalación sencilla y rápida, con instrucciones claras y soporte técnico disponible.</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <div class="feature-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h4>Garantía</h4>
+                    <p>Todos nuestros accesorios cuentan con garantía de calidad y el respaldo de DH2OCOL Colombia.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="productos" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title">Nuestros Productos</h2>
+            
+            {% for categoria, productos in productos_por_categoria.items() %}
+            <div class="mb-5">
+                <h3 class="text-center mb-4 text-primary">{{ categoria.title() }}</h3>
+                <div class="row">
+                    {% for producto in productos %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card product-card">
+                            {% if producto.imagen %}
+                            <div class="product-image-container">
+                                <img src="{{ producto.imagen if 'firebase' in producto.imagen else url_for('static', filename='img/' + producto.categoria.lower() + '/' + producto.imagen) }}" 
+                                     class="card-img-top product-image" alt="{{ producto.nombre }}">
+                            </div>
+                            {% else %}
+                            <div class="product-image-container">
+                                <div class="card-img-top product-image bg-secondary d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-cog fa-3x text-white"></i>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ producto.nombre }}</h5>
+                                <p class="card-text">{{ producto.descripcion }}</p>
+                                {% if producto.precio %}
+                                <div class="mb-3">
+                                    <span class="price-tag">${{ "{:,.0f}".format(producto.precio) }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="d-grid">
+                                    <a href="https://api.whatsapp.com/send?phone={{ configuracion.whatsapp or '573015551234' }}&text=Hola, estoy interesado en {{ producto.nombre }}" 
+                                       class="btn btn-primary-custom" target="_blank">
+                                        <i class="fab fa-whatsapp me-2"></i>Consultar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% if not productos_por_categoria %}
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="alert alert-info">
+                        <h4><i class="fas fa-info-circle me-2"></i>No hay productos disponibles</h4>
+                        <p class="mb-0">Actualmente no hay productos configurados. Por favor, contacta con nosotros para más información sobre nuestros accesorios.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Guide Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title">Guía de Instalación</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <strong>1</strong>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5>Preparación</h5>
+                                    <p>Revisa que tengas todas las herramientas necesarias y lee las instrucciones completamente.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <strong>2</strong>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5>Instalación</h5>
+                                    <p>Sigue el orden recomendado de instalación para cada accesorio según su función.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <strong>3</strong>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5>Pruebas</h5>
+                                    <p>Realiza pruebas de funcionamiento para verificar que todo esté correctamente instalado.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <strong>4</strong>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5>Mantenimiento</h5>
+                                    <p>Programa revisiones periódicas para asegurar el óptimo funcionamiento a largo plazo.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galería de Medios -->
+    {% if medios %}
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center mb-5">
+                    <h2 class="section-title">Galería de Accesorios</h2>
+                    <p class="lead">Conoce más sobre nuestros accesorios para tanques elevados</p>
+                </div>
+            </div>
+            <div class="row">
+                {% for medio in medios %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{ medio.ruta if 'firebase' in medio.ruta else url_for('static', filename=medio.ruta) }}" 
+                             class="card-img-top" 
+                             alt="{{ medio.titulo or 'Accesorio para tanque elevado' }}"
+                             style="height: 250px; object-fit: cover;">
+                        <div class="card-body">
+                            {% if medio.titulo %}
+                            <h5 class="card-title">{{ medio.titulo }}</h5>
+                            {% endif %}
+                            {% if medio.descripcion %}
+                            <p class="card-text">{{ medio.descripcion }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="mb-4">¿Necesitas Asesoría Técnica?</h2>
+                    <p class="lead mb-4">Nuestro equipo de expertos está disponible para ayudarte a elegir los accesorios correctos para tu tanque elevado y brindarte soporte en la instalación.</p>
+                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+                        <a href="https://api.whatsapp.com/send?phone={{ configuracion.whatsapp or '573157484662' }}&text=Hola, necesito asesoría sobre accesorios para tanques elevados" 
+                           class="btn btn-primary-custom btn-lg" target="_blank">
+                            <i class="fab fa-whatsapp me-2"></i>Contactar por WhatsApp
+                        </a>
+                        <button type="button" class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#contactModal">
+                            <i class="fas fa-envelope me-2"></i>Enviar Mensaje
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de Contacto -->
+    <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="contactModalLabel">
+                        <i class="fas fa-envelope me-2"></i>Envíanos tu Mensaje
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Mostrar mensajes flash si existen -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form action="{{ url_for('main.contacto') }}" method="POST" id="contactForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">Nombre Completo *</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Correo Electrónico *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="empresa" class="form-label">Empresa</label>
+                                <input type="text" class="form-control" id="empresa" name="empresa">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mensaje" class="form-label">Mensaje *</label>
+                            <textarea class="form-control" id="mensaje" name="mensaje" rows="4" required placeholder="Describe tu consulta sobre accesorios para tanques elevados..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Los campos marcados con (*) son obligatorios. Te contactaremos en un plazo máximo de 24 horas.
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </button>
+                    <button type="submit" form="contactForm" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i>Enviar Mensaje
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white">DH2OCOL Colombia</h5>
+                    <p class="text-white">Especialistas en limpieza y mantenimiento de tanques elevados. Comprometidos con la educación sobre el agua potable.</p>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white">Enlaces Útiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none"><i class="fas fa-home me-2"></i>Inicio</a></li>
+                        <li><a href="{{ url_for('main.educagua') }}" class="text-white text-decoration-none"><i class="fas fa-graduation-cap me-2"></i>EducAgua</a></li>
+                        <li><a href="{{ url_for('main.limpieza_tanques_elevados') }}" class="text-white text-decoration-none"><i class="fas fa-tint me-2"></i>Limpieza de Tanques</a></li>
+                        <li><a href="{{ url_for('main.politica_tratamiento_datos') }}" class="text-white text-decoration-none" target="_blank"><i class="fas fa-shield-alt me-2"></i>Política de Tratamiento de Datos</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white">Contacto</h5>
+                    <p class="text-white"><i class="fas fa-phone me-2"></i> {{ configuracion.telefono or '+57 315 748 4662' }}</p>
+                    <p class="text-white"><i class="fas fa-envelope me-2"></i> {{ configuracion.email or 'contacto@dh2o.com.co' }}</p>
+                    <p class="text-white"><i class="fas fa-map-marker-alt me-2"></i> {{ configuracion.direccion or 'Valledupar, Cesar' }}</p>
+                    <div class="social-links mt-3">
+                        <a href="{{ url_for('main.redirect_facebook') }}" target="_blank" class="text-white me-3" title="Facebook">
+                            <i class="fab fa-facebook fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_youtube') }}" target="_blank" class="text-white me-3" title="YouTube">
+                            <i class="fab fa-youtube fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_instagram') }}" target="_blank" class="text-white me-3" title="Instagram">
+                            <i class="fab fa-instagram fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_tiktok') }}" target="_blank" class="text-white me-3" title="TikTok">
+                            <i class="fab fa-tiktok fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_whatsapp') }}" target="_blank" class="text-white" title="WhatsApp">
+                            <i class="fab fa-whatsapp fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr class="text-white">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-white">&copy; 2025 DH2OCOL Colombia - EducAgua. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- TanquiBot Chatbot -->
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ 'Editar' if pregunta else 'Nueva' }} Pregunta - Panel Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-question-circle"></i> 
+                    {{ 'Editar Pregunta' if pregunta else 'Nueva Pregunta' }}
+                </h2>
+                <a href="{{ url_for('admin.quiz') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ 'Editar' if pregunta else 'Crear' }} Pregunta del Quiz</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="pregunta" class="form-label">Pregunta *</label>
+                                    <textarea class="form-control" id="pregunta" name="pregunta" rows="3" required>{{ pregunta.pregunta if pregunta else '' }}</textarea>
+                                    <div class="form-text">Escribe la pregunta de manera clara y concisa.</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="opcion_a" class="form-label">Opción A *</label>
+                                            <input type="text" class="form-control" id="opcion_a" name="opcion_a" 
+                                                   value="{{ pregunta.opcion_a if pregunta else '' }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="opcion_b" class="form-label">Opción B *</label>
+                                            <input type="text" class="form-control" id="opcion_b" name="opcion_b" 
+                                                   value="{{ pregunta.opcion_b if pregunta else '' }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="opcion_c" class="form-label">Opción C *</label>
+                                            <input type="text" class="form-control" id="opcion_c" name="opcion_c" 
+                                                   value="{{ pregunta.opcion_c if pregunta else '' }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="respuesta_correcta" class="form-label">Respuesta Correcta *</label>
+                                    <select class="form-select" id="respuesta_correcta" name="respuesta_correcta" required>
+                                        <option value="">Selecciona la respuesta correcta</option>
+                                        <option value="a" {{ 'selected' if pregunta and pregunta.respuesta_correcta == 'a' else '' }}>A</option>
+                                        <option value="b" {{ 'selected' if pregunta and pregunta.respuesta_correcta == 'b' else '' }}>B</option>
+                                        <option value="c" {{ 'selected' if pregunta and pregunta.respuesta_correcta == 'c' else '' }}>C</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="explicacion" class="form-label">Explicación</label>
+                                    <textarea class="form-control" id="explicacion" name="explicacion" rows="3">{{ pregunta.explicacion if pregunta else '' }}</textarea>
+                                    <div class="form-text">Explicación que se mostrará al usuario después de responder (opcional).</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Configuración</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="orden" class="form-label">Orden</label>
+                                            <input type="number" class="form-control" id="orden" name="orden" 
+                                                   value="{{ pregunta.orden if pregunta else '1' }}" min="1">
+                                            <div class="form-text">Orden de aparición en el quiz.</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="activo" name="activo" 
+                                                       {{ 'checked' if not pregunta or pregunta.activo else '' }}>
+                                                <label class="form-check-label" for="activo">
+                                                    Pregunta activa
+                                                </label>
+                                            </div>
+                                            <div class="form-text">Solo las preguntas activas aparecen en el quiz.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Vista previa -->
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Vista Previa</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="preview-pregunta" class="fw-bold mb-2">{{ pregunta.pregunta if pregunta else 'Tu pregunta aparecerá aquí...' }}</div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="preview" disabled>
+                                            <label class="form-check-label">
+                                                <span id="preview-opcion-a">{{ pregunta.opcion_a if pregunta else 'Opción A' }}</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="preview" disabled>
+                                            <label class="form-check-label">
+                                                <span id="preview-opcion-b">{{ pregunta.opcion_b if pregunta else 'Opción B' }}</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="preview" disabled>
+                                            <label class="form-check-label">
+                                                <span id="preview-opcion-c">{{ pregunta.opcion_c if pregunta else 'Opción C' }}</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ url_for('admin.quiz') }}" class="btn btn-secondary">Cancelar</a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> 
+                                        {{ 'Actualizar' if pregunta else 'Crear' }} Pregunta
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Vista previa en tiempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const preguntaInput = document.getElementById('pregunta');
+    const opcionAInput = document.getElementById('opcion_a');
+    const opcionBInput = document.getElementById('opcion_b');
+    const opcionCInput = document.getElementById('opcion_c');
+    
+    const previewPregunta = document.getElementById('preview-pregunta');
+    const previewOpcionA = document.getElementById('preview-opcion-a');
+    const previewOpcionB = document.getElementById('preview-opcion-b');
+    const previewOpcionC = document.getElementById('preview-opcion-c');
+    
+    function updatePreview() {
+        previewPregunta.textContent = preguntaInput.value || 'Tu pregunta aparecerá aquí...';
+        previewOpcionA.textContent = opcionAInput.value || 'Opción A';
+        previewOpcionB.textContent = opcionBInput.value || 'Opción B';
+        previewOpcionC.textContent = opcionCInput.value || 'Opción C';
+    }
+    
+    preguntaInput.addEventListener('input', updatePreview);
+    opcionAInput.addEventListener('input', updatePreview);
+    opcionBInput.addEventListener('input', updatePreview);
+    opcionCInput.addEventListener('input', updatePreview);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,113 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Logs (runtime logs, not config)
+*.log
+logs/
+
+# Database files (local development)
+*.db
+*.sqlite
+*.sqlite3
+
+# Backups
+backups/
+*.backup
+*.bak
+
+# Test files
+test_*.py
+*_test.py
+tests/
+
+# Documentation (keep deployment docs)
+*.md
+!README.md
+!DEPLOYMENT_DOCKPLOY.md
+
+# Environment files (Dockploy manages these)
+.env
+.env.*
+.env.docker
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Node modules (if any)
+node_modules/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# Development scripts (not needed in production)
+clean_migration.py
+verify_migration.py
+test_*.py
+migrate_*.py
+remove_*.py
+
+# Server configs (Dockploy uses Traefik)
+nginx.conf
+apache.conf
+
+# Local uploads (use volumes in production)
+static/uploads/*
+!static/uploads/.gitkeep

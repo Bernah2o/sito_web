@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DH2OCOL - Limpieza y desinfección de tanques de agua potable</title>
+    <meta name="description" content="DH2OCOL - Especialistas en tratamiento y purificación del agua. Soluciones integrales con tecnología de vanguardia para hogares e industrias.">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    
+    <!-- reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfYourSiteKey"></script>
+    
+    <style>
+        /* Modal Flotante de Logros */
+        .logros-modal {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+            width: 90%;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .logros-modal.show {
+            display: block;
+        }
+
+        .logros-modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            position: relative;
+            border: 2px solid #e9ecef;
+        }
+
+        .logros-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #6c757d;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .logros-close-btn:hover {
+            color: #dc3545;
+        }
+
+        .logro-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logro-icon {
+            flex-shrink: 0;
+        }
+
+        .logro-icon img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid #fff;
+        }
+
+        .logro-content h4 {
+            color: #228B22;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .logro-subtitle {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .logro-content p {
+            color: #495057;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 0;
+        }
+
+        .logros-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #dee2e6, transparent);
+            margin: 20px 0;
+        }
+
+        .logros-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            margin-top: 15px;
+        }
+
+        .logros-actions-global {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-conocer-mas {
+            background: #228B22;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-conocer-mas:hover {
+            background: #1e7b1e;
+            transform: translateY(-2px);
+        }
+
+        .btn-mas-tarde {
+            background: transparent;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-mas-tarde:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .logros-modal.hide {
+            animation: slideOutRight 0.5s ease-in forwards;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logros-modal {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                width: auto;
+            }
+
+            .logros-modal-content {
+                padding: 20px;
+            }
+
+            .logro-icon img {
+                width: 50px;
+                height: 50px;
+            }
+
+            .logros-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegación Moderna -->
+    <nav class="navbar navbar-expand-lg fixed-top" style="background: rgba(0, 128, 55, 0.95); backdrop-filter: blur(10px);">
+        <div class="container">
+            <a class="navbar-brand text-white fw-bold fs-3" href="{{ url_for('main.index') }}">
+                <i class="fas fa-tint text-info me-2"></i>DH2OCOL
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="#inicio">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="#que-hacemos">Nosotros</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white fw-semibold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            Servicios
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#servicios">Nuestros Servicios</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.blog_mantenimiento') }}">Mantenimiento de Tanques</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.limpieza_tanques_elevados') }}">Limpieza de Tanques Elevados</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.accesorios_tanques') }}">Accesorios y Productos</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('main.educagua') }}">EducAgua</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="#testimonios">Testimonios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="#contacto">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-info text-white px-3 ms-2" href="{{ url_for('main.redirect_app') }}" target="_blank">
+                    <i class="fas fa-mobile-alt me-1"></i>App DH2OCOL
+                </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-section">
+        <div class="hero-content">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10 text-center">
+                        <h1 class="fade-in">Cuidado Integral de Tanques Elevados: Eficiencia, Calidad y Respeto al Medio Ambiente</h1>
+                        <p class="lead fade-in">
+                            Cuidamo tu agua, cuidamos tu salud.
+                        </p>
+                        <div class="hero-buttons fade-in">
+                            <a href="#servicios" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-cogs me-2"></i>Nuestros Servicios
+                            </a>
+                            <a href="#contacto" class="btn btn-outline btn-lg">
+                                <i class="fas fa-phone me-2"></i>Contactar Ahora
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Carousel de Imágenes -->
+    <section class="container">
+        {% if carousel_images %}
+        <div id="carouselDH2O" class="carousel slide carousel-container" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for image in carousel_images %}
+                <button type="button" data-bs-target="#carouselDH2O" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active"{% endif %}></button>
+                {% endfor %}
+            </div>
+            <div class="carousel-inner">
+                {% for image in carousel_images %}
+                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                    <img src="{{ image.ruta if 'firebase' in image.ruta else url_for('static', filename=image.ruta) }}" class="d-block w-100" alt="{{ image.descripcion or 'Imagen del carrusel' }}">
+                    {% if image.descripcion %}
+                    <div class="carousel-caption">
+                        <h3>{{ image.nombre or 'DH2O Colombia' }}</h3>
+                        <p>{{ image.descripcion }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselDH2O" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselDH2O" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Sección "Qué hacemos" -->
+    <section id="que-hacemos" class="que-hacemos scroll-reveal">
+        <div class="container">
+            <h2 class="text-center mb-5">¿Qué Hacemos?</h2>
+            <div class="section-divider mb-5"></div>
+            <div class="content-wrapper">
+                <div class="text-content">
+                    <h3 class="text-primary mb-4">Especialistas en Limpieza de Tanques de Agua Potable</h3>
+                    <p class="text-justify">
+                        Somos expertos en la limpieza, desinfección, reparación e instalación
+                        de tanques elevados de agua potable. Nuestro compromiso es garantizar
+                        la calidad y seguridad del agua que llega a tu hogar o negocio.
+                    </p>
+                    <p class="text-justify">
+                        Utilizamos tecnología de vanguardia y métodos sostenibles que respetan el medio ambiente,
+                        ofreciendo servicios personalizados que se adaptan a las necesidades específicas de cada cliente.
+                    </p>
+                    <div class="row mt-4">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-check-circle text-success me-3 fs-4"></i>
+                                <span>Tecnología Avanzada</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-check-circle text-success me-3 fs-4"></i>
+                                <span>Métodos Sostenibles</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-check-circle text-success me-3 fs-4"></i>
+                                <span>Calidad Garantizada</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-check-circle text-success me-3 fs-4"></i>
+                                <span>Servicio Personalizado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="image-content">
+                    <img src="{{ url_for('static', filename='img/logo_3.png') }}" alt="Qué hacemos en DH2OCOL" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Servicios -->
+    <section id="servicios" class="servicios-section scroll-reveal">
+        <div class="container">
+            <h2 class="text-center mb-5">Nuestros Servicios</h2>
+            <div class="section-divider mb-5"></div>
+            <div class="servicios-grid">
+                {% if servicios %}
+                {% for servicio in servicios[:3] %}
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <h4>{{ servicio.nombre }}</h4>
+                    <p>{{ servicio.descripcion[:100] }}{% if servicio.descripcion|length > 100 %}...{% endif %}</p>
+                    <div class="mt-3">
+                        <span class="badge bg-primary fs-6">Desde ${{ "{:,.0f}".format(servicio.precio_base) }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <!-- Servicios por defecto si no hay en la base de datos -->
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h4>Limpieza y Desinfección</h4>
+                    <p>Realizamos limpieza y desinfección de tanques elevados, eliminando bacterias y microorganismos para garantizar agua segura, limpia y de alta calidad para tu hogar o negocio.</p>
+                </div>
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h4>Reparación e Instalación</h4>
+                    <p>Brindamos servicios especializados en la reparación e instalación de tanques elevados de agua potable, enfocados en resolver problemas técnicos y desgaste.</p>
+                </div>
+                <div class="servicio-card">
+                    <div class="servicio-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Mantenimiento Preventivo</h4>
+                    <p>Programas de mantenimiento preventivo para garantizar la calidad del agua a largo plazo.</p>
+                </div>
+                {% endif %}
+            </div>
+            {% if servicios %}
+            <div class="text-center mt-5">
+                <a href="{{ url_for('main.servicios') }}" class="btn btn-primary btn-lg">Ver todos los servicios</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Sección de Testimonios -->
+    <section id="testimonios" class="testimonios-section scroll-reveal">
+        <div class="container">
+            <h2 class="text-center mb-5">Lo que Dicen Nuestros Clientes</h2>
+            <div class="section-divider mb-5"></div>
+            <div class="testimonios-grid">
+                {% if testimonios %}
+                {% for testimonio in testimonios[:3] %}
+                <div class="testimonio-card">
+                    <div class="testimonio-texto">
+                        "{{ testimonio.testimonio[:150] }}{% if testimonio.testimonio|length > 150 %}...{% endif %}"
+                    </div>
+                    <div class="testimonio-cliente">
+                        {{ testimonio.nombre_cliente }}
+                    </div>
+                    {% if testimonio.empresa %}
+                    <div class="testimonio-empresa">
+                        {{ testimonio.empresa }}
+                    </div>
+                    {% endif %}
+                    <div class="testimonio-rating">
+                        {% for i in range(testimonio.calificacion) %}
+                        <i class="fas fa-star text-warning"></i>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <!-- Testimonios por defecto si no hay en la base de datos -->
+                <div class="testimonio-card">
+                    <div class="testimonio-texto">
+                        "Excelente servicio de limpieza de tanques. El agua de nuestra casa nunca había estado tan limpia y pura."
+                    </div>
+                    <div class="testimonio-cliente">María González</div>
+                    <div class="testimonio-empresa">Cliente Residencial</div>
+                </div>
+                <div class="testimonio-card">
+                    <div class="testimonio-texto">
+                        "Muy profesionales en la instalación del nuevo tanque. Trabajo impecable y puntual."
+                    </div>
+                    <div class="testimonio-cliente">Carlos Rodríguez</div>
+                    <div class="testimonio-empresa">Empresa ABC</div>
+                </div>
+                <div class="testimonio-card">
+                    <div class="testimonio-texto">
+                        "El mantenimiento preventivo que ofrecen es excelente. Recomendados al 100%."
+                    </div>
+                    <div class="testimonio-cliente">Ana Martínez</div>
+                    <div class="testimonio-empresa">Hotel Plaza</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Contacto -->
+    <section id="contacto" class="contacto-rapido">
+        <div class="container">
+            <h2 class="text-center mb-4">¿Necesitas Nuestros Servicios?</h2>
+            <p class="text-center mb-5">Contáctanos para una cotización gratuita y personalizada</p>
+            
+            <div class="contacto-info">
+                <div class="contacto-item">
+                    <h5><i class="fas fa-phone text-info me-2"></i>Teléfono</h5>
+                    <p>{{ configuracion.telefono or configuracion.empresa_telefono or '+57 315 748 4662' }}</p>
+                </div>
+                <div class="contacto-item">
+                    <h5><i class="fas fa-envelope text-info me-2"></i>Email</h5>
+                    <p>{{ configuracion.email or configuracion.empresa_email or 'contacto@dh2o.com.co' }}</p>
+                </div>
+                <div class="contacto-item">
+                    <h5><i class="fas fa-map-marker-alt text-info me-2"></i>Dirección</h5>
+                    <p>{{ configuracion.direccion or configuracion.empresa_direccion or 'Valledupar, Colombia' }}</p>
+                </div>
+                <div class="contacto-item">
+                    <h5><i class="fas fa-clock text-info me-2"></i>Horarios</h5>
+                    <p>{{ configuracion.horarios or 'Lun - Vie: 8:00 AM - 6:00 PM - Sab: 8:00 AM - 1:00 PM' }}</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <button type="button" class="btn btn-primary btn-lg me-3" data-bs-toggle="modal" data-bs-target="#contactModal">
+                    <i class="fas fa-envelope me-2"></i>Enviar Mensaje
+                </button>
+                <a href="tel:{{ configuracion.telefono or configuracion.empresa_telefono or '+573157484662' }}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-phone me-2"></i>Llamar Ahora
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de Contacto -->
+    <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="contactModalLabel">
+                        <i class="fas fa-envelope me-2"></i>Envíanos tu Mensaje
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Mostrar mensajes flash si existen -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form action="{{ url_for('main.contacto') }}" method="POST" id="contactForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">Nombre Completo *</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Correo Electrónico *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="empresa" class="form-label">Empresa</label>
+                                <input type="text" class="form-control" id="empresa" name="empresa">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mensaje" class="form-label">Mensaje *</label>
+                            <textarea class="form-control" id="mensaje" name="mensaje" rows="4" required placeholder="Describe tu consulta o solicitud de servicio..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Los campos marcados con (*) son obligatorios. Te contactaremos en un plazo máximo de 24 horas.
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </button>
+                    <button type="submit" form="contactForm" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i>Enviar Mensaje
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white"><i class="fas fa-tint me-2 text-white"></i>{{ configuracion.nombre_empresa or configuracion.empresa_nombre or 'DH2OCOL' }}</h5>
+                    <p class="text-white">{{ configuracion.descripcion or configuracion.empresa_slogan or 'Soluciones integrales para el tratamiento del agua' }}</p>
+                    <div class="social-links mb-3">
+                        <a href="{{ url_for('main.redirect_facebook') }}" target="_blank" class="text-white me-3" title="Facebook">
+                            <i class="fab fa-facebook fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_youtube') }}" target="_blank" class="text-white me-3" title="YouTube">
+                            <i class="fab fa-youtube fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_instagram') }}" target="_blank" class="text-white me-3" title="Instagram">
+                            <i class="fab fa-instagram fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_tiktok') }}" target="_blank" class="text-white me-3" title="TikTok">
+                            <i class="fab fa-tiktok fa-lg"></i>
+                        </a>
+                        <a href="{{ url_for('main.redirect_whatsapp') }}" target="_blank" class="text-white" title="WhatsApp">
+                            <i class="fab fa-whatsapp fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white">Enlaces Útiles</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('main.blog_mantenimiento') }}" class="text-white text-decoration-none"><i class="fas fa-wrench me-2"></i>Mantenimiento de Tanques</a></li>
+                        <li><a href="{{ url_for('main.limpieza_tanques_elevados') }}" class="text-white text-decoration-none"><i class="fas fa-tint me-2"></i>Limpieza de Tanques Elevados</a></li>
+                        <li><a href="{{ url_for('main.accesorios_tanques') }}" class="text-white text-decoration-none"><i class="fas fa-tools me-2"></i>Accesorios para Tanques</a></li>
+                        <li><a href="{{ url_for('main.educagua') }}" class="text-white text-decoration-none"><i class="fas fa-graduation-cap me-2"></i>EducAgua - Educación del Agua</a></li>
+                        <li><a href="{{ url_for('main.politica_tratamiento_datos') }}" class="text-white text-decoration-none" target="_blank"><i class="fas fa-shield-alt me-2"></i>Política de Tratamiento de Datos</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white">Acceso Rápido</h5>
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        <a href="{{ url_for('main.redirect_app') }}" class="btn btn-info btn-sm d-flex align-items-center" target="_blank">
+                            <i class="fas fa-mobile-alt me-2"></i>App DH2OCOL
+                        </a>
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-warning btn-sm d-flex align-items-center">
+                            <i class="fas fa-cog me-2"></i>Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr class="text-white" />
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-white">&copy; 2025 DH2OCOL. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="text-white">{{ configuracion.direccion or 'Valledupar, Cesar - Colombia' }}</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Flotante de Logros -->
+    <div id="logrosModal" class="logros-modal">
+        <div class="logros-modal-content">
+            <button class="logros-close-btn" onclick="cerrarModal()">&times;</button>
+            
+            <!-- Sello de Paz -->
+            <div class="logro-item">
+                <div class="logro-icon">
+                    <img src="{{ url_for('static', filename='img/Sello_ColombiaDestinoDePaz.png') }}" alt="Sello de Paz" width="60" height="60">
+                </div>
+                <div class="logro-content">
+                    <h4>Sello de Paz</h4>
+                    <p class="logro-subtitle">Certificación Oficial</p>
+                    <p>DH2OCOL ha sido reconocida oficialmente con el Sello de Paz por nuestro compromiso con la construcción de paz y reconciliación en Colombia.</p>
+                    <div class="logros-actions">
+                        <button class="btn-conocer-mas" onclick="window.open('https://www.destinosdepaz.gov.co/', '_blank')">Conocer Más</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="logros-divider"></div>
+            
+            <!-- Plazos Justos -->
+            <div class="logro-item">
+                <div class="logro-icon">
+                    <img src="{{ url_for('static', filename='img/plazos_justos.jpeg') }}" alt="Plazos Justos" width="60" height="60">
+                </div>
+                <div class="logro-content">
+                    <h4>Plazos Justos</h4>
+                    <p class="logro-subtitle">Empresa comprometida con el pago puntual a proveedores</p>
+                    <div class="logros-actions">
+                        <button class="btn-conocer-mas" onclick="window.open('https://plazosjustos.gov.co/', '_blank')">Conocer Más</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="logros-actions-global">
+                <button class="btn-mas-tarde" onclick="cerrarModal()">Más Tarde</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scrolling para los enlaces de navegación
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animaciones de scroll reveal
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Navbar transparencia en scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(0, 128, 55, 0.95)';
+            } else {
+                navbar.style.background = 'rgba(0, 128, 55, 0.95)';
+            }
+        });
+
+        // Manejar modal de contacto
+        document.addEventListener('DOMContentLoaded', function() {
+            // Si hay mensajes flash, mostrar el modal automáticamente
+            const alerts = document.querySelectorAll('#contactModal .alert');
+            if (alerts.length > 0) {
+                const contactModal = new bootstrap.Modal(document.getElementById('contactModal'));
+                contactModal.show();
+            }
+
+            // Validación del formulario
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    const nombre = document.getElementById('nombre').value.trim();
+                    const email = document.getElementById('email').value.trim();
+                    const mensaje = document.getElementById('mensaje').value.trim();
+
+                    if (!nombre || !email || !mensaje) {
+                        e.preventDefault();
+                        alert('Por favor, completa todos los campos obligatorios.');
+                        return false;
+                    }
+
+                    // Validar formato de email
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        e.preventDefault();
+                        alert('Por favor, ingresa un correo electrónico válido.');
+                        return false;
+                    }
+
+                    // Mostrar indicador de carga
+                    const submitBtn = document.querySelector('#contactModal button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Enviando...';
+                    submitBtn.disabled = true;
+
+                    // El formulario se enviará normalmente
+                    return true;
+                });
+            }
+
+            // Limpiar formulario cuando se cierre el modal
+            const contactModal = document.getElementById('contactModal');
+            if (contactModal) {
+                contactModal.addEventListener('hidden.bs.modal', function() {
+                    const form = document.getElementById('contactForm');
+                    if (form) {
+                        form.reset();
+                    }
+                });
+            }
+        });
+    </script>
+    
+    <!-- JavaScript del Modal de Logros -->
+    <script>
+        let modalTimer;
+        
+        // Función para mostrar el modal
+        function mostrarModal() {
+            const modal = document.getElementById('logrosModal');
+            modal.classList.add('show');
+            
+            // Auto-cerrar después de 15 segundos
+            modalTimer = setTimeout(() => {
+                cerrarModal();
+            }, 15000);
+        }
+        
+        // Función para cerrar el modal
+        function cerrarModal() {
+            const modal = document.getElementById('logrosModal');
+            modal.classList.add('hide');
+            
+            // Limpiar el temporizador
+            if (modalTimer) {
+                clearTimeout(modalTimer);
+            }
+            
+            // Ocultar completamente después de la animación
+            setTimeout(() => {
+                modal.classList.remove('show', 'hide');
+            }, 500);
+            
+            // Guardar en localStorage que el usuario ya vio el modal
+            localStorage.setItem('logrosModalVisto', 'true');
+        }
+        
+        // Mostrar el modal cuando la página cargue (si no se ha visto antes)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si el usuario ya vio el modal
+            const yaVisto = localStorage.getItem('logrosModalVisto');
+            
+            if (!yaVisto) {
+                // Mostrar el modal después de 3 segundos
+                setTimeout(() => {
+                    mostrarModal();
+                }, 3000);
+            }
+        });
+        
+        // Cerrar modal al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('logrosModal');
+            const modalContent = modal.querySelector('.logros-modal-content');
+            
+            if (modal.classList.contains('show') && !modalContent.contains(event.target)) {
+                cerrarModal();
+            }
+        });
+        
+        // Cerrar modal con tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('logrosModal');
+                if (modal.classList.contains('show')) {
+                    cerrarModal();
+                }
+            }
+        });
+    </script>
+    
+    <!-- TanquiBot Chatbot -->
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+</html>

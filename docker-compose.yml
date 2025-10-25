@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # Aplicación Flask
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: dh2ocol-web
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      # Variables que se configurarán en Dockploy
+      - FLASK_ENV=production
+      - SECRET_KEY
+      - WEBSITE_URL
+      - WEBSITE_NAME
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER
+      - DB_PASSWORD
+      - DB_NAME
+      - MAIL_SERVER
+      - MAIL_PORT
+      - MAIL_USE_TLS
+      - MAIL_USERNAME
+      - MAIL_PASSWORD
+      - JWT_SECRET_KEY
+      - JWT_ALGORITHM
+      - JWT_ACCESS_TOKEN_EXPIRES_HOURS
+      - JWT_REFRESH_TOKEN_EXPIRES_DAYS
+      - OPENAI_API_KEY
+      - RUN_MIGRATIONS=true
+      # Firebase Storage Configuration
+      - FIREBASE_TYPE
+      - FIREBASE_PROJECT_ID
+      - FIREBASE_PRIVATE_KEY_ID
+      - FIREBASE_PRIVATE_KEY
+      - FIREBASE_CLIENT_EMAIL
+      - FIREBASE_CLIENT_ID
+      - FIREBASE_AUTH_URI
+      - FIREBASE_TOKEN_URI
+      - FIREBASE_AUTH_PROVIDER_X509_CERT_URL
+      - FIREBASE_CLIENT_X509_CERT_URL
+      - FIREBASE_UNIVERSE_DOMAIN
+    volumes:
+      - uploads_data:/app/static/uploads
+      - logs_data:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dh2ocol-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Base de datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: dh2ocol-db
+    restart: unless-stopped
+    environment:
+      # Variables que se configurarán en Dockploy
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+      - mysql_logs:/var/log/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - dh2ocol-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+# Volúmenes persistentes
+volumes:
+  mysql_data:
+    driver: local
+  uploads_data:
+    driver: local
+  logs_data:
+    driver: local
+  mysql_logs:
+    driver: local
+
+# Red personalizada
+networks:
+  dh2ocol-network:
+    driver: bridge

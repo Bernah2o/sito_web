@@ -7,8 +7,12 @@
 node_modules/
 dist/
 env/
+venv/
+backups/
 *.sqlite3
 .env
+.env.example
+.env.docker
 
 
 
@@ -52,4 +56,31 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
+
+# Firebase Storage - Archivos gestionados externamente
+# Excluir carpetas de imágenes que serán manejadas por Firebase
+static/img/productos/
+static/img/servicios/
+static/img/carousel/
+static/img/accesorios/
+static/img/bombas/
+static/img/filtros/
+static/img/herramientas/
+static/img/quimicos/
+static/img/tanques/
+static/uploads/
+
+# Mantener solo archivos esenciales del sistema
+!static/img/logo.png
+!static/img/logo.svg
+!static/img/logo_3.png
+!static/img/Sello_ColombiaDestinoDePaz.png
+!static/img/plazos_justos.jpeg
+!static/img/plazos_justos_2.png
+!static/uploads/.gitkeep
+
+# Archivos de configuración de Firebase (credenciales)
+firebase-service-account.json
+*firebase*.json
+firebase-debug.log
 

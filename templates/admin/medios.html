@@ -1,0 +1,500 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Gestión de Medios - Panel de Administración{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Gestión de Medios</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            <i class="fas fa-upload me-2"></i>Subir Archivo
+        </button>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="row mb-4">
+    <div class="col-md-2">
+        <select class="form-select" id="filterType" onchange="filterFiles()">
+            <option value="">Todos los tipos</option>
+            <option value="image">Imágenes</option>
+            <option value="pdf">PDFs</option>
+            <option value="video">Videos</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select class="form-select" id="filterCategory" onchange="filterByCategory()">
+            <option value="">Todas las categorías</option>
+        </select>
+    </div>
+    <div class="col-md-5">
+        <input type="text" class="form-control" id="searchFiles" placeholder="Buscar archivos..." onkeyup="searchFiles()">
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-outline-danger" onclick="deleteSelected()">
+            <i class="fas fa-trash me-2"></i>Eliminar Seleccionados
+        </button>
+    </div>
+</div>
+
+<!-- Lista de archivos -->
+<div class="row" id="filesList">
+    {% if files %}
+        {% for file in files %}
+        <div class="col-md-4 col-lg-3 mb-4 file-item" data-type="{{ file.type }}" data-name="{{ file.name }}" data-category="{{ file.category }}">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <input type="checkbox" class="form-check-input file-checkbox" value="{{ file.id }}">
+                    <small class="text-muted">{{ file.size }}</small>
+                </div>
+                
+                {% if file.type == 'image' %}
+                <img src="{{ file.path if 'firebase' in file.path else url_for('static', filename=file.path) }}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="{{ file.name }}">
+                {% elif file.type == 'pdf' %}
+                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 150px;">
+                    <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                </div>
+                {% elif file.type == 'video' %}
+                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 150px;">
+                    <i class="fas fa-file-video fa-3x text-primary"></i>
+                </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h6 class="card-title">{{ file.name }}</h6>
+                    <div class="mb-2">
+                        <span class="badge bg-secondary category-badge" data-file-id="{{ file.id }}">
+                            {{ file.category or 'general' }}
+                        </span>
+                        <button class="btn btn-sm btn-link p-0 ms-1" onclick="editCategory('{{ file.id }}', '{{ file.category or 'general' }}')" title="Editar categoría">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    <p class="card-text">
+                        <small class="text-muted">{{ file.upload_date }}</small>
+                    </p>
+                    <div class="btn-group w-100">
+                        <button class="btn btn-sm btn-outline-primary" onclick="copyUrl('{{ file.path if 'firebase' in file.path else url_for('static', filename=file.path) }}')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="previewFile('{{ file.id }}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteFile('{{ file.id }}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No hay archivos subidos</h5>
+            <p class="text-muted">Sube tu primer archivo haciendo clic en "Subir Archivo"</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal para subir archivos -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Subir Archivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('admin.upload_file') }}" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Seleccionar archivo</label>
+                        <input type="file" class="form-control" id="file" name="file" required 
+                               accept="image/*,.pdf,video/*" onchange="previewUploadFile(this)">
+                        <div class="form-text">Formatos permitidos: Imágenes (JPG, PNG, GIF), PDFs, Videos (MP4, AVI, MOV)</div>
+                    </div>
+                    
+                    <!-- Previsualización del archivo -->
+                    <div class="mb-3" id="uploadPreview" style="display: none;">
+                        <label class="form-label">Previsualización</label>
+                        <div class="border rounded p-3 text-center bg-light">
+                            <img id="previewImage" src="" alt="Previsualización" class="img-fluid" style="max-height: 200px; display: none;">
+                            <div id="previewInfo" class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-file me-1"></i>
+                                    <span id="previewFileName"></span> 
+                                    (<span id="previewFileSize"></span>)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="file_name" class="form-label">Nombre del archivo (opcional)</label>
+                        <input type="text" class="form-control" id="file_name" name="file_name" 
+                               placeholder="Se usará el nombre original si se deja vacío">
+                    </div>
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Categoría</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="general">General</option>
+                            <option value="carousel">Carrusel</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descripción (opcional)</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" 
+                                  placeholder="Descripción del archivo"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Subir Archivo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar categoría -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Categoría</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="editCategorySelect" class="form-label">Nueva categoría</label>
+                    <select class="form-select" id="editCategorySelect">
+                        <option value="general">General</option>
+                        <option value="carousel">Carrusel</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="updateCategory()">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentEditingFileId = null;
+
+function filterFiles() {
+    const filterType = document.getElementById('filterType').value;
+    const filterCategory = document.getElementById('filterCategory').value;
+    const fileItems = document.querySelectorAll('.file-item');
+    
+    fileItems.forEach(item => {
+        const typeMatch = filterType === '' || item.dataset.type === filterType;
+        const categoryMatch = filterCategory === '' || item.dataset.category === filterCategory;
+        
+        if (typeMatch && categoryMatch) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function filterByCategory() {
+    filterFiles(); // Reutilizar la función de filtrado existente
+}
+
+function searchFiles() {
+    const searchTerm = document.getElementById('searchFiles').value.toLowerCase();
+    const fileItems = document.querySelectorAll('.file-item');
+    
+    fileItems.forEach(item => {
+        const fileName = item.dataset.name.toLowerCase();
+        if (fileName.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function copyUrl(url) {
+    navigator.clipboard.writeText(window.location.origin + url).then(() => {
+        alert('URL copiada al portapapeles');
+    });
+}
+
+function previewFile(fileId) {
+    // Buscar el archivo en la lista
+    const fileItems = document.querySelectorAll('.file-item');
+    let fileData = null;
+    
+    fileItems.forEach(item => {
+        const checkbox = item.querySelector('.file-checkbox');
+        if (checkbox && checkbox.value === fileId) {
+            const img = item.querySelector('img');
+            const fileName = item.dataset.name;
+            const fileUrl = img ? img.src : null;
+            
+            if (fileUrl) {
+                fileData = {
+                    name: fileName,
+                    url: fileUrl
+                };
+            }
+        }
+    });
+    
+    if (fileData) {
+        // Crear modal de previsualización
+        const modalHtml = `
+            <div class="modal fade" id="previewModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Previsualización: ${fileData.name}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="${fileData.url}" class="img-fluid" alt="${fileData.name}" style="max-height: 70vh;">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" onclick="copyUrl('${fileData.url}')">
+                                <i class="fas fa-copy me-1"></i>Copiar URL
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remover modal existente si existe
+        const existingModal = document.getElementById('previewModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Agregar nuevo modal al DOM
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Mostrar modal
+        const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+        modal.show();
+        
+        // Limpiar modal cuando se cierre
+        document.getElementById('previewModal').addEventListener('hidden.bs.modal', function() {
+            this.remove();
+        });
+    } else {
+        alert('No se pudo cargar la previsualización del archivo');
+    }
+}
+
+function previewUploadFile(input) {
+    const file = input.files[0];
+    const uploadPreview = document.getElementById('uploadPreview');
+    const previewImage = document.getElementById('previewImage');
+    const previewFileName = document.getElementById('previewFileName');
+    const previewFileSize = document.getElementById('previewFileSize');
+    
+    if (file) {
+        // Mostrar información del archivo
+        previewFileName.textContent = file.name;
+        previewFileSize.textContent = formatFileSize(file.size);
+        
+        // Auto-completar el nombre del archivo si está vacío
+        const fileNameInput = document.getElementById('file_name');
+        if (!fileNameInput.value) {
+            const nameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
+            fileNameInput.value = nameWithoutExtension;
+        }
+        
+        // Mostrar previsualización si es una imagen
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewImage.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewImage.style.display = 'none';
+        }
+        
+        uploadPreview.style.display = 'block';
+    } else {
+        uploadPreview.style.display = 'none';
+        previewImage.style.display = 'none';
+    }
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+async function deleteFile(fileId) {
+    const confirmed = await showConfirm(
+        '¿Estás seguro de que quieres eliminar este archivo? Esta acción no se puede deshacer.',
+        {
+            title: 'Eliminar Archivo',
+            confirmText: 'Eliminar',
+            confirmClass: 'btn-danger',
+            icon: 'fas fa-trash text-danger'
+        }
+    );
+    
+    if (confirmed) {
+        fetch(`/admin/medios/delete/${fileId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error al eliminar el archivo');
+            }
+        });
+    }
+}
+
+async function deleteSelected() {
+    const selected = document.querySelectorAll('.file-checkbox:checked');
+    if (selected.length === 0) {
+        alert('Selecciona al menos un archivo para eliminar');
+        return;
+    }
+    
+    const confirmed = await showConfirm(
+        `¿Estás seguro de que quieres eliminar ${selected.length} archivo(s)? Esta acción no se puede deshacer.`,
+        {
+            title: 'Eliminar Archivos',
+            confirmText: 'Eliminar',
+            confirmClass: 'btn-danger',
+            icon: 'fas fa-trash text-danger'
+        }
+    );
+    
+    if (confirmed) {
+        const fileIds = Array.from(selected).map(cb => cb.value);
+        
+        fetch('/admin/medios/delete-multiple', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({file_ids: fileIds})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error al eliminar los archivos');
+            }
+        });
+    }
+}
+
+function editCategory(fileId, currentCategory) {
+    currentEditingFileId = fileId;
+    document.getElementById('editCategorySelect').value = currentCategory;
+    
+    const modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+    modal.show();
+}
+
+function updateCategory() {
+    if (!currentEditingFileId) return;
+    
+    const newCategory = document.getElementById('editCategorySelect').value;
+    
+    fetch(`/admin/medios/update-category/${currentEditingFileId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({category: newCategory})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Actualizar la badge de categoría
+            const badge = document.querySelector(`[data-file-id="${currentEditingFileId}"]`);
+            if (badge) {
+                badge.textContent = newCategory;
+            }
+            
+            // Actualizar el data-category del item
+            const allItems = document.querySelectorAll('.file-item');
+            allItems.forEach(item => {
+                const checkbox = item.querySelector('.file-checkbox');
+                if (checkbox && checkbox.value === currentEditingFileId) {
+                    item.dataset.category = newCategory;
+                }
+            });
+            
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editCategoryModal'));
+            modal.hide();
+            
+            // Mostrar mensaje de éxito
+            alert('Categoría actualizada exitosamente');
+        } else {
+            alert('Error al actualizar la categoría');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al actualizar la categoría');
+    });
+}
+
+// Cargar categorías dinámicamente al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    loadCategories();
+});
+
+function loadCategories() {
+    fetch('/admin/medios/categories')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const filterSelect = document.getElementById('filterCategory');
+            const uploadSelect = document.getElementById('category');
+            const editSelect = document.getElementById('editCategorySelect');
+            
+            // Limpiar opciones existentes (excepto la primera)
+            [filterSelect, uploadSelect, editSelect].forEach(select => {
+                while (select.children.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+            });
+            
+            // Agregar todas las categorías dinámicas
+            data.categories.forEach(category => {
+                [filterSelect, uploadSelect, editSelect].forEach(select => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                    select.appendChild(option);
+                });
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error loading categories:', error);
+    });
+}
+</script>
+{% endblock %}
