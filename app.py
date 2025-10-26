@@ -99,13 +99,18 @@ def init_db_connection(app):
     # Hacer get_db disponible globalmente
     app.get_db = get_db
 
+# Crear instancia de la aplicación para Gunicorn
+# Determinar entorno para producción
+env = os.environ.get('FLASK_ENV', 'production')
+app = create_app(env)
+
 def main():
     """Función principal para ejecutar la aplicación"""
     # Determinar entorno
     env = os.environ.get('FLASK_ENV', 'development')
     
     # Crear aplicación
-    app = create_app(env)
+    local_app = create_app(env)
     
     # Solo mostrar información detallada en desarrollo
     if env == 'development':
@@ -113,7 +118,7 @@ def main():
         print("=" * 50)
         print(f"🌐 Entorno: {env}")
         print(f"📊 Base de datos: MySQL")
-        print(f"🔧 Debug: {app.config['DEBUG']}")
+        print(f"🔧 Debug: {local_app.config['DEBUG']}")
         print("=" * 50)
         print("📋 URLs disponibles:")
         print("   • Sitio web: http://localhost:5000")
@@ -125,8 +130,8 @@ def main():
         print(f"🚀 DH2OCOL iniciado en modo {env}")
     
     # Ejecutar aplicación
-    app.run(
-        debug=app.config['DEBUG'],
+    local_app.run(
+        debug=local_app.config['DEBUG'],
         host='0.0.0.0',
         port=5000
     )
