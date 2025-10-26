@@ -64,8 +64,8 @@ def create_app(config_name='development'):
     def health_check_db():
         """Endpoint de verificación de salud de la base de datos"""
         try:
-            # Verificar conexión a base de datos
-            db = get_db()
+            # Verificar conexión a base de datos usando la función del app
+            db = app.get_db()
             cursor = db.cursor()
             cursor.execute("SELECT 1")
             cursor.close()
