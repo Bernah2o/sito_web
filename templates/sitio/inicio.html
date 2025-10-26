@@ -429,7 +429,8 @@
                     </div>
                     {% endif %}
                     <div class="testimonio-rating">
-                        {% for i in range(testimonio.calificacion) %}
+                        {% set calificacion = testimonio.calificacion or 5 %}
+                        {% for i in range(calificacion|int) %}
                         <i class="fas fa-star text-warning"></i>
                         {% endfor %}
                     </div>

@@ -38,9 +38,11 @@ CREATE TABLE IF NOT EXISTS servicios (
 -- Tabla de testimonios
 CREATE TABLE IF NOT EXISTS testimonios (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    nombre_cliente VARCHAR(100) NOT NULL,
+    empresa VARCHAR(100),
     testimonio TEXT NOT NULL,
     calificacion INT DEFAULT 5,
+    imagen VARCHAR(1000),
     activo BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -79,10 +81,10 @@ INSERT IGNORE INTO servicios (nombre, descripcion, precio, categoria) VALUES
 ('Mantenimiento Preventivo', 'Programa de mantenimiento preventivo para garantizar la calidad del agua', 100000.00, 'mantenimiento');
 
 -- Insertar testimonios por defecto
-INSERT IGNORE INTO testimonios (nombre, testimonio, calificacion) VALUES
-('María González', 'Excelente servicio profesional. Cuentan con personal altamente calificado, las herramientas adecuadas para una limpieza eficiente de los tanques y brindan una atención al cliente excepcional. ¡Totalmente recomendado!', 5),
-('Carlos Rodríguez', 'Excelente servicio recomendados al 100% matriculados con ustedes.', 5),
-('Ana Martínez', 'Excelente servicio, son muy cuidados con los productos que usan para ayudar al medio ambiente. Se los recomiendo a todos.', 5);
+INSERT IGNORE INTO testimonios (nombre_cliente, empresa, testimonio, calificacion) VALUES
+('María González', 'Edificio Los Pinos', 'Excelente servicio profesional. Cuentan con personal altamente calificado, las herramientas adecuadas para una limpieza eficiente de los tanques y brindan una atención al cliente excepcional. ¡Totalmente recomendado!', 5),
+('Carlos Rodríguez', 'Conjunto Residencial El Parque', 'Excelente servicio recomendados al 100% matriculados con ustedes.', 5),
+('Ana Martínez', 'Hotel Plaza', 'Excelente servicio, son muy cuidados con los productos que usan para ayudar al medio ambiente. Se los recomiendo a todos.', 5);
 
 -- Crear índices para optimizar consultas
 CREATE INDEX IF NOT EXISTS idx_usuarios_username ON usuarios(username);
