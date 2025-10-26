@@ -160,7 +160,7 @@ def upload_media_file():
         cursor = db.cursor()
         
         cursor.execute("""
-                INSERT INTO medios (nombre, filename, tipo, categoria, tamaño, descripcion, ruta)
+                INSERT INTO medios (nombre, filename, tipo, categoria, tamano, descripcion, ruta)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (file_name, file.filename, file_type, category, file_size, description, firebase_url))
         
