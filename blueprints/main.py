@@ -25,7 +25,7 @@ def index():
         productos_raw = cursor.fetchall()
         
         # Obtener testimonios
-        cursor.execute("SELECT * FROM testimonios WHERE activo = TRUE ORDER BY fecha_creacion DESC")
+        cursor.execute("SELECT * FROM testimonios WHERE activo = TRUE ORDER BY id DESC")
         testimonios = cursor.fetchall()
         
         # Obtener configuración de la empresa

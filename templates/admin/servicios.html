@@ -35,7 +35,10 @@
                             {% set descripcion = servicio.descripcion if servicio.descripcion else servicio[2] %}
                             {{ descripcion[:50] + '...' if descripcion|length > 50 else descripcion }}
                         </td>
-                        <td>${{ "{:,.0f}".format(servicio.precio_base if servicio.precio_base else servicio[3]) }}</td>
+                        <td>
+                            {% set precio = servicio.precio_base if servicio.precio_base else servicio[3] %}
+                            ${{ "{:,.0f}".format(precio) if precio else '0' }}
+                        </td>
                         <td>
                             {% set activo = servicio.activo if servicio.activo is defined else servicio[4] %}
                             {% if activo %}

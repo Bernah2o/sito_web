@@ -477,7 +477,7 @@ def dashboard():
         cursor.execute('SELECT COUNT(*) FROM testimonios WHERE activo = TRUE')
         total_testimonios = cursor.fetchone()[0]
         
-        cursor.execute('SELECT * FROM contactos ORDER BY fecha_creacion DESC LIMIT 5')
+        cursor.execute('SELECT * FROM contactos ORDER BY id DESC LIMIT 5')
         contactos_recientes = cursor.fetchall()
         
         stats = {
@@ -612,7 +612,7 @@ def contactos():
         db = get_db()
         cursor = db.cursor()
         
-        cursor.execute('SELECT * FROM contactos ORDER BY fecha_creacion DESC')
+        cursor.execute('SELECT * FROM contactos ORDER BY id DESC')
         contactos_data = cursor.fetchall()
         
         return render_template('admin/contactos.html', contactos=contactos_data)
@@ -648,7 +648,7 @@ def testimonios():
         db = get_db()
         cursor = db.cursor()
         
-        cursor.execute('SELECT * FROM testimonios ORDER BY fecha_creacion DESC')
+        cursor.execute('SELECT * FROM testimonios ORDER BY id DESC')
         testimonios_data = cursor.fetchall()
         
         return render_template('admin/testimonios.html', testimonios=testimonios_data)
@@ -1266,17 +1266,31 @@ def chatbot():
         
         # Obtener preguntas del chatbot
         cursor.execute("""
-                SELECT id, pregunta, respuesta, activo, fecha_creacion 
+                SELECT id, pregunta, respuesta, activo, id 
                 FROM chatbot_preguntas 
-                ORDER BY fecha_creacion DESC
+                ORDER BY id DESC
             """)
         
         preguntas = cursor.fetchall()
         
         # Obtener configuración del chatbot
         cursor.execute("SELECT * FROM chatbot_configuracion WHERE id = %s", (1,))
-        
         configuracion = cursor.fetchone()
+        
+        # Si no hay configuración, crear una por defecto
+        if not configuracion:
+            cursor.execute('''
+                INSERT INTO chatbot_configuracion (id, nombre_bot, mensaje_bienvenida, mensaje_no_entendido, activo, usar_gpt)
+                VALUES (1, 'TanquiBot', 
+                        '¡Hola! 👋 Soy TanquiBot, tu asistente virtual de DH2OCOL. Estoy aquí para ayudarte con información sobre nuestros servicios de tanques de agua. ¿En qué puedo ayudarte hoy?', 
+                        'Lo siento, no entiendo tu pregunta. 🤔 ¿Podrías reformularla o elegir una de las opciones disponibles? También puedes contactarnos directamente por WhatsApp.', 
+                        TRUE, FALSE)
+            ''')
+            db.commit()
+            
+            # Obtener la configuración recién creada
+            cursor.execute("SELECT * FROM chatbot_configuracion WHERE id = %s", (1,))
+            configuracion = cursor.fetchone()
         
         return render_template('admin/chatbot.html', 
                              preguntas=preguntas, 
