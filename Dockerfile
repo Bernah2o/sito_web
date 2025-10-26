@@ -40,5 +40,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/health || exit 1
 
-# Usar script de entrada personalizado
-CMD ["./docker-entrypoint.sh", "python", "app.py"]
+# Usar script de entrada personalizado con Gunicorn
+CMD ["./docker-entrypoint.sh", "gunicorn", "--config", "gunicorn.conf.py", "app:app"]

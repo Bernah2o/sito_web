@@ -18,3 +18,4 @@ openai>=1.0.0
 PyJWT==2.8.0
 cryptography==41.0.7
 firebase-admin==6.2.0
+gunicorn==21.2.0
