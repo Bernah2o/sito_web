@@ -684,7 +684,8 @@ def nuevo_testimonio():
             print(f"Error al crear testimonio: {e}")
             flash('Error al crear testimonio', 'error')
     
-    return render_template('admin/nuevo_testimonio.html')
+    # Si es GET, redirigir a la página de testimonios donde está el modal
+    return redirect(url_for('admin.testimonios'))
 
 
 
