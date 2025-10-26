@@ -49,7 +49,7 @@
                 </div>
                 
                 {% if file.type == 'image' %}
-                <img src="{{ file.path if 'firebase' in file.path else url_for('static', filename=file.path) }}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="{{ file.name }}">
+                <img src="{{ file.path }}" class="card-img-top" style="height: 150px; object-fit: cover;" alt="{{ file.name }}">
                 {% elif file.type == 'pdf' %}
                 <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 150px;">
                     <i class="fas fa-file-pdf fa-3x text-danger"></i>
@@ -74,7 +74,7 @@
                         <small class="text-muted">{{ file.upload_date }}</small>
                     </p>
                     <div class="btn-group w-100">
-                        <button class="btn btn-sm btn-outline-primary" onclick="copyUrl('{{ file.path if 'firebase' in file.path else url_for('static', filename=file.path) }}')">
+                        <button class="btn btn-sm btn-outline-primary" onclick="copyUrl('{{ file.path }}')">
                             <i class="fas fa-copy"></i>
                         </button>
                         <button class="btn btn-sm btn-outline-info" onclick="previewFile('{{ file.id }}')">

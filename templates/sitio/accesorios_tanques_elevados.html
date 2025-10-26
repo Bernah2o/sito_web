@@ -160,7 +160,7 @@
                         <div class="card product-card">
                             {% if producto.imagen %}
                             <div class="product-image-container">
-                                <img src="{{ producto.imagen if 'firebase' in producto.imagen else url_for('static', filename='img/' + producto.categoria.lower() + '/' + producto.imagen) }}" 
+                                <img src="{{ producto.imagen }}" 
                                      class="card-img-top product-image" alt="{{ producto.nombre }}">
                             </div>
                             {% else %}
