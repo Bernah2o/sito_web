@@ -917,7 +917,7 @@ def editar_testimonio(testimonio_id):
         empresa = request.form.get('empresa')
         testimonio = request.form.get('testimonio')
         calificacion = int(request.form.get('calificacion', 5))
-        activo = TRUE if request.form.get('activo') else 0
+        activo = True if request.form.get('activo') else 0
         
         db = get_db()
         cursor = db.cursor()
@@ -1047,7 +1047,7 @@ def nueva_pregunta():
             respuesta_correcta = request.form.get('respuesta_correcta')
             explicacion = request.form.get('explicacion')
             orden = request.form.get('orden', 1)
-            activo = TRUE if request.form.get('activo') else 0
+            activo = True if request.form.get('activo') else 0
             
             db = get_db()
             cursor = db.cursor()
@@ -1194,7 +1194,7 @@ def editar_pregunta(id):
             respuesta_correcta = request.form.get('respuesta_correcta')
             explicacion = request.form.get('explicacion')
             orden = request.form.get('orden', 1)
-            activo = TRUE if request.form.get('activo') else 0
+            activo = True if request.form.get('activo') else 0
             
             cursor.execute("""
                     UPDATE quiz_preguntas 
@@ -1294,7 +1294,7 @@ def nueva_pregunta_chatbot():
     try:
         pregunta = request.form.get('pregunta', '').strip()
         respuesta = request.form.get('respuesta', '').strip()
-        activo = TRUE if request.form.get('activo') else 0
+        activo = True if request.form.get('activo') else 0
         
         if not pregunta or not respuesta:
             flash('La pregunta y respuesta son obligatorias', 'error')
@@ -1495,7 +1495,7 @@ def editar_pregunta_chatbot(pregunta_id):
     try:
         pregunta = request.form.get('pregunta', '').strip()
         respuesta = request.form.get('respuesta', '').strip()
-        activo = TRUE if request.form.get('activo') else 0
+        activo = True if request.form.get('activo') else 0
         
         if not pregunta or not respuesta:
             flash('La pregunta y respuesta son obligatorias', 'error')

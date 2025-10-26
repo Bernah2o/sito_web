@@ -133,6 +133,8 @@ class DatabaseManager:
                 activo BOOLEAN DEFAULT TRUE,
                 recaptcha_site_key VARCHAR(255),
                 recaptcha_secret_key VARCHAR(255),
+                openai_api_key VARCHAR(255),
+                usar_gpt BOOLEAN DEFAULT FALSE,
                 fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )
         ''')
