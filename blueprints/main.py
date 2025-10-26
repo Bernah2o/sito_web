@@ -547,9 +547,9 @@ def chatbot_mensaje():
             config = cursor.fetchone()
             
             # Intentar usar GPT si está habilitado
-            if config and config[2] and config[1]:  # usar_gpt y openai_api_key
+            if config and config['usar_gpt'] and config['openai_api_key']:  # usar_gpt y openai_api_key
                 try:
-                    client = OpenAI(api_key=config[1])
+                    client = OpenAI(api_key=config['openai_api_key'])
                     
                     # Crear contexto sobre DH2OCOL
                     contexto = """Eres TanquiBot, el asistente virtual de DH2OCOL, una empresa especializada en:
@@ -578,13 +578,13 @@ redirige cortésmente hacia nuestros servicios o sugiere contactar por WhatsApp.
                     print(f"Error con OpenAI: {e}")
                     # Si falla GPT, usar mensaje por defecto
                     if config:
-                        respuesta_encontrada = config[0] if config[0] else "Lo siento, no entiendo tu pregunta. 🤔 ¿Podrías reformularla o elegir una de las opciones disponibles%s También puedes contactarnos directamente por WhatsApp."
+                        respuesta_encontrada = config['mensaje_no_entendido'] if config['mensaje_no_entendido'] else "Lo siento, no entiendo tu pregunta. 🤔 ¿Podrías reformularla o elegir una de las opciones disponibles%s También puedes contactarnos directamente por WhatsApp."
                     else:
                         respuesta_encontrada = "Lo siento, no entiendo tu pregunta. 🤔 ¿Podrías reformularla o elegir una de las opciones disponibles%s También puedes contactarnos directamente por WhatsApp."
             else:
                 # Usar mensaje por defecto
                 if config:
-                    respuesta_encontrada = config[0] if config[0] else "Lo siento, no entiendo tu pregunta. 🤔 ¿Podrías reformularla o elegir una de las opciones disponibles%s También puedes contactarnos directamente por WhatsApp."
+                    respuesta_encontrada = config['mensaje_no_entendido'] if config['mensaje_no_entendido'] else "Lo siento, no entiendo tu pregunta. 🤔 ¿Podrías reformularla o elegir una de las opciones disponibles%s También puedes contactarnos directamente por WhatsApp."
                 else:
                     respuesta_encontrada = "Lo siento, no entiendo tu pregunta. 🤔 ¿Podrías reformularla o elegir una de las opciones disponibles%s También puedes contactarnos directamente por WhatsApp."
         

@@ -166,38 +166,38 @@
                                 <tbody>
                                     {% for pregunta in preguntas %}
                                     <tr>
-                                        <td>{{ pregunta[0] }}</td>
+                                        <td>{{ pregunta.id }}</td>
                                         <td>
                                             <div class="pregunta-text" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
-                                                {{ pregunta[1] }}
+                                                {{ pregunta.pregunta }}
                                             </div>
                                         </td>
                                         <td>
                                             <div class="respuesta-text" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
-                                                {{ pregunta[2] }}
+                                                {{ pregunta.respuesta }}
                                             </div>
                                         </td>
                                         <td>
-                                            {% if pregunta[3] %}
+                                            {% if pregunta.activo %}
                                                 <span class="badge bg-success">Activa</span>
                                             {% else %}
                                                 <span class="badge bg-secondary">Inactiva</span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ pregunta[4] }}</td>
+                                        <td>{{ pregunta.fecha_creacion }}</td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                        onclick="editarPregunta({{ pregunta[0] }}, '{{ pregunta[1]|replace("'", "\\'") }}', '{{ pregunta[2]|replace("'", "\\'") }}', {{ pregunta[3] }})">
+                                                        onclick="editarPregunta({{ pregunta.id }}, '{{ pregunta.pregunta|replace("'", "\\'") }}', '{{ pregunta.respuesta|replace("'", "\\'") }}', {{ pregunta.activo }})">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <form method="POST" action="{{ url_for('admin.toggle_pregunta_chatbot', pregunta_id=pregunta[0]) }}" 
+                                                <form method="POST" action="{{ url_for('admin.toggle_pregunta_chatbot', pregunta_id=pregunta.id) }}" 
                                                       style="display: inline;">
                                                     <button type="submit" class="btn btn-sm btn-outline-warning">
-                                                        <i class="fas fa-toggle-{% if pregunta[3] %}on{% else %}off{% endif %}"></i>
+                                                        <i class="fas fa-toggle-{% if pregunta.activo %}on{% else %}off{% endif %}"></i>
                                                     </button>
                                                 </form>
-                                                <form method="POST" action="{{ url_for('admin.eliminar_pregunta_chatbot', pregunta_id=pregunta[0]) }}" 
+                                                <form method="POST" action="{{ url_for('admin.eliminar_pregunta_chatbot', pregunta_id=pregunta.id) }}" 
                                                       style="display: inline;" 
                                                       onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta pregunta?')">
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">

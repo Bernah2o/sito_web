@@ -465,17 +465,17 @@ def dashboard():
         cursor = db.cursor()
         
         # Estadísticas básicas
-        cursor.execute('SELECT COUNT(*) FROM servicios WHERE activo = TRUE')
-        total_servicios = cursor.fetchone()[0]
+        cursor.execute('SELECT COUNT(*) as total FROM servicios WHERE activo = TRUE')
+        total_servicios = cursor.fetchone()['total']
         
-        cursor.execute('SELECT COUNT(*) FROM productos WHERE activo = TRUE')
-        total_productos = cursor.fetchone()[0]
+        cursor.execute('SELECT COUNT(*) as total FROM productos WHERE activo = TRUE')
+        total_productos = cursor.fetchone()['total']
         
-        cursor.execute("SELECT COUNT(*) FROM contactos WHERE estado = 'nuevo'")
-        contactos_nuevos = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) as total FROM contactos WHERE estado = 'nuevo'")
+        contactos_nuevos = cursor.fetchone()['total']
         
-        cursor.execute('SELECT COUNT(*) FROM testimonios WHERE activo = TRUE')
-        total_testimonios = cursor.fetchone()[0]
+        cursor.execute('SELECT COUNT(*) as total FROM testimonios WHERE activo = TRUE')
+        total_testimonios = cursor.fetchone()['total']
         
         cursor.execute('SELECT * FROM contactos ORDER BY id DESC LIMIT 5')
         contactos_recientes = cursor.fetchall()
@@ -740,20 +740,20 @@ def configuracion():
         # Convertir a diccionario
         config = {}
         for row in config_rows:
-            config[row[0]] = row[1]
+            config[row['clave']] = row['valor']
         
         # Obtener estadísticas
-        cursor.execute('SELECT COUNT(*) FROM servicios')
-        servicios_count = cursor.fetchone()[0]
+        cursor.execute('SELECT COUNT(*) as total FROM servicios')
+        servicios_count = cursor.fetchone()['total']
         
-        cursor.execute('SELECT COUNT(*) FROM productos')
-        productos_count = cursor.fetchone()[0]
+        cursor.execute('SELECT COUNT(*) as total FROM productos')
+        productos_count = cursor.fetchone()['total']
         
-        cursor.execute('SELECT COUNT(*) FROM contactos')
-        contactos_count = cursor.fetchone()[0]
+        cursor.execute('SELECT COUNT(*) as total FROM contactos')
+        contactos_count = cursor.fetchone()['total']
         
-        cursor.execute('SELECT COUNT(*) FROM testimonios')
-        testimonios_count = cursor.fetchone()[0]
+        cursor.execute('SELECT COUNT(*) as total FROM testimonios')
+        testimonios_count = cursor.fetchone()['total']
         
         stats = {
             'servicios': servicios_count,
@@ -950,7 +950,7 @@ def toggle_testimonio(testimonio_id):
         
         result = cursor.fetchone()
         if result:
-            nuevo_estado = 0 if result[0] else 1
+            nuevo_estado = 0 if result['activo'] else 1
             
             cursor.execute("UPDATE testimonios SET activo = %s WHERE id = %s", (nuevo_estado, testimonio_id))
             

@@ -101,10 +101,10 @@
                         <tbody>
                             {% for contacto in contactos_recientes %}
                             <tr>
-                                <td>{{ contacto[0] }}</td>
-                                <td>{{ contacto[1] }}</td>
-                                <td>{{ contacto[2] or 'No especificado' }}</td>
-                                <td>{{ contacto[3].strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>{{ contacto.nombre }}</td>
+                                <td>{{ contacto.email }}</td>
+                                <td>{{ contacto.empresa or 'No especificado' }}</td>
+                                <td>{{ contacto.fecha_creacion.strftime('%d/%m/%Y %H:%M') if contacto.fecha_creacion else 'N/A' }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
