@@ -1266,9 +1266,9 @@ def chatbot():
         
         # Obtener preguntas del chatbot
         cursor.execute("""
-                SELECT id, pregunta, respuesta, activo, id 
+                SELECT id, pregunta, respuesta, palabras_clave, categoria, activo, orden, fecha_creacion
                 FROM chatbot_preguntas 
-                ORDER BY id DESC
+                ORDER BY orden ASC, id DESC
             """)
         
         preguntas = cursor.fetchall()

@@ -26,14 +26,14 @@
                                 <div class="mb-3">
                                     <label for="nombre_bot" class="form-label">Nombre del Bot</label>
                                     <input type="text" class="form-control" id="nombre_bot" name="nombre_bot" 
-                                           value="{{ configuracion[1] if configuracion else 'TanquiBot' }}" required>
+                                           value="{{ configuracion.nombre_bot if configuracion else 'TanquiBot' }}" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="recaptcha_site_key" class="form-label">reCAPTCHA Site Key</label>
                                     <input type="text" class="form-control" id="recaptcha_site_key" name="recaptcha_site_key" 
-                                           value="{{ configuracion[4] if configuracion else '' }}" 
+                                           value="{{ configuracion.recaptcha_site_key if configuracion else '' }}" 
                                            placeholder="Clave pública de reCAPTCHA">
                                 </div>
                             </div>
@@ -43,14 +43,14 @@
                                 <div class="mb-3">
                                     <label for="mensaje_bienvenida" class="form-label">Mensaje de Bienvenida</label>
                                     <textarea class="form-control" id="mensaje_bienvenida" name="mensaje_bienvenida" 
-                                              rows="3" required>{{ configuracion[2] if configuracion else '¡Hola! Soy TanquiBot, tu asistente virtual de DH2OCOL Colombia. ¿En qué puedo ayudarte hoy?' }}</textarea>
+                                              rows="3" required>{{ configuracion.mensaje_bienvenida if configuracion else '¡Hola! Soy TanquiBot, tu asistente virtual de DH2OCOL Colombia. ¿En qué puedo ayudarte hoy?' }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="recaptcha_secret_key" class="form-label">reCAPTCHA Secret Key</label>
                                     <input type="password" class="form-control" id="recaptcha_secret_key" name="recaptcha_secret_key" 
-                                           value="{{ configuracion[5] if configuracion else '' }}" 
+                                           value="{{ configuracion.recaptcha_secret_key if configuracion else '' }}" 
                                            placeholder="Clave secreta de reCAPTCHA">
                                 </div>
                             </div>
@@ -58,7 +58,7 @@
                         <div class="mb-3">
                             <label for="mensaje_no_entendido" class="form-label">Mensaje cuando no entiende</label>
                             <textarea class="form-control" id="mensaje_no_entendido" name="mensaje_no_entendido" 
-                                      rows="2" required>{{ configuracion[3] if configuracion else 'Lo siento, no entiendo tu consulta. ¿Podrías reformularla o elegir una de las opciones disponibles?' }}</textarea>
+                                      rows="2" required>{{ configuracion.mensaje_no_entendido if configuracion else 'Lo siento, no entiendo tu consulta. ¿Podrías reformularla o elegir una de las opciones disponibles?' }}</textarea>
                         </div>
                         
                         <!-- Configuración de OpenAI GPT -->
@@ -69,7 +69,7 @@
                                         <i class="fas fa-robot me-2"></i>OpenAI API Key
                                     </label>
                                     <input type="password" class="form-control" id="openai_api_key" name="openai_api_key" 
-                                           value="{{ configuracion[7] if configuracion and configuracion|length > 7 else '' }}" 
+                                           value="{{ configuracion.openai_api_key if configuracion else '' }}" 
                                            placeholder="sk-...">
                                     <div class="form-text">
                                         <i class="fas fa-info-circle me-1"></i>
@@ -82,7 +82,7 @@
                                     <label for="usar_gpt" class="form-label">Usar ChatGPT</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="usar_gpt" name="usar_gpt" 
-                                               {{ 'checked' if configuracion and configuracion|length > 8 and configuracion[8] else '' }}>
+                                               {{ 'checked' if configuracion and configuracion.usar_gpt else '' }}>
                                         <label class="form-check-label" for="usar_gpt">
                                             Activar respuestas inteligentes con GPT
                                         </label>
