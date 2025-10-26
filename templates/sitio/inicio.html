@@ -436,27 +436,13 @@
                 </div>
                 {% endfor %}
                 {% else %}
-                <!-- Testimonios por defecto si no hay en la base de datos -->
-                <div class="testimonio-card">
-                    <div class="testimonio-texto">
-                        "Excelente servicio de limpieza de tanques. El agua de nuestra casa nunca había estado tan limpia y pura."
+                <!-- No hay testimonios disponibles -->
+                <div class="col-12 text-center">
+                    <div class="py-5">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay testimonios disponibles</h5>
+                        <p class="text-muted">Los testimonios se gestionan desde el panel de administración</p>
                     </div>
-                    <div class="testimonio-cliente">María González</div>
-                    <div class="testimonio-empresa">Cliente Residencial</div>
-                </div>
-                <div class="testimonio-card">
-                    <div class="testimonio-texto">
-                        "Muy profesionales en la instalación del nuevo tanque. Trabajo impecable y puntual."
-                    </div>
-                    <div class="testimonio-cliente">Carlos Rodríguez</div>
-                    <div class="testimonio-empresa">Empresa ABC</div>
-                </div>
-                <div class="testimonio-card">
-                    <div class="testimonio-texto">
-                        "El mantenimiento preventivo que ofrecen es excelente. Recomendados al 100%."
-                    </div>
-                    <div class="testimonio-cliente">Ana Martínez</div>
-                    <div class="testimonio-empresa">Hotel Plaza</div>
                 </div>
                 {% endif %}
             </div>
