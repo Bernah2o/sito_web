@@ -46,6 +46,24 @@ def create_app(config_name='development'):
     def health_check():
         """Endpoint de verificación de salud para Docker"""
         try:
+            # Health check básico sin dependencia de base de datos
+            return {
+                'status': 'healthy',
+                'timestamp': datetime.now().isoformat(),
+                'version': '1.0.0'
+            }, 200
+        except Exception as e:
+            return {
+                'status': 'error',
+                'timestamp': datetime.now().isoformat(),
+                'error': str(e)
+            }, 500
+    
+    # Endpoint separado para verificar base de datos
+    @app.route('/health/db')
+    def health_check_db():
+        """Endpoint de verificación de salud de la base de datos"""
+        try:
             # Verificar conexión a base de datos
             db = get_db()
             cursor = db.cursor()
