@@ -322,7 +322,7 @@ def get_mysql_init_sql():
             filename VARCHAR(255) NOT NULL,
             tipo VARCHAR(50) NOT NULL,
             categoria VARCHAR(50) DEFAULT 'general',
-            tamaño INT,
+            tamano INT,
             descripcion TEXT,
             ruta VARCHAR(1000) NOT NULL,
             fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP

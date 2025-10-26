@@ -371,7 +371,7 @@
                     <h4>{{ servicio.nombre }}</h4>
                     <p>{{ servicio.descripcion[:100] }}{% if servicio.descripcion|length > 100 %}...{% endif %}</p>
                     <div class="mt-3">
-                        <span class="badge bg-primary fs-6">Desde ${{ "{:,.0f}".format(servicio.precio_base) }}</span>
+                        <span class="badge bg-primary fs-6">Desde ${{ "{:,.0f}".format(servicio.precio_base) if servicio.precio_base else '0' }}</span>
                     </div>
                 </div>
                 {% endfor %}

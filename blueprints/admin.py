@@ -84,7 +84,7 @@ def medios():
                     'filename': file_data['filename'],
                     'type': file_data['tipo'],
                     'category': file_data.get('categoria', 'general'),
-                    'size': file_data['tamaño'],
+                    'size': file_data['tamano'],
                     'description': file_data['descripcion'],
                     'path': file_data['ruta'],
                     'upload_date': file_data['fecha_subida']
@@ -286,7 +286,7 @@ def filter_medios_by_category(category):
                     'filename': file_data['filename'],
                     'type': file_data['tipo'],
                     'category': file_data.get('categoria', 'general'),
-                    'size': file_data['tamaño'],
+                    'size': file_data['tamano'],
                     'description': file_data['descripcion'],
                     'path': file_data['ruta'],
                     'upload_date': file_data['fecha_subida']

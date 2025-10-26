@@ -45,7 +45,7 @@
                             {% set descripcion = producto.descripcion if producto.descripcion else producto[2] %}
                             {{ descripcion[:40] + '...' if descripcion|length > 40 else descripcion }}
                         </td>
-                        <td>${{ "{:,.0f}".format(producto.precio if producto.precio else producto[3]) }}</td>
+                        <td>${{ "{:,.0f}".format(producto.precio if producto.precio else producto[3]) if (producto.precio if producto.precio else producto[3]) else '0' }}</td>
                         <td>
                             {% set activo = producto.activo if producto.activo is defined else producto[5] %}
                             {% if activo %}
