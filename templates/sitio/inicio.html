@@ -293,7 +293,7 @@
             <div class="carousel-inner">
                 {% for image in carousel_images %}
                 <div class="carousel-item {% if loop.first %}active{% endif %}">
-                    <img src="{{ image.ruta if 'firebase' in image.ruta else url_for('static', filename=image.ruta) }}" class="d-block w-100" alt="{{ image.descripcion or 'Imagen del carrusel' }}">
+                    <img src="{{ image.ruta if 'firebasestorage.googleapis.com' in image.ruta else url_for('static', filename=image.ruta) }}" class="d-block w-100" alt="{{ image.descripcion or 'Imagen del carrusel' }}">
                     {% if image.descripcion %}
                     <div class="carousel-caption">
                         <h3>{{ image.nombre or 'DH2O Colombia' }}</h3>

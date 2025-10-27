@@ -19,6 +19,13 @@
     <!-- reCAPTCHA v3 -->
     <script src="https://www.google.com/recaptcha/api.js?render=6LfYourSiteKey"></script>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/logo.png') }}">
+    
     <style>
         .hero-section {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -285,7 +292,7 @@
                 {% for medio in medios %}
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="{{ medio.ruta if 'firebase' in medio.ruta else url_for('static', filename=medio.ruta) }}" 
+                        <img src="{{ medio.ruta if 'firebasestorage.googleapis.com' in medio.ruta else url_for('static', filename=medio.ruta) }}" 
                              class="card-img-top" 
                              alt="{{ medio.titulo or 'Accesorio para tanque elevado' }}"
                              style="height: 250px; object-fit: cover;">
