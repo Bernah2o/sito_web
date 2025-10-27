@@ -96,22 +96,47 @@ class FirebaseStorageManager:
         
         return unique_filename
     
-    def _optimize_image(self, file_data: bytes, max_size: Tuple[int, int] = (1200, 1200), quality: int = 85) -> bytes:
-        """Optimize image for web usage"""
+    def _optimize_image(self, file_data: bytes, max_size: Tuple[int, int] = (500, 375), quality: int = 90) -> bytes:
+        """Optimize image for web usage with better sizing for product cards"""
         try:
             # Open image
             image = Image.open(io.BytesIO(file_data))
             
             # Convert to RGB if necessary
-            if image.mode in ('RGBA', 'P'):
+            if image.mode in ('RGBA', 'LA', 'P'):
+                background = Image.new('RGB', image.size, (255, 255, 255))
+                if image.mode == 'P':
+                    image = image.convert('RGBA')
+                background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+                image = background
+            elif image.mode != 'RGB':
                 image = image.convert('RGB')
             
-            # Resize if too large
-            image.thumbnail(max_size, Image.Resampling.LANCZOS)
+            # Correct orientation based on EXIF data
+            from PIL import ImageOps
+            image = ImageOps.exif_transpose(image)
+            
+            # Calculate optimal size maintaining aspect ratio
+            original_width, original_height = image.size
+            target_width, target_height = max_size
+            
+            # Calculate scaling factor to fit within target size
+            scale_factor = min(target_width / original_width, target_height / original_height)
+            
+            if scale_factor < 1:  # Only resize if image is larger than target
+                new_width = int(original_width * scale_factor)
+                new_height = int(original_height * scale_factor)
+                image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Create final image with white background centered
+            final_image = Image.new('RGB', max_size, (255, 255, 255))
+            x_offset = (max_size[0] - image.width) // 2
+            y_offset = (max_size[1] - image.height) // 2
+            final_image.paste(image, (x_offset, y_offset))
             
             # Save optimized image
             output = io.BytesIO()
-            image.save(output, format='JPEG', quality=quality, optimize=True)
+            final_image.save(output, format='JPEG', quality=quality, optimize=True)
             
             return output.getvalue()
         except Exception as e:

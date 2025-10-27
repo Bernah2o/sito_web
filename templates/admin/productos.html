@@ -6,7 +6,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="fas fa-box me-2"></i>Gestión de Productos</h2>
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-outline-warning" onclick="handleReprocessImages()" disabled title="Función temporalmente deshabilitada">
+        <button type="button" class="btn btn-outline-warning" onclick="handleReprocessImages()" title="Optimizar todas las imágenes de productos al tamaño adecuado">
             <i class="fas fa-sync-alt me-2"></i>Reprocesar Imágenes
         </button>
         <a href="{{ url_for('admin.nuevo_producto') }}" class="btn btn-primary">
@@ -194,7 +194,13 @@ function editProduct(id, nombre, categoria, descripcion, precio, imagen) {
     const currentImage = document.getElementById('currentImage');
     
     if (imagen && imagen.trim() !== '') {
-        currentImage.src = '/static/img/' + categoria.toLowerCase() + '/' + imagen;
+        // Si la imagen ya es una URL de Firebase, usarla directamente
+        // Si no, construir la ruta local (para compatibilidad con imágenes antiguas)
+        if (imagen.startsWith('https://')) {
+            currentImage.src = imagen;
+        } else {
+            currentImage.src = '/static/img/' + categoria.toLowerCase() + '/' + imagen;
+        }
         currentImagePreview.style.display = 'block';
     } else {
         currentImagePreview.style.display = 'none';

@@ -893,15 +893,40 @@ def editar_producto(producto_id):
 @admin_bp.route('/productos/eliminar/<int:producto_id>', methods=['POST'])
 @login_required
 def eliminar_producto(producto_id):
-    """Eliminar producto"""
+    """Eliminar producto y su imagen de Firebase Storage"""
     try:
         db = get_db()
         cursor = db.cursor()
         
-        cursor.execute("DELETE FROM productos WHERE id = %s", (producto_id,))
+        # Obtener información del producto antes de eliminarlo
+        cursor.execute("SELECT nombre, imagen FROM productos WHERE id = %s", (producto_id,))
+        producto_data = cursor.fetchone()
         
+        if not producto_data:
+            flash('Producto no encontrado', 'error')
+            return redirect(url_for('admin.productos'))
+        
+        producto_nombre = producto_data['nombre']
+        imagen_url = producto_data['imagen']
+        
+        # Eliminar imagen de Firebase Storage si existe y es una URL de Firebase
+        firebase_success = True
+        if imagen_url and 'firebase' in imagen_url:
+            if is_firebase_available():
+                firebase_success = delete_file(imagen_url)
+                if not firebase_success:
+                    print(f"Advertencia: No se pudo eliminar la imagen de Firebase para el producto {producto_nombre}")
+            else:
+                print("Advertencia: Firebase Storage no está disponible para eliminar la imagen")
+        
+        # Eliminar producto de la base de datos
+        cursor.execute("DELETE FROM productos WHERE id = %s", (producto_id,))
         db.commit()
-        flash('Producto eliminado exitosamente', 'success')
+        
+        if firebase_success:
+            flash('Producto e imagen eliminados exitosamente', 'success')
+        else:
+            flash('Producto eliminado, pero hubo un problema al eliminar la imagen', 'warning')
         
     except Exception as e:
         print(f"Error al eliminar producto: {e}")
@@ -1099,10 +1124,21 @@ def reprocess_product_image(firebase_url):
         image = ImageOps.exif_transpose(image)
         
         # Redimensionar con el mismo proceso que save_product_image
-        target_size = (400, 300)
-        image.thumbnail(target_size, Image.Resampling.LANCZOS)
+        target_size = (500, 375)  # Tamaño optimizado para tarjetas de productos
         
-        # Crear imagen final con fondo blanco
+        # Calculate optimal size maintaining aspect ratio
+        original_width, original_height = image.size
+        target_width, target_height = target_size
+        
+        # Calculate scaling factor to fit within target size
+        scale_factor = min(target_width / original_width, target_height / original_height)
+        
+        if scale_factor < 1:  # Only resize if image is larger than target
+            new_width = int(original_width * scale_factor)
+            new_height = int(original_height * scale_factor)
+            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        # Crear imagen final con fondo blanco centrada
         final_image = Image.new('RGB', target_size, (255, 255, 255))
         x_offset = (target_size[0] - image.width) // 2
         y_offset = (target_size[1] - image.height) // 2
@@ -1110,7 +1146,7 @@ def reprocess_product_image(firebase_url):
         
         # Crear un archivo temporal en memoria
         img_buffer = BytesIO()
-        final_image.save(img_buffer, 'JPEG', quality=85, optimize=True)
+        final_image.save(img_buffer, 'JPEG', quality=90, optimize=True)
         img_buffer.seek(0)
         
         # Crear un objeto de archivo simulado para upload_file
@@ -1140,38 +1176,55 @@ def reprocess_product_image(firebase_url):
 def reprocess_images():
     """Reprocesar todas las imágenes de productos para asegurar tamaño correcto"""
     try:
-        upload_folder = os.path.join(current_app.static_folder, 'uploads', 'productos')
-        
-        if not os.path.exists(upload_folder):
-            flash('No se encontró la carpeta de imágenes', 'error')
+        if not is_firebase_available():
+            flash('Firebase Storage no está disponible', 'error')
             return redirect(url_for('admin.productos'))
         
-        # Obtener lista de archivos de imagen
-        image_files = [f for f in os.listdir(upload_folder) 
-                      if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif'))]
+        db = get_db()
+        cursor = db.cursor()
+        
+        # Obtener todos los productos con imágenes
+        cursor.execute("SELECT id, nombre, imagen FROM productos WHERE imagen IS NOT NULL AND imagen != ''")
+        productos = cursor.fetchall()
+        
+        if not productos:
+            flash('No se encontraron productos con imágenes para reprocesar', 'info')
+            return redirect(url_for('admin.productos'))
         
         processed_count = 0
-        updated_filenames = {}
+        updated_count = 0
         
         # Reprocesar cada imagen
-        for filename in image_files:
-            result = reprocess_product_image(filename)
-            if result:
+        for producto in productos:
+            producto_id = producto['id'] if isinstance(producto, dict) else producto[0]
+            producto_nombre = producto['nombre'] if isinstance(producto, dict) else producto[1]
+            imagen_url = producto['imagen'] if isinstance(producto, dict) else producto[2]
+            
+            # Solo procesar URLs de Firebase
+            if imagen_url and imagen_url.startswith('https://'):
+                print(f"Reprocesando imagen del producto: {producto_nombre}")
+                result = reprocess_product_image(imagen_url)
+                
+                if result and result != imagen_url:
+                    # Actualizar la URL en la base de datos
+                    cursor.execute("UPDATE productos SET imagen = %s WHERE id = %s", (result, producto_id))
+                    updated_count += 1
+                    print(f"Imagen actualizada para {producto_nombre}: {result}")
+                elif result:
+                    print(f"Imagen reprocesada para {producto_nombre} (misma URL)")
+                
                 processed_count += 1
-                if result != filename:  # Si cambió el nombre (PNG -> JPG)
-                    updated_filenames[filename] = result
+            else:
+                print(f"Saltando imagen local para {producto_nombre}: {imagen_url}")
         
-        # Actualizar base de datos si hay cambios de nombre de archivo
-        if updated_filenames:
-            db = get_db()
-            cursor = db.cursor()
-            
-            for old_name, new_name in updated_filenames.items():
-                cursor.execute("UPDATE productos SET imagen = %s WHERE imagen = %s", (new_name, old_name))
-            
+        # Confirmar cambios en la base de datos
+        if updated_count > 0:
             db.commit()
         
-        flash(f'Se reprocesaron {processed_count} imágenes exitosamente', 'success')
+        if processed_count > 0:
+            flash(f'Se reprocesaron {processed_count} imágenes exitosamente. {updated_count} URLs actualizadas.', 'success')
+        else:
+            flash('No se encontraron imágenes de Firebase para reprocesar', 'info')
         
     except Exception as e:
         print(f"Error reprocesando imágenes: {e}")
