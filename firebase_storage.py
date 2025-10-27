@@ -142,15 +142,169 @@ class FirebaseStorageManager:
         except Exception as e:
             print(f"Error optimizing image: {str(e)}")
             return file_data
+
+    def _optimize_carousel_image(self, file_data: bytes, max_size: Tuple[int, int] = (1920, 1080), quality: int = 95) -> bytes:
+        """Optimize image specifically for carousel usage with higher quality preservation"""
+        try:
+            # Open image
+            image = Image.open(io.BytesIO(file_data))
+            
+            # Preserve original format if possible
+            original_format = image.format
+            
+            # Correct orientation based on EXIF data first
+            from PIL import ImageOps
+            image = ImageOps.exif_transpose(image)
+            
+            # Get original dimensions
+            original_width, original_height = image.size
+            target_width, target_height = max_size
+            
+            # Only resize if image is significantly larger than target
+            # Allow some tolerance to avoid unnecessary resizing
+            scale_factor = min(target_width / original_width, target_height / original_height)
+            
+            if scale_factor < 0.8:  # Only resize if image is much larger than target
+                new_width = int(original_width * scale_factor)
+                new_height = int(original_height * scale_factor)
+                # Use LANCZOS for high-quality resizing
+                image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Determine best output format
+            output = io.BytesIO()
+            
+            # For carousel images, prefer to keep original format if it's high quality
+            if original_format in ['PNG', 'WEBP'] and image.mode in ['RGBA', 'LA']:
+                # Keep transparency for PNG/WEBP
+                if original_format == 'PNG':
+                    image.save(output, format='PNG', optimize=True, compress_level=6)
+                else:
+                    # Convert to RGB for JPEG with high quality
+                    if image.mode in ('RGBA', 'LA', 'P'):
+                        background = Image.new('RGB', image.size, (255, 255, 255))
+                        if image.mode == 'P':
+                            image = image.convert('RGBA')
+                        background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+                        image = background
+                    elif image.mode != 'RGB':
+                        image = image.convert('RGB')
+                    
+                    image.save(output, format='JPEG', quality=quality, optimize=True)
+            else:
+                # Convert to RGB for JPEG
+                if image.mode in ('RGBA', 'LA', 'P'):
+                    background = Image.new('RGB', image.size, (255, 255, 255))
+                    if image.mode == 'P':
+                        image = image.convert('RGBA')
+                    background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+                    image = background
+                elif image.mode != 'RGB':
+                    image = image.convert('RGB')
+                
+                # Use higher quality for carousel images
+                image.save(output, format='JPEG', quality=quality, optimize=True)
+            
+            return output.getvalue()
+        except Exception as e:
+            print(f"Error optimizing carousel image: {str(e)}")
+            return file_data
+
+    def _optimize_product_image_by_category(self, file_data: bytes, category: str) -> bytes:
+        """Optimize product images based on their category with specific parameters"""
+        try:
+            # Define category-specific optimization parameters
+            category_settings = {
+                'Tanques': {
+                    'max_size': (800, 600),
+                    'quality': 92,
+                    'description': 'High resolution for detailed tank views'
+                },
+                'Bombas': {
+                    'max_size': (700, 525),
+                    'quality': 90,
+                    'description': 'Good detail for mechanical components'
+                },
+                'Filtros': {
+                    'max_size': (600, 450),
+                    'quality': 88,
+                    'description': 'Clear view of filter systems'
+                },
+                'Accesorios': {
+                    'max_size': (500, 375),
+                    'quality': 85,
+                    'description': 'Compact size for small accessories'
+                },
+                'Químicos': {
+                    'max_size': (550, 400),
+                    'quality': 87,
+                    'description': 'Clear product labeling visibility'
+                },
+                'Herramientas': {
+                    'max_size': (650, 500),
+                    'quality': 89,
+                    'description': 'Good detail for tool identification'
+                }
+            }
+            
+            # Get settings for the category, default to Accesorios if not found
+            settings = category_settings.get(category, category_settings['Accesorios'])
+            max_size = settings['max_size']
+            quality = settings['quality']
+            
+            print(f"Optimizing {category} product image: {settings['description']} - {max_size} at {quality}% quality")
+            
+            # Open image
+            image = Image.open(io.BytesIO(file_data))
+            
+            # Correct orientation based on EXIF data
+            from PIL import ImageOps
+            image = ImageOps.exif_transpose(image)
+            
+            # Convert to RGB if necessary, but preserve quality
+            if image.mode in ('RGBA', 'LA', 'P'):
+                background = Image.new('RGB', image.size, (255, 255, 255))
+                if image.mode == 'P':
+                    image = image.convert('RGBA')
+                background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+                image = background
+            elif image.mode != 'RGB':
+                image = image.convert('RGB')
+            
+            # Calculate optimal size maintaining aspect ratio
+            original_width, original_height = image.size
+            target_width, target_height = max_size
+            
+            # Calculate scaling factor to fit within target size
+            scale_factor = min(target_width / original_width, target_height / original_height)
+            
+            # Only resize if image is larger than target (avoid upscaling)
+            if scale_factor < 1:
+                new_width = int(original_width * scale_factor)
+                new_height = int(original_height * scale_factor)
+                # Use LANCZOS for high-quality resizing
+                image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # For product images, maintain aspect ratio without adding background
+            # This preserves the natural proportions of the product
+            
+            # Save optimized image
+            output = io.BytesIO()
+            image.save(output, format='JPEG', quality=quality, optimize=True)
+            
+            return output.getvalue()
+        except Exception as e:
+            print(f"Error optimizing {category} product image: {str(e)}")
+            return file_data
     
-    def upload_file(self, file: FileStorage, folder: str = "", optimize_image: bool = True) -> Optional[str]:
+    def upload_file(self, file: FileStorage, folder: str = "", optimize_image: bool = True, product_category: str = None) -> Optional[str]:
         """
         Upload a file to Firebase Storage
         
         Args:
             file: FileStorage object from Flask
-            folder: Folder path in storage (e.g., 'productos', 'servicios')
+            folder: Folder path in storage (e.g., 'productos', 'servicios', 'carousel')
             optimize_image: Whether to optimize images before upload
+            product_category: Product category for category-specific optimization (Tanques, Bombas, etc.)
         
         Returns:
             Public URL of uploaded file or None if failed
@@ -158,11 +312,11 @@ class FirebaseStorageManager:
         if not self.is_initialized():
             print("Firebase Storage not initialized")
             return None
-        
+
         if not file or not file.filename:
             print("No file provided")
             return None
-        
+
         try:
             # Generate unique filename
             filename = self._generate_unique_filename(file.filename, folder)
@@ -172,7 +326,19 @@ class FirebaseStorageManager:
             
             # Optimize image if it's an image file and optimization is enabled
             if optimize_image and file.content_type and file.content_type.startswith('image/'):
-                file_data = self._optimize_image(file_data)
+                # Use specific optimization based on folder/purpose
+                if folder == 'carousel':
+                    # Use high-quality optimization for carousel images
+                    file_data = self._optimize_carousel_image(file_data)
+                    print(f"Optimizing carousel image with high quality settings")
+                elif folder == 'productos' and product_category:
+                    # Use category-specific optimization for product images
+                    file_data = self._optimize_product_image_by_category(file_data, product_category)
+                    print(f"Optimizing product image for category: {product_category}")
+                else:
+                    # Use standard optimization for other images (services, general, etc.)
+                    file_data = self._optimize_image(file_data)
+                    print(f"Optimizing image with standard settings for folder: {folder}")
             
             # Upload to Firebase Storage
             blob = self.bucket.blob(filename)

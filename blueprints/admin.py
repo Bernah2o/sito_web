@@ -33,8 +33,8 @@ def save_product_image(file, categoria):
         # Determinar carpeta basada en la categoría
         folder = f"productos/{categoria.lower()}" if categoria else "productos"
         
-        # Subir archivo a Firebase Storage con optimización automática
-        firebase_url = upload_file(file, folder=folder, optimize_image=True)
+        # Subir archivo a Firebase Storage con optimización específica por categoría
+        firebase_url = upload_file(file, folder="productos", optimize_image=True, product_category=categoria)
         
         if firebase_url:
             print(f"Imagen subida exitosamente a Firebase: {firebase_url}")
@@ -1093,8 +1093,8 @@ def nueva_pregunta():
     
     return render_template('admin/quiz.html')
 
-def reprocess_product_image(firebase_url):
-    """Reprocesar una imagen existente en Firebase Storage para asegurar el tamaño correcto"""
+def reprocess_product_image(firebase_url, categoria=None):
+    """Reprocesar una imagen existente en Firebase Storage con optimización específica por categoría"""
     if not firebase_url or not is_firebase_available():
         return False
     
@@ -1107,47 +1107,21 @@ def reprocess_product_image(firebase_url):
         if response.status_code != 200:
             return False
         
-        # Abrir imagen desde bytes
-        image = Image.open(BytesIO(response.content))
+        # Usar la nueva función de optimización por categoría
+        from firebase_storage import FirebaseStorageManager
+        storage_manager = FirebaseStorageManager()
         
-        # Convertir a RGB si es necesario
-        if image.mode in ('RGBA', 'LA', 'P'):
-            background = Image.new('RGB', image.size, (255, 255, 255))
-            if image.mode == 'P':
-                image = image.convert('RGBA')
-            background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
-            image = background
-        elif image.mode != 'RGB':
-            image = image.convert('RGB')
+        # Aplicar optimización específica por categoría
+        if categoria:
+            optimized_data = storage_manager._optimize_product_image_by_category(response.content, categoria)
+            print(f"Aplicando optimización específica para categoría: {categoria}")
+        else:
+            # Fallback a optimización estándar si no hay categoría
+            optimized_data = storage_manager._optimize_image(response.content)
+            print("Aplicando optimización estándar (sin categoría especificada)")
         
-        # Corregir orientación
-        image = ImageOps.exif_transpose(image)
-        
-        # Redimensionar con el mismo proceso que save_product_image
-        target_size = (500, 375)  # Tamaño optimizado para tarjetas de productos
-        
-        # Calculate optimal size maintaining aspect ratio
-        original_width, original_height = image.size
-        target_width, target_height = target_size
-        
-        # Calculate scaling factor to fit within target size
-        scale_factor = min(target_width / original_width, target_height / original_height)
-        
-        if scale_factor < 1:  # Only resize if image is larger than target
-            new_width = int(original_width * scale_factor)
-            new_height = int(original_height * scale_factor)
-            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        
-        # Crear imagen final con fondo blanco centrada
-        final_image = Image.new('RGB', target_size, (255, 255, 255))
-        x_offset = (target_size[0] - image.width) // 2
-        y_offset = (target_size[1] - image.height) // 2
-        final_image.paste(image, (x_offset, y_offset))
-        
-        # Crear un archivo temporal en memoria
-        img_buffer = BytesIO()
-        final_image.save(img_buffer, 'JPEG', quality=90, optimize=True)
-        img_buffer.seek(0)
+        # Crear un archivo temporal en memoria con los datos optimizados
+        img_buffer = BytesIO(optimized_data)
         
         # Crear un objeto de archivo simulado para upload_file
         from werkzeug.datastructures import FileStorage
@@ -1158,6 +1132,7 @@ def reprocess_product_image(firebase_url):
         )
         
         # Subir imagen reprocesada a Firebase (reemplazará la existente)
+        # No aplicar optimización adicional ya que ya fue optimizada específicamente por categoría
         new_url = upload_file(temp_file, folder='productos', optimize_image=False)
         
         # Eliminar la imagen original de Firebase si la nueva subida fue exitosa
@@ -1184,7 +1159,7 @@ def reprocess_images():
         cursor = db.cursor()
         
         # Obtener todos los productos con imágenes
-        cursor.execute("SELECT id, nombre, imagen FROM productos WHERE imagen IS NOT NULL AND imagen != ''")
+        cursor.execute("SELECT id, nombre, imagen, categoria FROM productos WHERE imagen IS NOT NULL AND imagen != ''")
         productos = cursor.fetchall()
         
         if not productos:
@@ -1199,11 +1174,12 @@ def reprocess_images():
             producto_id = producto['id'] if isinstance(producto, dict) else producto[0]
             producto_nombre = producto['nombre'] if isinstance(producto, dict) else producto[1]
             imagen_url = producto['imagen'] if isinstance(producto, dict) else producto[2]
+            categoria = producto['categoria'] if isinstance(producto, dict) else producto[3]
             
             # Solo procesar URLs de Firebase
             if imagen_url and imagen_url.startswith('https://'):
-                print(f"Reprocesando imagen del producto: {producto_nombre}")
-                result = reprocess_product_image(imagen_url)
+                print(f"Reprocesando imagen del producto: {producto_nombre} (Categoría: {categoria})")
+                result = reprocess_product_image(imagen_url, categoria)
                 
                 if result and result != imagen_url:
                     # Actualizar la URL en la base de datos
