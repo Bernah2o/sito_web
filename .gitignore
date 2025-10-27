@@ -56,6 +56,11 @@ init_db.py
 init_db.sql
 *.db
 
+# SQL dump files with sensitive data
+flaskdb_production_dump.sql
+flaskdb_sqlite_dump.sql
+*_dump.sql
+
 # Large media files
 *.mp4
 *.tiff
