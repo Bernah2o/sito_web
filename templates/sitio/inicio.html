@@ -214,7 +214,7 @@
     <nav class="navbar navbar-expand-lg fixed-top" style="background: rgba(0, 128, 55, 0.95); backdrop-filter: blur(10px);">
         <div class="container">
             <a class="navbar-brand text-white fw-bold fs-3" href="{{ url_for('main.index') }}">
-                <i class="fas fa-tint text-info me-2"></i>DH2OCOL
+                <img src="{{ url_for('static', filename='img/logo_4.png') }}" alt="DH2OCOL Logo" style="width: 40px; height: 40px; object-fit: contain;" class="me-2">DH2OCOL
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -370,7 +370,7 @@
                 {% for servicio in servicios[:3] %}
                 <div class="servicio-card">
                     <div class="servicio-icon">
-                        <i class="fas fa-tint"></i>
+                        <img src="{{ url_for('static', filename='img/logo_4.png') }}" alt="DH2OCOL Logo" style="width: 60px; height: 60px; object-fit: contain;">
                     </div>
                     <h4>{{ servicio.nombre }}</h4>
                     <p>{{ servicio.descripcion[:100] }}{% if servicio.descripcion|length > 100 %}...{% endif %}</p>
@@ -379,29 +379,6 @@
                     </div>
                 </div>
                 {% endfor %}
-                {% else %}
-                <!-- Servicios por defecto si no hay en la base de datos -->
-                <div class="servicio-card">
-                    <div class="servicio-icon">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <h4>Limpieza y Desinfección</h4>
-                    <p>Realizamos limpieza y desinfección de tanques elevados, eliminando bacterias y microorganismos para garantizar agua segura, limpia y de alta calidad para tu hogar o negocio.</p>
-                </div>
-                <div class="servicio-card">
-                    <div class="servicio-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <h4>Reparación e Instalación</h4>
-                    <p>Brindamos servicios especializados en la reparación e instalación de tanques elevados de agua potable, enfocados en resolver problemas técnicos y desgaste.</p>
-                </div>
-                <div class="servicio-card">
-                    <div class="servicio-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h4>Mantenimiento Preventivo</h4>
-                    <p>Programas de mantenimiento preventivo para garantizar la calidad del agua a largo plazo.</p>
-                </div>
                 {% endif %}
             </div>
             {% if servicios %}

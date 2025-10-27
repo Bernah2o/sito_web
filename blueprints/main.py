@@ -113,8 +113,8 @@ def limpieza_tanques_elevados():
             valor = config['valor'] if isinstance(config, dict) else config[1]
             configuracion[clave] = valor
         
-        # Obtener medios (imágenes y videos) para la galería
-        cursor.execute("SELECT * FROM medios WHERE tipo IN ('image', 'video') ORDER BY fecha_subida DESC")
+        # Obtener medios (imágenes y videos) para la galería, excluyendo las imágenes del carrusel
+        cursor.execute("SELECT * FROM medios WHERE tipo IN ('image', 'video') AND categoria != 'carousel' ORDER BY fecha_subida DESC")
         medios_raw = cursor.fetchall()
         
         # Convertir medios a lista de diccionarios

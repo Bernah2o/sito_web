@@ -91,3 +91,6 @@ firebase-service-account.json
 *firebase*.json
 firebase-debug.log
 
+#Archivos .py
+convert_mysql_to_sqlite.py
+
