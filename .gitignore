@@ -14,7 +14,9 @@ backups/
 .env.example
 .env.docker
 
-
+# Ignorar configuraciones locales de conexión
+TUNNEL_SSH_SIMPLE.md
+dbeaver-config-example.json
 
 # Compiled Java class files
 *.class
@@ -48,6 +50,11 @@ Thumbs.db
 *.app
 *.exe
 *.war
+
+# Database files with sensitive data
+init_db.py
+init_db.sql
+*.db
 
 # Large media files
 *.mp4

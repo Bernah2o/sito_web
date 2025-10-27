@@ -9,12 +9,18 @@ class Config:
     """Configuración base de la aplicación"""
     SECRET_KEY = os.environ.get('SECRET_KEY')
     
-    # Configuración de base de datos MySQL
+    # Configuración de base de datos - por defecto MySQL
+    DATABASE_TYPE = os.environ.get('DATABASE_TYPE', 'mysql')  # 'mysql' o 'sqlite'
+    
+    # Configuración MySQL (para producción)
     DB_HOST = os.environ.get('DB_HOST')
     DB_USER = os.environ.get('DB_USER')
     DB_PASSWORD = os.environ.get('DB_PASSWORD')
     DB_NAME = os.environ.get('DB_NAME')
-    DB_PORT = int(os.environ.get('DB_PORT'))
+    DB_PORT = int(os.environ.get('DB_PORT', 3306))
+    
+    # Configuración SQLite (para desarrollo)
+    SQLITE_DB_PATH = os.environ.get('SQLITE_DB_PATH', 'dh2ocol_dev.db')
     
     # Configuración de sesiones
     PERMANENT_SESSION_LIFETIME = timedelta(hours=2)
@@ -46,12 +52,15 @@ class DevelopmentConfig(Config):
     """Configuración para desarrollo"""
     DEBUG = True
     TESTING = False
+    DATABASE_TYPE = 'sqlite'  # Usar SQLite en desarrollo
+    SQLITE_DB_PATH = 'dh2ocol_dev.db'
 
 class ProductionConfig(Config):
     """Configuración para producción"""
     DEBUG = False
     TESTING = False
     SESSION_COOKIE_SECURE = True
+    DATABASE_TYPE = 'mysql'  # Usar MySQL en producción
 
 # Configuración por defecto
 config = {

@@ -36,6 +36,10 @@ def index():
         cursor.execute("SELECT * FROM medios WHERE categoria = 'carousel' ORDER BY fecha_subida DESC")
         carousel_images = cursor.fetchall()
         
+        # Debug: Log de las URLs del carrusel
+        for img in carousel_images:
+            print(f"Imagen del carrusel: {img.get('nombre', 'Sin nombre')} - URL: {img.get('ruta', 'Sin URL')}")
+        
         # Agrupar productos por categoría
         productos = {}
         for producto in productos_raw:
@@ -339,9 +343,9 @@ def contacto():
             email_sent = send_contact_email(nombre, email, telefono, empresa, mensaje)
             
             if email_sent:
-                flash('¡Mensaje enviado exitosamente! Te contactaremos pronto. También hemos enviado una confirmación a tu email.', 'success')
+                flash('¡Mensaje enviado exitosamente! Te contactaremos pronto. Hemos enviado una confirmación a tu email.', 'success')
             else:
-                flash('¡Mensaje enviado exitosamente! Te contactaremos pronto. (Nota: No se pudo enviar la confirmación por email)', 'warning')
+                flash('¡Mensaje enviado exitosamente! Te contactaremos pronto.', 'success')
             
             return redirect(url_for('main.index') + '#contacto')
             

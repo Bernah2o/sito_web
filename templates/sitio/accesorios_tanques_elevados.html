@@ -292,7 +292,7 @@
                 {% for medio in medios %}
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="{{ medio.ruta if 'firebasestorage.googleapis.com' in medio.ruta else url_for('static', filename=medio.ruta) }}" 
+                        <img src="{{ medio.ruta | firebase_url }}" 
                              class="card-img-top" 
                              alt="{{ medio.titulo or 'Accesorio para tanque elevado' }}"
                              style="height: 250px; object-fit: cover;">

@@ -255,20 +255,20 @@
                         <div class="col-md-6 col-lg-4 media-item" data-type="{{ medio.tipo }}">
                             <div class="card h-100 shadow-sm">
                                 {% if medio.tipo == 'image' %}
-                                <img src="{{ medio.ruta if 'firebasestorage.googleapis.com' in medio.ruta else url_for('static', filename=medio.ruta) }}" 
+                                <img src="{{ medio.ruta | firebase_url }}" 
                                      class="card-img-top" 
                                      style="height: 250px; object-fit: cover; cursor: pointer;" 
                                      alt="{{ medio.nombre }}"
                                      data-bs-toggle="modal" 
                                      data-bs-target="#mediaModal"
-                                     data-src="{{ medio.ruta if 'firebasestorage.googleapis.com' in medio.ruta else url_for('static', filename=medio.ruta) }}"
+                                     data-src="{{ medio.ruta | firebase_url }}"
                                      data-title="{{ medio.nombre }}"
                                      data-description="{{ medio.descripcion }}"
                                      data-type="image">
                                 {% elif medio.tipo == 'video' %}
                                 <div class="position-relative">
                                     <video class="card-img-top" style="height: 250px; object-fit: cover;" controls>
-                                        <source src="{{ medio.ruta if 'firebasestorage.googleapis.com' in medio.ruta else url_for('static', filename=medio.ruta) }}" type="video/mp4">
+                                        <source src="{{ medio.ruta | firebase_url }}" type="video/mp4">
                                         Tu navegador no soporta el elemento video.
                                     </video>
                                     <div class="position-absolute top-50 start-50 translate-middle">

@@ -50,18 +50,23 @@
                         <td>{{ servicio.fecha_creacion if servicio.fecha_creacion else servicio[5] }}</td>
                         <td>
                             <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-outline-primary" 
-                                        onclick="editarServicio({{ servicio.id if servicio.id else servicio[0] }}, '{{ servicio.nombre if servicio.nombre else servicio[1] }}', '{{ servicio.descripcion if servicio.descripcion else servicio[2] }}', {{ servicio.precio_base if servicio.precio_base else servicio[3] }}, {{ 'true' if (servicio.activo if servicio.activo is defined else servicio[4]) else 'false' }})" 
+                                <button type="button" class="btn btn-sm btn-outline-primary btn-editar" 
+                                        data-id="{{ servicio.id if servicio.id else servicio[0] }}"
+                                        data-nombre="{{ (servicio.nombre if servicio.nombre else servicio[1])|e }}"
+                                        data-descripcion="{{ (servicio.descripcion if servicio.descripcion else servicio[2])|e }}"
+                                        data-precio="{{ servicio.precio_base if servicio.precio_base else servicio[3] }}"
+                                        data-activo="{{ 'true' if (servicio.activo if servicio.activo is defined else servicio[4]) else 'false' }}"
                                         title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-warning" 
-                                        onclick="toggleEstado({{ servicio.id if servicio.id else servicio[0] }})" 
+                                <button type="button" class="btn btn-sm btn-outline-warning btn-toggle" 
+                                        data-id="{{ servicio.id if servicio.id else servicio[0] }}"
                                         title="Cambiar Estado">
                                     <i class="fas fa-toggle-{{ 'on' if (servicio.activo if servicio.activo is defined else servicio[4]) else 'off' }}"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger" 
-                                        onclick="eliminarServicio({{ servicio.id if servicio.id else servicio[0] }}, '{{ servicio.nombre if servicio.nombre else servicio[1] }}')" 
+                                <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar" 
+                                        data-id="{{ servicio.id if servicio.id else servicio[0] }}"
+                                        data-nombre="{{ (servicio.nombre if servicio.nombre else servicio[1])|e }}"
                                         title="Eliminar">
                                     <i class="fas fa-trash"></i>
                                 </button>
@@ -170,6 +175,40 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners para botones de editar
+    document.querySelectorAll('.btn-editar').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nombre = this.dataset.nombre;
+            const descripcion = this.dataset.descripcion;
+            const precio = this.dataset.precio;
+            const activo = this.dataset.activo === 'true';
+            
+            editarServicio(id, nombre, descripcion, precio, activo);
+        });
+    });
+    
+    // Event listeners para botones de eliminar
+    document.querySelectorAll('.btn-eliminar').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nombre = this.dataset.nombre;
+            
+            eliminarServicio(id, nombre);
+        });
+    });
+    
+    // Event listeners para botones de toggle
+    document.querySelectorAll('.btn-toggle').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            
+            toggleEstado(id, this);
+        });
+    });
+});
+
 function editarServicio(id, nombre, descripcion, precio, activo) {
     document.getElementById('editNombre').value = nombre;
     document.getElementById('editDescripcion').value = descripcion;
@@ -190,9 +229,9 @@ function eliminarServicio(id, nombre) {
     modal.show();
 }
 
-function toggleEstado(id) {
+function toggleEstado(id, buttonElement) {
     // Obtener información del servicio desde la fila de la tabla
-    var fila = event.target.closest('tr');
+    var fila = buttonElement.closest('tr');
     var nombre = fila.cells[1].textContent;
     var estadoActual = fila.querySelector('.badge').textContent.trim();
     
