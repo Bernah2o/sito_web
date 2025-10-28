@@ -13,6 +13,7 @@ services:
     environment:
       # Variables que se configurarán en Dockploy
       - FLASK_ENV=production
+      - GUNICORN_LOG_LEVEL=warning
       - SECRET_KEY
       - WEBSITE_URL
       - WEBSITE_NAME
@@ -32,6 +33,9 @@ services:
       - JWT_REFRESH_TOKEN_EXPIRES_DAYS
       - OPENAI_API_KEY
       - RUN_MIGRATIONS=true
+      # reCAPTCHA Configuration
+      - RECAPTCHA_SITE_KEY
+      - RECAPTCHA_SECRET_KEY
       # Firebase Storage Configuration
       - FIREBASE_TYPE
       - FIREBASE_PROJECT_ID

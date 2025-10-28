@@ -21,7 +21,9 @@
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/logo.png') }}">
     
     <!-- reCAPTCHA v3 -->
-    <script src="https://www.google.com/recaptcha/api.js?render=6LfYourSiteKey"></script>
+    {% if recaptcha_site_key %}
+<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
+{% endif %}
     
     <style>
         /* Modal Flotante de Logros */
@@ -540,7 +542,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
-                    <h5 class="text-white"><i class="fas fa-tint me-2 text-white"></i>{{ configuracion.nombre_empresa or configuracion.empresa_nombre or 'DH2OCOL' }}</h5>
+                    <h5 class="text-white"><i class="text-white"></i>{{ configuracion.nombre_empresa or configuracion.empresa_nombre or 'DH2OCOL' }}</h5>
                     <p class="text-white">{{ configuracion.descripcion or configuracion.empresa_slogan or 'Soluciones integrales para el tratamiento del agua' }}</p>
                     <div class="social-links mb-3">
                         <a href="{{ url_for('main.redirect_facebook') }}" target="_blank" class="text-white me-3" title="Facebook">
@@ -693,13 +695,14 @@
             // Validación del formulario
             const contactForm = document.getElementById('contactForm');
             if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
+                contactForm.addEventListener('submit', async function(e) {
+                    e.preventDefault(); // Prevenir envío inmediato
+                    
                     const nombre = document.getElementById('nombre').value.trim();
                     const email = document.getElementById('email').value.trim();
                     const mensaje = document.getElementById('mensaje').value.trim();
 
                     if (!nombre || !email || !mensaje) {
-                        e.preventDefault();
                         alert('Por favor, completa todos los campos obligatorios.');
                         return false;
                     }
@@ -707,7 +710,6 @@
                     // Validar formato de email
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!emailRegex.test(email)) {
-                        e.preventDefault();
                         alert('Por favor, ingresa un correo electrónico válido.');
                         return false;
                     }
@@ -718,8 +720,31 @@
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Enviando...';
                     submitBtn.disabled = true;
 
-                    // El formulario se enviará normalmente
-                    return true;
+                    try {
+                        // Verificar reCAPTCHA si está configurado
+                        if (typeof grecaptcha !== 'undefined' && window.recaptchaSiteKey) {
+                            const recaptchaToken = await grecaptcha.execute(window.recaptchaSiteKey, {action: 'contact_form'});
+                            
+                            // Agregar token al formulario
+                            let tokenInput = document.getElementById('recaptcha_token');
+                            if (!tokenInput) {
+                                tokenInput = document.createElement('input');
+                                tokenInput.type = 'hidden';
+                                tokenInput.name = 'recaptcha_token';
+                                tokenInput.id = 'recaptcha_token';
+                                contactForm.appendChild(tokenInput);
+                            }
+                            tokenInput.value = recaptchaToken;
+                        }
+                        
+                        // Enviar formulario
+                        contactForm.submit();
+                        
+                    } catch (error) {
+                        console.error('Error con reCAPTCHA:', error);
+                        // Enviar formulario sin reCAPTCHA en caso de error
+                        contactForm.submit();
+                    }
                 });
             }
 
@@ -805,6 +830,12 @@
     </script>
     
     <!-- TanquiBot Chatbot -->
+    <script>
+        // Configuración de reCAPTCHA
+        {% if recaptcha_site_key %}
+        window.recaptchaSiteKey = '{{ recaptcha_site_key }}';
+        {% endif %}
+    </script>
     <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
 </body>
 </html>

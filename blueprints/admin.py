@@ -1091,7 +1091,7 @@ def nueva_pregunta():
             print(f"Error creando pregunta: {e}")
             flash('Error al crear la pregunta', 'error')
     
-    return render_template('admin/quiz.html')
+    return render_template('admin/quiz_form.html')
 
 def reprocess_product_image(firebase_url, categoria=None):
     """Reprocesar una imagen existente en Firebase Storage con optimización específica por categoría"""

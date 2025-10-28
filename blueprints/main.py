@@ -9,6 +9,17 @@ def get_db():
     """Obtener conexión a la base de datos"""
     return current_app.get_db()
 
+def get_recaptcha_site_key():
+    """Obtener la clave pública de reCAPTCHA desde la configuración"""
+    return current_app.config.get('RECAPTCHA_SITE_KEY')
+
+@main_bp.app_context_processor
+def inject_recaptcha():
+    """Inyectar configuración de reCAPTCHA en todos los templates"""
+    return {
+        'recaptcha_site_key': get_recaptcha_site_key()
+    }
+
 @main_bp.route('/')
 def index():
     """Página de inicio moderna con todo el contenido"""
@@ -320,10 +331,16 @@ def contacto():
         telefono = request.form.get('telefono')
         empresa = request.form.get('empresa')
         mensaje = request.form.get('mensaje')
+        recaptcha_token = request.form.get('recaptcha_token')
         
         # Validar datos básicos
         if not all([nombre, email, mensaje]):
             flash('Por favor completa todos los campos obligatorios', 'error')
+            return redirect(url_for('main.index') + '#contacto')
+        
+        # Verificar reCAPTCHA si está configurado
+        if recaptcha_token and not verificar_recaptcha(recaptcha_token):
+            flash('Error de verificación de seguridad. Inténtalo nuevamente.', 'error')
             return redirect(url_for('main.index') + '#contacto')
         
         try:
@@ -456,21 +473,13 @@ def chatbot_opciones_rapidas():
         return jsonify([])
 
 def verificar_recaptcha(token):
-    """Verificar token de reCAPTCHA"""
+    """Verificar token de reCAPTCHA usando variables de entorno"""
     try:
-        db = get_db()
-        cursor = db.cursor()
+        # Obtener clave secreta de reCAPTCHA desde variables de entorno
+        secret_key = current_app.config.get('RECAPTCHA_SECRET_KEY')
         
-        # Obtener clave secreta de reCAPTCHA
-        cursor.execute("SELECT recaptcha_secret_key FROM chatbot_configuracion WHERE activo = TRUE LIMIT 1")
-        
-        config = cursor.fetchone()
-        if not config:
-            return False
-            
-        secret_key = config['recaptcha_secret_key'] if isinstance(config, dict) else config[0]
         if not secret_key:
-            return False
+            return True  # Si no hay clave secreta configurada, permitir acceso
         
         # Verificar con Google
         response = requests.post('https://www.google.com/recaptcha/api/siteverify', {
@@ -483,7 +492,7 @@ def verificar_recaptcha(token):
         
     except Exception as e:
         print(f"Error verificando reCAPTCHA: {e}")
-        return False
+        return True  # En caso de error, permitir acceso
 
 @main_bp.route('/api/chatbot/mensaje', methods=['POST'])
 def chatbot_mensaje():
@@ -599,9 +608,9 @@ redirige cortésmente hacia nuestros servicios o sugiere contactar por WhatsApp.
             
             cursor.execute("""
                 INSERT INTO chatbot_conversaciones 
-                (session_id, pregunta_usuario, respuesta_bot, pregunta_id, ip_usuario, user_agent)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """, (session_id, data.get('mensaje', ''), respuesta_encontrada, pregunta_id, ip_usuario, user_agent))
+                (session_id, mensaje_usuario, respuesta_bot, ip_usuario, user_agent)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (session_id, data.get('mensaje', ''), respuesta_encontrada, ip_usuario, user_agent))
             
             db.commit()
         except Exception as e:

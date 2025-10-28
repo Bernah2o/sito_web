@@ -21,7 +21,7 @@ max_requests_jitter = 100
 # Logging
 accesslog = "-"
 errorlog = "-"
-loglevel = "info"
+loglevel = os.environ.get('GUNICORN_LOG_LEVEL', 'info')
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" %(D)s'
 
 # Process naming

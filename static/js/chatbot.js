@@ -154,10 +154,10 @@ class TanquiBot {
         
         if (!message) return;
         
-        // Verificar reCAPTCHA antes de enviar
-        if (typeof grecaptcha !== 'undefined') {
+        // Verificar reCAPTCHA antes de enviar (solo si está configurado correctamente)
+        if (typeof grecaptcha !== 'undefined' && window.recaptchaSiteKey && window.recaptchaSiteKey !== '6LfYourSiteKey') {
             try {
-                const recaptchaToken = await grecaptcha.execute('6LfYourSiteKey', {action: 'chatbot_message'});
+                const recaptchaToken = await grecaptcha.execute(window.recaptchaSiteKey, {action: 'chatbot_message'});
                 
                 // Limpiar input
                 input.value = '';

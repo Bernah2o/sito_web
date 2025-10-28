@@ -47,6 +47,10 @@ class Config:
     # Configuración del sitio web
     WEBSITE_URL = os.environ.get('WEBSITE_URL')
     WEBSITE_NAME = os.environ.get('WEBSITE_NAME')
+    
+    # Configuración de reCAPTCHA
+    RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY')
+    RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY')
 
 class DevelopmentConfig(Config):
     """Configuración para desarrollo"""
