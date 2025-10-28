@@ -317,12 +317,33 @@ class FirebaseStorageManager:
             print("No file provided")
             return None
 
+        print(f"Firebase: Uploading file {file.filename} to folder '{folder}'")
+        print(f"Firebase: Content type: {file.content_type}")
+        print(f"Firebase: Product category: {product_category}")
+
         try:
             # Generate unique filename
             filename = self._generate_unique_filename(file.filename, folder)
+            print(f"Firebase: Generated filename: {filename}")
             
             # Read file data
             file_data = file.read()
+            print(f"Firebase: File data size: {len(file_data)} bytes")
+            
+            if len(file_data) == 0:
+                print("Firebase: Error - File data is empty")
+                return None
+            
+            # Validate image format if it's supposed to be an image
+            if file.content_type and file.content_type.startswith('image/'):
+                try:
+                    # Try to open the image to validate it
+                    img = Image.open(io.BytesIO(file_data))
+                    img.verify()  # Verify that it's a valid image
+                    print(f"Firebase: Image validation successful - Format: {img.format}, Size: {img.size}")
+                except Exception as img_error:
+                    print(f"Firebase: Image validation failed: {img_error}")
+                    return None
             
             # Optimize image if it's an image file and optimization is enabled
             if optimize_image and file.content_type and file.content_type.startswith('image/'):
@@ -330,28 +351,36 @@ class FirebaseStorageManager:
                 if folder == 'carousel':
                     # Use high-quality optimization for carousel images
                     file_data = self._optimize_carousel_image(file_data)
-                    print(f"Optimizing carousel image with high quality settings")
+                    print(f"Firebase: Optimizing carousel image with high quality settings")
                 elif folder == 'productos' and product_category:
                     # Use category-specific optimization for product images
                     file_data = self._optimize_product_image_by_category(file_data, product_category)
-                    print(f"Optimizing product image for category: {product_category}")
+                    print(f"Firebase: Optimizing product image for category: {product_category}")
                 else:
                     # Use standard optimization for other images (services, general, etc.)
                     file_data = self._optimize_image(file_data)
-                    print(f"Optimizing image with standard settings for folder: {folder}")
+                    print(f"Firebase: Optimizing image with standard settings for folder: {folder}")
+                
+                print(f"Firebase: Optimized file data size: {len(file_data)} bytes")
             
             # Upload to Firebase Storage
             blob = self.bucket.blob(filename)
             blob.upload_from_string(file_data, content_type=file.content_type)
+            print(f"Firebase: File uploaded successfully")
             
             # Make the file publicly accessible
             blob.make_public()
+            print(f"Firebase: File made public")
             
             # Return public URL
-            return blob.public_url
+            public_url = blob.public_url
+            print(f"Firebase: Public URL: {public_url}")
+            return public_url
             
         except Exception as e:
-            print(f"Error uploading file: {str(e)}")
+            print(f"Firebase: Error uploading file: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def delete_file(self, file_url: str) -> bool:
@@ -452,9 +481,9 @@ class FirebaseStorageManager:
 firebase_storage = FirebaseStorageManager()
 
 # Utility functions for easy access
-def upload_file(file: FileStorage, folder: str = "", optimize_image: bool = True) -> Optional[str]:
+def upload_file(file: FileStorage, folder: str = "", optimize_image: bool = True, product_category: str = None) -> Optional[str]:
     """Upload a file to Firebase Storage"""
-    return firebase_storage.upload_file(file, folder, optimize_image)
+    return firebase_storage.upload_file(file, folder, optimize_image, product_category)
 
 def delete_file(file_url: str) -> bool:
     """Delete a file from Firebase Storage"""

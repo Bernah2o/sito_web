@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from functools import wraps
 import os
 import uuid
+import io
 from datetime import datetime
 from PIL import Image, ImageOps
 from jwt_utils import JWTManager, admin_required
@@ -22,7 +23,20 @@ def allowed_file(filename):
 
 def save_product_image(file, categoria):
     """Guardar imagen de producto en Firebase Storage y retornar la URL pública"""
-    if not file or not allowed_file(file.filename):
+    if not file:
+        print("Error: No se proporcionó archivo")
+        return None
+        
+    if not file.filename:
+        print("Error: Archivo sin nombre")
+        return None
+    
+    print(f"Procesando archivo: {file.filename}")
+    print(f"Tipo de contenido: {file.content_type}")
+    
+    if not allowed_file(file.filename):
+        print(f"Error: Formato de archivo no permitido: {file.filename}")
+        print(f"Extensiones permitidas: {ALLOWED_EXTENSIONS}")
         return None
     
     if not is_firebase_available():
@@ -30,8 +44,34 @@ def save_product_image(file, categoria):
         return None
     
     try:
-        # Determinar carpeta basada en la categoría
-        folder = f"productos/{categoria.lower()}" if categoria else "productos"
+        # Verificar que el archivo tenga contenido
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        file.seek(0)
+        
+        if file_size == 0:
+            print("Error: El archivo está vacío")
+            return None
+        
+        print(f"Tamaño del archivo: {file_size} bytes")
+        
+        # Validar que es realmente una imagen válida
+        try:
+            file_content = file.read()
+            file.seek(0)  # Reset file pointer
+            
+            from PIL import Image
+            import io
+            img = Image.open(io.BytesIO(file_content))
+            img.verify()  # Verificar que es una imagen válida
+            print(f"Validación de imagen exitosa - Formato: {img.format}, Tamaño: {img.size}")
+            
+            # Reset file pointer again after validation
+            file.seek(0)
+            
+        except Exception as img_error:
+            print(f"Error: Formato de imagen no válido - {img_error}")
+            return None
         
         # Subir archivo a Firebase Storage con optimización específica por categoría
         firebase_url = upload_file(file, folder="productos", optimize_image=True, product_category=categoria)
@@ -45,6 +85,8 @@ def save_product_image(file, categoria):
             
     except Exception as e:
         print(f"Error procesando imagen: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def login_required(f):
