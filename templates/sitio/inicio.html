@@ -586,10 +586,22 @@
             </div>
             <hr class="text-white" />
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <p class="text-white">&copy; 2025 DH2OCOL. Todos los derechos reservados.</p>
                 </div>
-                <div class="col-md-6 text-end">
+                <div class="col-md-4 text-center">
+                    <!-- Contador de Visitantes -->
+                    <div id="visitor-counter" class="text-white">
+                        <small>
+                            <i class="fas fa-users me-1"></i>
+                            <span id="visitor-count">0</span> visitantes
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-eye me-1"></i>
+                            <span id="online-count">0</span> en línea
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
                     <p class="text-white">{{ configuracion.direccion or 'Valledupar, Cesar - Colombia' }}</p>
                 </div>
             </div>
@@ -837,5 +849,43 @@
         {% endif %}
     </script>
     <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+    
+    <!-- Contador de Visitantes -->
+    <script src="{{ url_for('static', filename='js/visitor_counter.js') }}"></script>
+    <script>
+        // Inicializar contador de visitantes cuando la página cargue
+        document.addEventListener('DOMContentLoaded', function() {
+            // Crear instancia del contador con configuración backend
+            const counter = new VisitorCounter({
+                useBackend: true,
+                apiEndpoint: '/api/visitor-count',
+                statsEndpoint: '/api/visitor-stats',
+                analyticsEndpoint: '/api/analytics',
+                updateInterval: 30000, // Actualizar cada 30 segundos
+                enableGeolocation: true,
+                enableAnalytics: true
+            });
+            
+            // Registrar visita con datos adicionales
+             counter.registerVisit({
+                 page: window.location.pathname,
+                 referrer: document.referrer,
+                 userAgent: navigator.userAgent,
+                 screenResolution: `${screen.width}x${screen.height}`,
+                 language: navigator.language,
+                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+             });
+             
+             // Actualizar estadísticas periódicamente
+             setInterval(() => {
+                 counter.updateStats();
+             }, 30000);
+             
+             // Actualizar estadísticas iniciales
+             setTimeout(() => {
+                 counter.updateStats();
+             }, 1000);
+        });
+    </script>
 </body>
 </html>
