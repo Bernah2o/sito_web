@@ -301,7 +301,14 @@ def redirect_instagram():
 @main_bp.route('/whatsapp')
 def redirect_whatsapp():
     """Redirección a WhatsApp"""
-    return redirect('https://api.whatsapp.com/message/F6MZTY5TX4F4C1%sautoload=1&app_absent=0', code=301)
+    from urllib.parse import quote_plus
+    # Mensaje predeterminado que aparecerá en el chat
+    default_message = (
+        "Hola, me gustaría iniciar una conversación con DH2OCOL "
+        "para obtener más información. ¡Gracias!"
+    )
+    wa_url = f"https://wa.me/573157484662?text={quote_plus(default_message)}"
+    return redirect(wa_url, code=301)
 
 @main_bp.route('/tiktok')
 def redirect_tiktok():

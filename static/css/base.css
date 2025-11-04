@@ -428,3 +428,57 @@ a:hover {
         padding: 15px;
     }
 }
+/* Botón flotante de WhatsApp */
+.whatsapp-float {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #25D366; /* Verde WhatsApp */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.whatsapp-float i {
+  font-size: 28px;
+}
+.whatsapp-float .wa-fallback {
+  font-weight: 700;
+  font-size: 14px;
+}
+.whatsapp-float:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* Animación de pulso similar al botón del chatbot */
+.whatsapp-float.pulse {
+  animation: wa-pulse 2s infinite;
+}
+
+@keyframes wa-pulse {
+  0% {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25), 0 0 0 10px rgba(37, 211, 102, 0.15);
+  }
+  100% {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+@media (max-width: 480px) {
+  .whatsapp-float {
+    left: 12px;
+    bottom: 12px;
+    width: 52px;
+    height: 52px;
+  }
+}
