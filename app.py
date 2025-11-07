@@ -111,22 +111,23 @@ def create_app(config_name='development'):
             db = db_adapter.get_db()
             cursor = db.cursor()
             
-            # Crear tabla si no existe (compatible con SQLite)
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS visitor_logs (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp DATETIME NOT NULL,
-                    ip_address VARCHAR(45),
-                    user_agent TEXT,
-                    referrer TEXT,
-                    page VARCHAR(255),
-                    session_id VARCHAR(100),
-                    screen_resolution VARCHAR(20),
-                    language VARCHAR(10),
-                    timezone VARCHAR(50),
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
+            # Crear tabla si no existe solo en SQLite (en MySQL ya existe creada)
+            if app.config.get('DATABASE_TYPE', 'mysql').lower() == 'sqlite':
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS visitor_logs (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        timestamp DATETIME NOT NULL,
+                        ip_address VARCHAR(45),
+                        user_agent TEXT,
+                        referrer TEXT,
+                        page VARCHAR(255),
+                        session_id VARCHAR(100),
+                        screen_resolution VARCHAR(20),
+                        language VARCHAR(10),
+                        timezone VARCHAR(50),
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
             
             # Insertar nueva visita
             cursor.execute("""
@@ -180,17 +181,25 @@ def create_app(config_name='development'):
         try:
             db = db_adapter.get_db()
             cursor = db.cursor()
+            # Determinar tipo de base de datos para usar funciones de fecha correctas
+            db_type = app.config.get('DATABASE_TYPE', 'mysql').lower()
             
             # Total de visitantes
             cursor.execute("SELECT COUNT(*) as total FROM visitor_logs")
             result = cursor.fetchone()
             total_visitors = result['total'] if result else 0
             
-            # Visitantes de hoy (compatible con SQLite)
-            cursor.execute("""
-                SELECT COUNT(*) as today FROM visitor_logs 
-                WHERE DATE(timestamp) = DATE('now')
-            """)
+            # Visitantes de hoy (MySQL vs SQLite)
+            if db_type == 'sqlite':
+                cursor.execute("""
+                    SELECT COUNT(*) as today FROM visitor_logs 
+                    WHERE DATE(timestamp) = DATE('now')
+                """)
+            else:
+                cursor.execute("""
+                    SELECT COUNT(*) as today FROM visitor_logs 
+                    WHERE DATE(timestamp) = CURDATE()
+                """)
             result = cursor.fetchone()
             today_visitors = result['today'] if result else 0
             
@@ -199,11 +208,17 @@ def create_app(config_name='development'):
             result = cursor.fetchone()
             unique_visitors = result['unique_count'] if result else 0
             
-            # Visitantes de la última hora (simulando "en línea") - compatible con SQLite
-            cursor.execute("""
-                SELECT COUNT(DISTINCT session_id) as online FROM visitor_logs 
-                WHERE timestamp >= datetime('now', '-1 hour')
-            """)
+            # Visitantes de la última hora (simulando "en línea") - MySQL vs SQLite
+            if db_type == 'sqlite':
+                cursor.execute("""
+                    SELECT COUNT(DISTINCT session_id) as online FROM visitor_logs 
+                    WHERE timestamp >= datetime('now', '-1 hour')
+                """)
+            else:
+                cursor.execute("""
+                    SELECT COUNT(DISTINCT session_id) as online FROM visitor_logs 
+                    WHERE timestamp >= (NOW() - INTERVAL 1 HOUR)
+                """)
             result = cursor.fetchone()
             online_visitors = result['online'] if result else 0
             
@@ -251,24 +266,25 @@ def create_app(config_name='development'):
             db = db_adapter.get_db()
             cursor = db.cursor()
             
-            # Crear tabla de analytics si no existe (compatible con SQLite)
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS visitor_analytics (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp DATETIME NOT NULL,
-                    page VARCHAR(255),
-                    referrer TEXT,
-                    user_agent TEXT,
-                    screen_resolution VARCHAR(20),
-                    language VARCHAR(10),
-                    timezone VARCHAR(50),
-                    is_new_visitor BOOLEAN,
-                    session_id VARCHAR(100),
-                    local_count INTEGER,
-                    ip_address VARCHAR(45),
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
+            # Crear tabla de analytics si no existe solo en SQLite (en MySQL ya existe creada)
+            if app.config.get('DATABASE_TYPE', 'mysql').lower() == 'sqlite':
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS visitor_analytics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        timestamp DATETIME NOT NULL,
+                        page VARCHAR(255),
+                        referrer TEXT,
+                        user_agent TEXT,
+                        screen_resolution VARCHAR(20),
+                        language VARCHAR(10),
+                        timezone VARCHAR(50),
+                        is_new_visitor BOOLEAN,
+                        session_id VARCHAR(100),
+                        local_count INTEGER,
+                        ip_address VARCHAR(45),
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
             
             # Insertar datos de analytics
             cursor.execute("""
