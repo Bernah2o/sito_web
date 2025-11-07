@@ -1,0 +1,310 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Registro de Visitantes{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/visitor_logs.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-user-friends me-2"></i>Registro de Visitantes</h2>
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('admin.visitor_logs') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-rotate me-2"></i>Actualizar
+        </a>
+        <a href="{{ url_for('admin.visitor_logs_export', start_date=filters.start_date, end_date=filters.end_date, page=filters.page, q=filters.q, limit=filters.limit) }}" class="btn btn-outline-primary" title="Exportar registros filtrados a CSV">
+            <i class="fas fa-file-csv me-2"></i>Exportar CSV
+        </a>
+        <div class="d-inline-flex align-items-center ms-2">
+            <select id="cleanupDays" class="form-select form-select-sm me-2" style="width:auto">
+                <option value="30">30 días</option>
+                <option value="60">60 días</option>
+                <option value="90" selected>90 días</option>
+                <option value="180">180 días</option>
+                <option value="365">365 días</option>
+            </select>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="handleCleanup()">
+                <i class="fas fa-trash-alt me-2"></i>Limpiar antiguos
+            </button>
+        </div>
+    </div>
+    </div>
+
+<!-- Resumen de estadísticas -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Visitantes Hoy</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.today }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-day fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Total Visitantes</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.total }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Únicos por IP</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.unique }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-fingerprint fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">En Línea (1h)</div>
+                        <div class="h5 mb-0 font-weight-bold">{{ stats.online }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-broadcast-tower fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" action="{{ url_for('admin.visitor_logs') }}" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="start_date" class="form-label">Desde</label>
+                <input type="date" id="start_date" name="start_date" class="form-control" value="{{ filters.start_date }}">
+            </div>
+            <div class="col-md-3">
+                <label for="end_date" class="form-label">Hasta</label>
+                <input type="date" id="end_date" name="end_date" class="form-control" value="{{ filters.end_date }}">
+            </div>
+            <div class="col-md-3">
+                <label for="page" class="form-label">Página</label>
+                <input type="text" id="page" name="page" class="form-control" placeholder="/ruta" value="{{ filters.page }}">
+            </div>
+            <div class="col-md-3">
+                <label for="q" class="form-label">Buscar (IP / Session / UA)</label>
+                <input type="text" id="q" name="q" class="form-control" placeholder="192.168..., sess..., Chrome" value="{{ filters.q }}">
+            </div>
+            <div class="col-md-3">
+                <label for="limit" class="form-label">Límite</label>
+                <select id="limit" name="limit" class="form-select">
+                    {% for n in [50, 100, 200, 500] %}
+                        <option value="{{ n }}" {% if filters.limit == n %}selected{% endif %}>{{ n }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-2"></i>Aplicar filtros
+                </button>
+            </div>
+        </form>
+    </div>
+    </div>
+
+<!-- Tabla de visitas -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Últimas visitas</h5>
+        <span class="text-muted small">Mostrando {{ logs|length }} registros</span>
+    </div>
+    <div class="card-body">
+        {% if logs %}
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Página</th>
+                        <th>IP</th>
+                        <th>Referrer</th>
+                        <th>Agente</th>
+                        <th>Session</th>
+                        <th>Language</th>
+                        <th>Resolución</th>
+                        <th>Zona</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in logs %}
+                    <tr>
+                        <td>{{ v.id }}</td>
+                        <td>
+                            {% set ts = v.timestamp if v.timestamp is defined else v['timestamp'] %}
+                            {% if ts is string %}
+                                {{ ts }}
+                            {% elif ts %}
+                                {{ ts.strftime('%d/%m/%Y %H:%M') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-info text-dark">{{ v.page or '/' }}</span></td>
+                        <td><span class="mono">{{ v.ip_address or '-' }}</span></td>
+                        <td class="truncate" title="{{ v.referrer }}">{{ v.referrer or '-' }}</td>
+                        <td class="truncate" title="{{ v.user_agent }}">{{ v.user_agent or '-' }}</td>
+                        <td class="mono truncate" title="{{ v.session_id }}">{{ v.session_id or '-' }}</td>
+                        <td>{{ v.language or '-' }}</td>
+                        <td>{{ v.screen_resolution or '-' }}</td>
+                        <td>{{ v.timezone or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-user-friends fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No hay visitas registradas</h5>
+            <p class="text-muted">Cuando existan registros, aparecerán aquí.</p>
+        </div>
+        {% endif %}
+    </div>
+    </div>
+
+<!-- Top páginas -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Páginas más visitadas</h5>
+    </div>
+    <div class="card-body">
+        {% if top_pages %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Página</th>
+                        <th>Visitas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in top_pages %}
+                    <tr>
+                        <td><code>{{ row.page }}</code></td>
+                        <td>{{ row.visits }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Sin datos</p>
+        {% endif %}
+    </div>
+    </div>
+
+<!-- Gráfica por país -->
+<div class="card mt-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Visitantes por País</h5>
+        <span class="text-muted small">Top {{ top_countries|length }}</span>
+    </div>
+    <div class="card-body">
+        {% if top_countries %}
+        <canvas id="countryChart" height="120"></canvas>
+        {% else %}
+        <p class="text-muted mb-0">Sin datos de país disponibles</p>
+        {% endif %}
+    </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+async function handleCleanup() {
+    const days = document.getElementById('cleanupDays').value;
+    const confirmed = (typeof showConfirm === 'function')
+        ? await showConfirm(
+            `¿Eliminar registros anteriores a ${days} días?`,
+            {
+                title: 'Limpiar registros antiguos',
+                confirmText: 'Eliminar',
+                confirmClass: 'btn-danger',
+                icon: 'fas fa-trash-alt text-danger'
+            }
+        )
+        : window.confirm(`¿Eliminar registros anteriores a ${days} días?`);
+    if (!confirmed) return;
+
+    try {
+        const resp = await fetch(`{{ url_for('admin.visitor_logs_cleanup') }}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ days: parseInt(days, 10) })
+        });
+        const data = await resp.json();
+        if (data.success) {
+            window.location.href = `{{ url_for('admin.visitor_logs') }}`;
+        } else {
+            alert(data.message || 'Error al limpiar registros');
+        }
+    } catch (e) {
+        alert('Error al solicitar limpieza de registros');
+    }
+}
+
+(function initCountryChart() {
+    const data = {{ top_countries|default([])|tojson }};
+    if (!data || !data.length) return;
+    const labels = data.map(d => d.country);
+    const values = data.map(d => d.visits);
+    const ctx = document.getElementById('countryChart');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Visitantes',
+                data: values,
+                backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                borderColor: 'rgba(118, 75, 162, 0.9)',
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}

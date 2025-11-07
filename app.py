@@ -12,6 +12,7 @@ from flask_mail import Mail
 from dotenv import load_dotenv
 from config import config
 from database_adapter import DatabaseAdapter
+import logging
 
 # Cargar variables de entorno
 load_dotenv()
@@ -29,6 +30,10 @@ def create_app(config_name='development'):
     
     # Cargar configuración
     app.config.from_object(config[config_name])
+
+    # Reducir el ruido de logs en producción
+    if not app.config.get('DEBUG', False):
+        logging.getLogger('werkzeug').setLevel(logging.WARNING)
     
     # Inicializar Flask-Mail
     mail.init_app(app)
@@ -332,14 +337,17 @@ def create_app(config_name='development'):
         Filtro para determinar si una URL es de Firebase y generar la URL correcta
         """
         if not url:
-            print("DEBUG: URL vacía recibida en firebase_url_filter")
+            if app.config.get('DEBUG', False):
+                print("DEBUG: URL vacía recibida en firebase_url_filter")
             return ''
         
-        print(f"DEBUG: Procesando URL en firebase_url_filter: {url}")
+        if app.config.get('DEBUG', False):
+            print(f"DEBUG: Procesando URL en firebase_url_filter: {url}")
         
         # Verificar si es una URL completa (HTTP/HTTPS)
         if url.startswith(('http://', 'https://')):
-            print(f"DEBUG: URL completa detectada: {url}")
+            if app.config.get('DEBUG', False):
+                print(f"DEBUG: URL completa detectada: {url}")
             return url
         
         # Verificar si es una URL de Firebase (más específica)
@@ -350,13 +358,15 @@ def create_app(config_name='development'):
         
         # Si contiene algún indicador de Firebase, usar la URL directamente
         if any(indicator in url.lower() for indicator in firebase_indicators):
-            print(f"DEBUG: URL de Firebase detectada: {url}")
+            if app.config.get('DEBUG', False):
+                print(f"DEBUG: URL de Firebase detectada: {url}")
             return url
         
         # Si no es de Firebase, usar url_for para archivos estáticos
         from flask import url_for
         static_url = url_for('static', filename=url)
-        print(f"DEBUG: URL estática generada: {static_url}")
+        if app.config.get('DEBUG', False):
+            print(f"DEBUG: URL estática generada: {static_url}")
         return static_url
     
     return app

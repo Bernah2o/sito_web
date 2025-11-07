@@ -1,0 +1,25 @@
+/* Visitor Logs page specific styles */
+.mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.truncate {
+    max-width: 240px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.filters .form-label {
+    font-weight: 600;
+}
+
+.filters .btn {
+    min-height: 38px;
+}
+
+@media (max-width: 768px) {
+    .truncate {
+        max-width: 140px;
+    }
+}

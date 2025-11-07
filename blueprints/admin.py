@@ -5,10 +5,12 @@ from functools import wraps
 import os
 import uuid
 import io
+import csv
 from datetime import datetime
 from PIL import Image, ImageOps
 from jwt_utils import JWTManager, admin_required
 from firebase_storage import upload_file, delete_file, is_firebase_available
+from database_adapter import get_db
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -361,6 +363,153 @@ def update_file_category(file_id):
         print(f"Error al actualizar categoría: {e}")
         return jsonify({'success': False, 'message': 'Error al actualizar categoría'})
 
+@admin_bp.route('/visitor-logs')
+@login_required
+def visitor_logs():
+    """Página de administración para ver registros de visitantes"""
+    try:
+        # Filtros desde query params
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        page = request.args.get('page')
+        q = request.args.get('q')
+        limit = int(request.args.get('limit', 100))
+
+        db = get_db()
+        cursor = db.cursor()
+
+        # Determinar tipo de base de datos
+        db_type = current_app.config.get('DATABASE_TYPE', 'mysql').lower()
+
+        # Estadísticas
+        cursor.execute("SELECT COUNT(*) as total FROM visitor_logs")
+        total_row = cursor.fetchone()
+        total_visitors = total_row['total'] if total_row else 0
+
+        if db_type == 'sqlite':
+            cursor.execute("""
+                SELECT COUNT(*) as today FROM visitor_logs
+                WHERE DATE(timestamp) = DATE('now')
+            """)
+        else:
+            cursor.execute("""
+                SELECT COUNT(*) as today FROM visitor_logs
+                WHERE DATE(timestamp) = CURDATE()
+            """)
+        today_row = cursor.fetchone()
+        today_visitors = today_row['today'] if today_row else 0
+
+        cursor.execute("SELECT COUNT(DISTINCT ip_address) as unique_count FROM visitor_logs")
+        unique_row = cursor.fetchone()
+        unique_visitors = unique_row['unique_count'] if unique_row else 0
+
+        if db_type == 'sqlite':
+            cursor.execute("""
+                SELECT COUNT(DISTINCT session_id) as online FROM visitor_logs
+                WHERE timestamp >= datetime('now', '-1 hour')
+            """)
+        else:
+            cursor.execute("""
+                SELECT COUNT(DISTINCT session_id) as online FROM visitor_logs
+                WHERE timestamp >= (NOW() - INTERVAL 1 HOUR)
+            """)
+        online_row = cursor.fetchone()
+        online_visitors = online_row['online'] if online_row else 0
+
+        # Construir consulta base para logs
+        query = "SELECT id, timestamp, page, ip_address, referrer, user_agent, session_id, language, screen_resolution, timezone FROM visitor_logs"
+        conditions = []
+        params = []
+
+        if start_date:
+            conditions.append("timestamp >= %s")
+            params.append(f"{start_date} 00:00:00")
+        if end_date:
+            conditions.append("timestamp <= %s")
+            params.append(f"{end_date} 23:59:59")
+        if page:
+            conditions.append("page LIKE %s")
+            params.append(f"%{page}%")
+        if q:
+            conditions.append("(ip_address LIKE %s OR session_id LIKE %s OR user_agent LIKE %s)")
+            params.extend([f"%{q}%", f"%{q}%", f"%{q}%"])
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
+        query += " ORDER BY timestamp DESC LIMIT %s"
+        params.append(limit)
+
+        cursor.execute(query, params)
+        logs = cursor.fetchall()
+
+        # Top páginas
+        cursor.execute("""
+            SELECT page, COUNT(*) as visits
+            FROM visitor_logs
+            GROUP BY page
+            ORDER BY visits DESC
+            LIMIT 10
+        """)
+        top_pages = cursor.fetchall()
+
+        # Países a partir de language (ej: es-CO -> CO) o timezone
+        country_counts = {}
+        name_map = {
+            'CO': 'Colombia', 'US': 'Estados Unidos', 'MX': 'México',
+            'ES': 'España', 'GB': 'Reino Unido', 'AR': 'Argentina', 'CL': 'Chile',
+            'PE': 'Perú', 'EC': 'Ecuador', 'VE': 'Venezuela', 'BR': 'Brasil'
+        }
+        tz_map = {
+            'america/bogota': 'CO',
+            'america/new_york': 'US',
+            'america/mexico_city': 'MX',
+            'europe/madrid': 'ES',
+            'europe/london': 'GB',
+        }
+        for row in logs:
+            lang = row.get('language') or ''
+            country_code = None
+            if '-' in lang:
+                parts = lang.split('-')
+                if len(parts) >= 2:
+                    country_code = parts[1].upper()
+            if not country_code:
+                tz = (row.get('timezone') or '').lower()
+                country_code = tz_map.get(tz)
+            country_name = name_map.get(country_code, country_code or 'Desconocido')
+            country_counts[country_name] = country_counts.get(country_name, 0) + 1
+
+        top_countries = sorted(
+            [{'country': k, 'visits': v} for k, v in country_counts.items()],
+            key=lambda x: x['visits'],
+            reverse=True
+        )[:10]
+
+        cursor.close()
+
+        stats = {
+            'total': total_visitors,
+            'today': today_visitors,
+            'unique': unique_visitors,
+            'online': online_visitors
+        }
+
+        filters = {
+            'start_date': start_date or '',
+            'end_date': end_date or '',
+            'page': page or '',
+            'q': q or '',
+            'limit': limit
+        }
+
+        return render_template('admin/visitor_logs.html', logs=logs, stats=stats, top_pages=top_pages, filters=filters, top_countries=top_countries)
+
+    except Exception as e:
+        print(f"Error cargando visitor logs: {e}")
+        flash('Error al cargar registros de visitantes', 'error')
+        return render_template('admin/visitor_logs.html', logs=[], stats={'total':0,'today':0,'unique':0,'online':0}, top_pages=[], filters={}, top_countries=[])
+
 @admin_bp.route('/medios/categories')
 @login_required
 def get_categories():
@@ -380,6 +529,91 @@ def get_categories():
 def get_db():
     """Obtener conexión a la base de datos"""
     return current_app.get_db()
+
+@admin_bp.route('/visitor-logs/export')
+@login_required
+def visitor_logs_export():
+    """Exportar registros de visitantes a CSV según filtros"""
+    try:
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        page = request.args.get('page')
+        q = request.args.get('q')
+
+        db = get_db()
+        cursor = db.cursor()
+
+        query = "SELECT id, timestamp, page, ip_address, referrer, user_agent, session_id, language, screen_resolution, timezone FROM visitor_logs"
+        conditions = []
+        params = []
+
+        if start_date:
+            conditions.append("timestamp >= %s")
+            params.append(f"{start_date} 00:00:00")
+        if end_date:
+            conditions.append("timestamp <= %s")
+            params.append(f"{end_date} 23:59:59")
+        if page:
+            conditions.append("page LIKE %s")
+            params.append(f"%{page}%")
+        if q:
+            conditions.append("(ip_address LIKE %s OR session_id LIKE %s OR user_agent LIKE %s)")
+            params.extend([f"%{q}%", f"%{q}%", f"%{q}%"]) 
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        query += " ORDER BY timestamp DESC"
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        cursor.close()
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['id','timestamp','page','ip_address','referrer','user_agent','session_id','language','screen_resolution','timezone'])
+        for r in rows:
+            writer.writerow([
+                r.get('id'), r.get('timestamp'), r.get('page'), r.get('ip_address'),
+                r.get('referrer'), r.get('user_agent'), r.get('session_id'), r.get('language'),
+                r.get('screen_resolution'), r.get('timezone')
+            ])
+
+        resp = make_response(output.getvalue())
+        resp.headers['Content-Type'] = 'text/csv; charset=utf-8'
+        resp.headers['Content-Disposition'] = 'attachment; filename="visitor_logs.csv"'
+        return resp
+    except Exception as e:
+        current_app.logger.exception('Error exportando CSV de visitantes: %s', e)
+        return jsonify({'success': False, 'message': 'Error al exportar CSV'}), 500
+
+
+@admin_bp.route('/visitor-logs/cleanup', methods=['POST'])
+@login_required
+def visitor_logs_cleanup():
+    """Eliminar registros anteriores a N días"""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        db_type = current_app.config.get('DATABASE_TYPE', 'mysql').lower()
+
+        payload = request.get_json(silent=True) or {}
+        days = int(payload.get('days', 90))
+        if days <= 0 or days > 3650:
+            return jsonify({'success': False, 'message': 'Valor de días inválido'}), 400
+
+        if db_type == 'sqlite':
+            delete_query = "DELETE FROM visitor_logs WHERE timestamp < datetime('now', ? || ' day')"
+            cursor.execute(delete_query, (f'-{days}',))
+        else:
+            delete_query = "DELETE FROM visitor_logs WHERE timestamp < (NOW() - INTERVAL %s DAY)"
+            cursor.execute(delete_query, (days,))
+
+        db.commit()
+        cursor.close()
+        return jsonify({'success': True})
+    except Exception as e:
+        current_app.logger.exception('Error limpiando registros antiguos: %s', e)
+        return jsonify({'success': False, 'message': 'Error interno al limpiar'}), 500
 
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():

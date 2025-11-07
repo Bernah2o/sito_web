@@ -608,42 +608,79 @@
         </div>
     </footer>
 
-    <!-- Modal Flotante de Logros -->
+    <!-- Modal Flotante de Logros con Slider -->
     <div id="logrosModal" class="logros-modal">
         <div class="logros-modal-content">
             <button class="logros-close-btn" onclick="cerrarModal()">&times;</button>
-            
-            <!-- Sello de Paz -->
-            <div class="logro-item">
-                <div class="logro-icon">
-                    <img src="{{ url_for('static', filename='img/Sello_ColombiaDestinoDePaz.png') }}" alt="Sello de Paz" width="60" height="60">
+
+            <div id="logrosCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="8000">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#logrosCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Sello de Paz"></button>
+                    <button type="button" data-bs-target="#logrosCarousel" data-bs-slide-to="1" aria-label="Plazos Justos"></button>
+                    <button type="button" data-bs-target="#logrosCarousel" data-bs-slide-to="2" aria-label="Aval Sanitario"></button>
                 </div>
-                <div class="logro-content">
-                    <h4>Sello de Paz</h4>
-                    <p class="logro-subtitle">Certificación Oficial</p>
-                    <p>DH2OCOL ha sido reconocida oficialmente con el Sello de Paz por nuestro compromiso con la construcción de paz y reconciliación en Colombia.</p>
-                    <div class="logros-actions">
-                        <button class="btn-conocer-mas" onclick="window.open('https://www.destinosdepaz.gov.co/', '_blank')">Conocer Más</button>
+                <div class="carousel-inner">
+                    <!-- Slide: Sello de Paz -->
+                    <div class="carousel-item active">
+                        <div class="logro-item">
+                            <div class="logro-icon">
+                                <img src="{{ url_for('static', filename='img/Sello_ColombiaDestinoDePaz.png') }}" alt="Sello de Paz" width="60" height="60">
+                            </div>
+                            <div class="logro-content">
+                                <h4>Sello de Paz</h4>
+                                <p class="logro-subtitle">Certificación Oficial</p>
+                                <p>DH2OCOL ha sido reconocida oficialmente con el Sello de Paz por nuestro compromiso con la construcción de paz y reconciliación en Colombia.</p>
+                                <div class="logros-actions">
+                                    <button class="btn-conocer-mas" onclick="window.open('https://www.destinosdepaz.gov.co/', '_blank')">Conocer Más</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide: Plazos Justos -->
+                    <div class="carousel-item">
+                        <div class="logro-item">
+                            <div class="logro-icon">
+                                <img src="{{ url_for('static', filename='img/plazos_justos.jpeg') }}" alt="Plazos Justos" width="60" height="60">
+                            </div>
+                            <div class="logro-content">
+                                <h4>Plazos Justos</h4>
+                                <p class="logro-subtitle">Empresa comprometida con el pago puntual a proveedores</p>
+                                <div class="logros-actions">
+                                    <button class="btn-conocer-mas" onclick="window.open('https://plazosjustos.gov.co/', '_blank')">Conocer Más</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide: Aval Sanitario -->
+                    <div class="carousel-item">
+                        <div class="logro-item">
+                            <div class="logro-icon">
+                                <img src="{{ url_for('static', filename='img/secretaria_logo.png') }}" alt="Secretaría de Salud de Valledupar" width="60" height="60">
+                            </div>
+                            <div class="logro-content">
+                                <h4>Aval Sanitario</h4>
+                                <p class="logro-subtitle">Secretaría de Salud de Valledupar</p>
+                                <p>Contamos con el aval sanitario de la Secretaría de Salud de Valledupar, que certifica el cumplimiento de estándares de higiene y calidad en nuestros servicios.</p>
+                                <div class="logros-actions">
+                                    <button class="btn-conocer-mas" onclick="window.open('https://valledupar-cesar.gov.co/', '_blank')">Conocer Más</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#logrosCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#logrosCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Siguiente</span>
+                </button>
             </div>
-            
-            <div class="logros-divider"></div>
-            
-            <!-- Plazos Justos -->
-            <div class="logro-item">
-                <div class="logro-icon">
-                    <img src="{{ url_for('static', filename='img/plazos_justos.jpeg') }}" alt="Plazos Justos" width="60" height="60">
-                </div>
-                <div class="logro-content">
-                    <h4>Plazos Justos</h4>
-                    <p class="logro-subtitle">Empresa comprometida con el pago puntual a proveedores</p>
-                    <div class="logros-actions">
-                        <button class="btn-conocer-mas" onclick="window.open('https://plazosjustos.gov.co/', '_blank')">Conocer Más</button>
-                    </div>
-                </div>
-            </div>
-            
+
             <div class="logros-actions-global">
                 <button class="btn-mas-tarde" onclick="cerrarModal()">Más Tarde</button>
             </div>
@@ -782,10 +819,10 @@
             const modal = document.getElementById('logrosModal');
             modal.classList.add('show');
             
-            // Auto-cerrar después de 15 segundos
+            // Auto-cerrar después de 26 segundos (para ver todas las diapositivas)
             modalTimer = setTimeout(() => {
                 cerrarModal();
-            }, 15000);
+            }, 26000);
         }
         
         // Función para cerrar el modal
@@ -803,21 +840,15 @@
                 modal.classList.remove('show', 'hide');
             }, 500);
             
-            // Guardar en localStorage que el usuario ya vio el modal
-            localStorage.setItem('logrosModalVisto', 'true');
+            // (Opcional) Guardar en sessionStorage si se desea evitar reaparición en esta sesión
+            // sessionStorage.setItem('logrosModalVisto', 'true');
         }
         
-        // Mostrar el modal cuando la página cargue (si no se ha visto antes)
+        // Mostrar el modal siempre a los 3 segundos
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar si el usuario ya vio el modal
-            const yaVisto = localStorage.getItem('logrosModalVisto');
-            
-            if (!yaVisto) {
-                // Mostrar el modal después de 3 segundos
-                setTimeout(() => {
-                    mostrarModal();
-                }, 3000);
-            }
+            setTimeout(() => {
+                mostrarModal();
+            }, 3000);
         });
         
         // Cerrar modal al hacer clic fuera de él
