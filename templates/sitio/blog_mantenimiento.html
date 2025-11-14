@@ -24,16 +24,16 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo_4.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/logo_4.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/logo_4.png') }}">
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary-gradient fixed-top">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="DH2OCOL" height="40" class="me-2">
+                <img src="{{ url_for('static', filename='img/logo_4.png') }}" alt="DH2OCOL" height="40" class="me-2">
                 DH2OCOL
             </a>
             
@@ -218,19 +218,117 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- CTA -->
                     <div class="card bg-primary-gradient text-white text-center">
                         <div class="card-body p-5">
                             <h3 class="mb-3">¿Necesitas mantenimiento profesional?</h3>
                             <p class="lead mb-4">En DH2OCOL somos expertos en mantenimiento de tanques de agua en Valledupar. Contamos con más de 4 años de experiencia y personal certificado.</p>
                             <div class="d-flex justify-content-center gap-3 flex-wrap">
-                                <a href="{{ url_for('main.contacto') }}" class="btn btn-accent btn-lg">
-                                    <i class="fas fa-phone me-2"></i>Solicitar Servicio
-                                </a>
+                                <button class="btn btn-accent btn-lg" data-bs-toggle="modal" data-bs-target="#cotizacionWizardModal">
+                                    <i class="fa fa-calculator"></i> Solicita tu Cotizacion
+                                </button>
                                 <a href="https://api.whatsapp.com/message/F6MZTY5TX4F4C1?autoload=1&app_absent=0" class="btn btn-success btn-lg" target="_blank">
                                     <i class="fab fa-whatsapp me-2"></i>WhatsApp
                                 </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medios de pago -->
+                    <div class="card shadow-sm mb-5">
+                        <div class="card-header bg-primary-gradient text-white text-center py-3">
+                            <h3 class="mb-0 text-white"><i class="fas fa-credit-card text-white me-2"></i>Medios de pago</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-5 align-items-stretch mt-4">
+                                <div class="col-md-4 px-md-3 mb-4">
+                                    <div class="h-100 p-3 border rounded-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-mobile-alt text-primary fs-3 me-2"></i>
+                                            <h5 class="mb-0">Nequi</h5>
+                                        </div>
+                                        <p class="mb-2">Pagos inmediatos vía código o enlace seguro.</p>
+                                        <ul class="small mb-0">
+                                            <li>Confirmación al instante</li>
+                                            <li>Sin costos adicionales</li>
+                                        </ul>
+                                        {% if nequi_qr_filename %}
+                                            <div class="mt-3 text-center">
+                                                <img src="{{ url_for('static', filename=nequi_qr_filename) }}" alt="QR Nequi" class="img-fluid rounded" style="max-width: 200px;">
+                                                <div class="small text-muted mt-1">Escanea el QR para pagar</div>
+                                            </div>
+                                        {% endif %}
+                                        {% if nequi_phone_number %}
+                                            <div class="mt-2 small">Número Nequi: <span class="fw-semibold">{{ nequi_phone_number }}</span></div>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm mt-2 copy-btn" data-copy-text="{{ nequi_phone_number }}">
+                                                <i class="fas fa-copy me-1"></i>Copiar número
+                                            </button>
+                                        {% endif %}
+                                        {% if nequi_payment_url %}
+                                            <div class="mt-3 text-center">
+                                                <a href="{{ nequi_payment_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-accent">
+                                                    <i class="fas fa-link me-2"></i> Pagar por Nequi
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 px-md-3 mb-4">
+                                    <div class="h-100 p-3 border rounded-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-university text-primary fs-3 me-2"></i>
+                                            <h5 class="mb-0">Bre-B</h5>
+                                        </div>
+                                        <p class="mb-2">Transferencia bancaria con comprobante.</p>
+                                        <ul class="small mb-0">
+                                            <li>Cuentas autorizadas</li>
+                                            <li>Soporte de recibo</li>
+                                        </ul>
+                                        {% if breb_qr_filename %}
+                                            <div class="mt-3 text-center">
+                                                <img src="{{ url_for('static', filename=breb_qr_filename) }}" alt="QR Bre-B" class="img-fluid rounded" style="max-width: 200px;">
+                                                <div class="small text-muted mt-1">Escanea el QR para pagar</div>
+                                            </div>
+                                        {% endif %}
+                                        {% if breb_bank_name or breb_account_number or breb_account_holder %}
+                                            <div class="mt-3">
+                                                <div class="small text-muted">Datos de cuenta</div>
+                                                <ul class="small mb-0">
+                                                    {% if breb_bank_name %}<li>Banco: {{ breb_bank_name }}</li>{% endif %}
+                                                    {% if breb_account_type %}<li>Tipo de cuenta: {{ breb_account_type }}</li>{% endif %}
+                                                    {% if breb_account_number %}<li>Número: {{ breb_account_number }}</li>{% endif %}
+                                                    {% if breb_account_holder %}<li>Titular: {{ breb_account_holder }}</li>{% endif %}
+                                                </ul>
+                                                {% if breb_account_number %}
+                                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2 copy-btn" data-copy-text="{{ breb_account_number }}">
+                                                    <i class="fas fa-copy me-1"></i>Copiar número
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 px-md-3 mb-4">
+                                    <div class="h-100 p-3 border rounded-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-credit-card text-primary fs-3 me-2"></i>
+                                            <h5 class="mb-0">Tarjeta de crédito</h5>
+                                        </div>
+                                        <p class="mb-2">Pago mediante enlace seguro de Wompi. Aceptamos todas las franquicias.</p>
+                                        <ul class="small mb-0">
+                                            <li>Verificación 3D Secure y antifraude</li>
+                                            <li>Comprobante y factura electrónica</li>
+                                        </ul>
+                                        <div class="mt-3">
+                                            <a href="{{ wompi_checkout_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-accent">
+                                                <i class="fas fa-link me-2"></i> Pagar con Wompi
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-info mt-4 mb-0">
+                                <i class="fas fa-shield-alt me-2"></i>Transacciones seguras con comprobantes y factura electrónica si se requiere.
                             </div>
                         </div>
                     </div>
@@ -239,49 +337,61 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <h5 class="text-white mb-3">DH2OCOL</h5>
-                    <p class="text-white">Especialistas en tratamiento y mantenimiento de agua en Valledupar y toda la región Caribe.</p>
-                    <div class="d-flex gap-3">
-                        <a href="{{ url_for('main.redirect_facebook') }}" class="text-white text-decoration-none"><i class="fab fa-facebook fs-4"></i></a>
-                        <a href="{{ url_for('main.redirect_instagram') }}" class="text-white text-decoration-none"><i class="fab fa-instagram fs-4"></i></a>
-                        <a href="{{ url_for('main.redirect_youtube') }}" class="text-white text-decoration-none"><i class="fab fa-youtube fs-4"></i></a>
-                        <a href="{{ url_for('main.redirect_tiktok') }}" class="text-white text-decoration-none"><i class="fab fa-tiktok fs-4"></i></a>
-                        <a href="{{ url_for('main.redirect_whatsapp') }}" class="text-white text-decoration-none"><i class="fab fa-whatsapp fs-4"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-4 mb-4">
-                    <h5 class="text-white mb-3">Enlaces útiles</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ url_for('main.index') }}" class="text-white text-decoration-none"><i class="fas fa-home me-2"></i>Inicio</a></li>
-                        <li><a href="{{ url_for('main.limpieza_tanques_elevados') }}" class="text-white text-decoration-none"><i class="fas fa-tint me-2"></i>Limpieza de Tanques</a></li>
-                        <li><a href="{{ url_for('main.accesorios_tanques') }}" class="text-white text-decoration-none"><i class="fas fa-tools me-2"></i>Accesorios</a></li>
-                        <li><a href="{{ url_for('main.educagua') }}" class="text-white text-decoration-none"><i class="fas fa-graduation-cap me-2"></i>EducAgua</a></li>
-                        <li><a href="{{ url_for('main.politica_tratamiento_datos') }}" class="text-white text-decoration-none" target="_blank"><i class="fas fa-shield-alt me-2"></i>Política de Tratamiento de Datos</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4 mb-4">
-                    <h5 class="text-white mb-3">Contacto</h5>
-                    <p class="text-white"><i class="fas fa-map-marker-alt me-2"></i>{{ configuracion.direccion or 'Valledupar, Cesar' }}</p>
-                    <p class="text-white"><i class="fas fa-phone me-2"></i>{{ configuracion.telefono or '+57 315 748 4662' }}</p>
-                    <p class="text-white"><i class="fas fa-envelope me-2"></i>{{ configuracion.email or 'contacto@dh2ocol.com' }}</p>
-                </div>
-            </div>
-            <hr class="my-4 text-white">
-            <div class="text-center">
-                <p class="text-white">&copy; 2025 DH2OCOL. Todos los derechos reservados.</p>
-            </div>
-        </div>
-    </footer>
+    {% include 'sitio/partials/footer.html' %}
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Contador de Visitantes -->
+    <script src="{{ url_for('static', filename='js/visitor_counter.js') }}"></script>
     <!-- Botón flotante WhatsApp -->
     <script src="{{ url_for('static', filename='js/whatsapp_float.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function copyTextFallback(text) {
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    const ok = document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    return ok;
+                } catch (e) {
+                    return false;
+                }
+            }
+            document.querySelectorAll('.copy-btn').forEach(function (btn) {
+                btn.addEventListener('click', async function () {
+                    const text = this.getAttribute('data-copy-text');
+                    if (!text) return;
+                    try {
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(text);
+                        } else {
+                            const ok = copyTextFallback(text);
+                            if (!ok) throw new Error('Copy fallback failed');
+                        }
+                        const originalHtml = this.innerHTML;
+                        const hadOutline = this.classList.contains('btn-outline-secondary');
+                        this.innerHTML = '<i class="fas fa-check me-1"></i>Copiado';
+                        if (hadOutline) this.classList.remove('btn-outline-secondary');
+                        this.classList.add('btn-success');
+                        setTimeout(() => {
+                            this.innerHTML = originalHtml;
+                            if (hadOutline) this.classList.add('btn-outline-secondary');
+                            this.classList.remove('btn-success');
+                        }, 2000);
+                    } catch (e) {
+                        // Fallback final: mostrar prompt para seleccionar
+                        window.prompt('Copia el número con Ctrl+C:', text);
+                    }
+                });
+            });
+        });
+    </script>
     
     <style>
         .timeline {
@@ -352,3 +462,240 @@
     <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
 </body>
 </html>
+    <!-- Modal Wizard de Cotización DH2O -->
+    <div class="modal fade" id="cotizacionWizardModal" tabindex="-1" aria-labelledby="cotizacionWizardLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content cotizacion-wizard">
+                <div class="modal-header wizard-header">
+                    <h5 class="modal-title" id="cotizacionWizardLabel"><i class="fas fa-water me-2"></i> Cotización rápida DH2OCOL</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Stepper -->
+                    <div class="wizard-steps">
+                        <div class="wizard-step active" data-step="1"><span>1</span> Servicio</div>
+                        <div class="wizard-step" data-step="2"><span>2</span> Detalles</div>
+                        <div class="wizard-step" data-step="3"><span>3</span> Ubicación</div>
+                        <div class="wizard-step" data-step="4"><span>4</span> Cliente</div>
+                        <div class="wizard-step" data-step="5"><span>5</span> Resultado</div>
+                    </div>
+
+                    <!-- Paso 1: Tipo de servicio -->
+                    <div class="wizard-pane" data-step="1">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Seleccione el tipo de servicio</label>
+                                <div class="row g-2">
+                                    <div class="col-6 col-md-4">
+                                        <button class="service-option" data-service="limpieza"><i class="fas fa-soap"></i> Limpieza de tanque</button>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <button class="service-option" data-service="reparacion"><i class="fas fa-tools"></i> Reparación</button>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <button class="service-option" data-service="instalacion"><i class="fas fa-wrench"></i> Instalación</button>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <button class="service-option" data-service="inspeccion"><i class="fas fa-drone"></i> Inspección con dron</button>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <button class="service-option" data-service="otro"><i class="fas fa-clipboard-list"></i> Otro</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2: Campos específicos según servicio -->
+                    <div class="wizard-pane d-none" data-step="2">
+                        <!-- Común: limpieza / instalación -->
+                        <div class="service-fields" data-service="limpieza instalacion">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Tipo de tanque</label>
+                                    <select class="form-select" id="tipoTanque">
+                                        <option value="plastico">Plástico</option>
+                                        <option value="fibra">Fibra</option>
+                                        <option value="metalico">Metálico</option>
+                                        <option value="elevado">Elevado</option>
+                                        <option value="subterraneo">Subterráneo</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Capacidad del tanque</label>
+                                    <select class="form-select" id="capacidadTanque">
+                                        <option value="250">250 L</option>
+                                        <option value="500">500 L</option>
+                                        <option value="1000">1000 L</option>
+                                        <option value="2000">2000 L</option>
+                                        <option value="otro">Otro</option>
+                                    </select>
+                                </div>
+                                <!-- Campo de altura eliminado por solicitud -->
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Nivel de accesibilidad</label>
+                                    <select class="form-select" id="accesibilidad">
+                                        <option value="facil">Fácil</option>
+                                        <option value="media">Media</option>
+                                        <option value="dificil">Difícil</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reparación -->
+                        <div class="service-fields d-none" data-service="reparacion">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Tipo de daño</label>
+                                    <select class="form-select" id="tipoDano">
+                                        <option value="fuga">Fuga</option>
+                                        <option value="fisura">Fisura</option>
+                                        <option value="corrosion">Corrosión</option>
+                                        <option value="valvulas">Válvulas</option>
+                                        <option value="otro">Otro</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Fotos (opcional)</label>
+                                    <input type="file" class="form-control" id="fotosReparacion" multiple accept="image/*">
+                                    <div id="progressReparacion" class="progress mt-2 d-none" aria-live="polite">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                                        <small class="text-muted ms-2" id="progressReparacionText">Subiendo imágenes...</small>
+                                    </div>
+                                    <div id="previewReparacion" class="image-previews d-none" aria-live="polite"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instalación -->
+                        <div class="service-fields d-none" data-service="instalacion">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Lugar de instalación</label>
+                                    <input type="text" class="form-control" id="lugarInstalacion" placeholder="Techo, patio, sótano, etc.">
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">¿Requiere estructura nueva?</label>
+                                    <select class="form-select" id="requiereEstructura">
+                                        <option value="no">No</option>
+                                        <option value="si">Sí</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Fotos (opcional)</label>
+                                    <input type="file" class="form-control" id="fotosInstalacion" multiple accept="image/*">
+                                    <div id="progressInstalacion" class="progress mt-2 d-none" aria-live="polite">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                                        <small class="text-muted ms-2" id="progressInstalacionText">Subiendo imágenes...</small>
+                                    </div>
+                                    <div id="previewInstalacion" class="image-previews d-none" aria-live="polite"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inspección con dron / Otro -->
+                        <div class="service-fields d-none" data-service="inspeccion otro">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Descripción breve</label>
+                                    <textarea class="form-control" id="descripcionOtro" rows="3" placeholder="Cuéntanos brevemente qué necesitas"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 3: Ubicación del cliente -->
+                    <div class="wizard-pane d-none" data-step="3">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Barrio</label>
+                                <input type="text" class="form-control" id="barrio" placeholder="Barrio">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Ciudad</label>
+                                <input type="text" class="form-control" id="ciudad" value="Valledupar">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Dirección aproximada</label>
+                                <input type="text" class="form-control" id="direccion" placeholder="Calle 12 #34-56">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Punto de referencia</label>
+                                <input type="text" class="form-control" id="referencia" placeholder="Frente al colegio...">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Ubicación en el mapa</label>
+                                <div class="input-group">
+                                    <input type="url" class="form-control" id="ubicacionMapa" placeholder="Pega aquí un enlace de Google Maps (opcional)">
+                                    <button class="btn btn-outline-primary" type="button" id="btnUbicacionMapa"><i class="fas fa-location-crosshairs me-1"></i>Compartir mi ubicación</button>
+                                </div>
+                                <small class="text-muted">Se insertará un enlace a Google Maps con tus coordenadas.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 4: Datos del cliente -->
+                    <div class="wizard-pane d-none" data-step="4">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombreCliente" placeholder="Nombre y apellido">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Teléfono (WhatsApp)</label>
+                                <input type="tel" class="form-control" id="telefonoCliente" placeholder="Ej. 3157484662" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Correo electrónico (opcional)</label>
+                                <input type="email" class="form-control" id="correoCliente" placeholder="email@ejemplo.com">
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="aceptaPolitica" required>
+                                    <label class="form-check-label" for="aceptaPolitica">
+                                        Acepto la <a href="{{ url_for('main.politicas_privacidad') }}" target="_blank">Política de Privacidad</a> y el tratamiento de datos.
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 5: Resultado dinámico -->
+                    <div class="wizard-pane d-none" data-step="5">
+                        <div class="quote-result card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">Cotización estimada</h6>
+                                    <span class="badge bg-primary" id="quote-service-label">Servicio</span>
+                                </div>
+                                <div class="display-6 fw-bold text-primary" id="quote-value">$0 COP</div>
+                                <div class="text-muted" id="quote-time">Tiempo estimado: -</div>
+                                <div class="alert alert-info mt-3" id="quote-note">
+                                    Nota: El valor final puede variar tras revisión en sitio.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer d-flex justify-content-between">
+                    <div>
+                        <button class="btn btn-outline-secondary" id="prevStep"><i class="fas fa-arrow-left me-2"></i>Atrás</button>
+                        <button class="btn btn-primary" id="nextStep"><i class="fas fa-arrow-right me-2"></i>Siguiente</button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-success d-none" id="sendWhatsapp" target="_blank"><i class="fab fa-whatsapp me-2"></i>Enviar a WhatsApp</a>
+                        <button class="btn btn-outline-primary d-none" id="sendEmail"><i class="fas fa-envelope me-2"></i>Enviar por correo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estilos y script del wizard -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quote_wizard.css') }}">
+    <script>
+        window.DH2O_WHATSAPP = '{{ configuracion.whatsapp if configuracion and configuracion.whatsapp else "573157484662" }}';
+    </script>
+    <script src="{{ url_for('static', filename='js/quote_wizard.js') }}"></script>

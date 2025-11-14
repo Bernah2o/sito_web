@@ -397,22 +397,42 @@ class FirebaseStorageManager:
             return False
         
         try:
-            # Extract filename from URL
-            # Firebase Storage URLs have format: https://storage.googleapis.com/bucket-name/filename
+            # Support both public URL formats
+            # 1) https://storage.googleapis.com/<bucket>/<object_path>
+            # 2) https://firebasestorage.googleapis.com/v0/b/<bucket>/o/<object_path>?...
+            import urllib.parse
+            parsed = urllib.parse.urlparse(file_url)
+            blob_name = None
+
             if 'storage.googleapis.com' in file_url:
-                filename = file_url.split('/')[-1]
-                # URL decode the filename
-                import urllib.parse
-                filename = urllib.parse.unquote(filename)
-                
-                # Delete the file
-                blob = self.bucket.blob(filename)
-                blob.delete()
-                
-                return True
-            else:
-                print(f"Invalid Firebase Storage URL: {file_url}")
+                # Path: /<bucket>/<object_path>
+                path = parsed.path.lstrip('/')
+                parts = path.split('/', 1)
+                if len(parts) == 2:
+                    blob_name = urllib.parse.unquote(parts[1])
+                else:
+                    # Fallback if object path not found
+                    blob_name = urllib.parse.unquote(parts[0])
+            elif 'firebasestorage.googleapis.com' in file_url:
+                # Path: /v0/b/<bucket>/o/<object_path>
+                segments = parsed.path.split('/')
+                try:
+                    o_index = segments.index('o')
+                    blob_name = urllib.parse.unquote(segments[o_index + 1])
+                except Exception:
+                    # Some signed URLs may have the name in query param
+                    qs = urllib.parse.parse_qs(parsed.query)
+                    name = qs.get('name', [None])[0]
+                    blob_name = urllib.parse.unquote(name) if name else None
+            
+            if not blob_name:
+                print(f"Could not extract blob name from URL: {file_url}")
                 return False
+
+            # Delete the file by its full object path (may include folders like 'servicios/...')
+            blob = self.bucket.blob(blob_name)
+            blob.delete()
+            return True
                 
         except Exception as e:
             print(f"Error deleting file: {str(e)}")

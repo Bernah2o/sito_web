@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Política de Cookies - DH2OCOL</title>
+    <meta name="description" content="Política de Cookies de DH2OCOL conforme a normativa aplicable." />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio.css', v='3') }}" />
+    <style>
+      body.bg-dark { color: #fff; }
+      main.container, main.container * { color: #fff !important; }
+      footer, footer small { color: #fff !important; }
+      a { color: #4cc9f0; }
+    </style>
+  </head>
+  <body class="bg-dark">
+    <nav class="navbar navbar-expand-lg" style="background: rgba(0, 128, 55, 0.95); backdrop-filter: blur(10px)">
+      <div class="container">
+        <a class="navbar-brand text-white fw-bold" href="{{ url_for('main.index') }}">
+          <img src="{{ url_for('static', filename='img/logo_4.png') }}" alt="DH2OCOL" style="width: 36px; height: 36px" class="me-2" />DH2OCOL
+        </a>
+      </div>
+    </nav>
+
+    <main class="container py-5 text-white">
+      <h1 class="mb-2">Política de Cookies</h1>
+      <p class="text-white mb-4">Última actualización: 2025</p>
+
+      <section class="mt-3">
+        <h5>1. ¿Qué son las cookies?</h5>
+        <p>Las cookies son pequeños archivos que se almacenan en tu dispositivo cuando visitas un sitio web. Permiten reconocer tu navegador y recordar información para mejorar la experiencia de navegación.</p>
+      </section>
+
+      <section class="mt-4">
+        <h5>2. Base legal y consentimiento</h5>
+        <p>El uso de cookies necesarias se realiza para la prestación del servicio solicitado. Las cookies no esenciales (por ejemplo, analíticas o de marketing) se utilizan únicamente con tu consentimiento. Puedes aceptar o rechazar dichas cookies en cualquier momento desde la configuración de tu navegador. Esta política se ajusta a la normativa aplicable en Colombia (Ley 1581 de 2012 y sus decretos reglamentarios) y, cuando corresponda, a estándares internacionales como el RGPD.</p>
+      </section>
+
+      <section class="mt-4">
+        <h5>3. Tipos de cookies que podemos utilizar</h5>
+        <ul>
+          <li><strong>Necesarias:</strong> Permiten funciones básicas del sitio y su seguridad. El sitio no puede funcionar correctamente sin estas cookies.</li>
+          <li><strong>Preferencias:</strong> Recuerdan tus elecciones (por ejemplo, idioma o región) para una experiencia personalizada.</li>
+          <li><strong>Analíticas:</strong> Nos ayudan a comprender cómo interactúan los usuarios con el sitio para mejorar su rendimiento.</li>
+          <li><strong>Marketing:</strong> Se utilizan para mostrar contenido o anuncios relevantes. Solo se emplean con consentimiento.</li>
+        </ul>
+      </section>
+
+      <section class="mt-4">
+        <h5>4. Cookies utilizadas</h5>
+        <p>Actualmente priorizamos cookies necesarias para el funcionamiento del sitio. Si incorporamos cookies analíticas o de marketing, te informaremos y solicitaremos el consentimiento correspondiente.</p>
+      </section>
+
+      <section class="mt-4">
+        <h5>5. Gestión y desactivación de cookies</h5>
+        <p>Puedes configurar tu navegador para bloquear, eliminar o recibir avisos sobre el uso de cookies. Ten en cuenta que algunas funciones del sitio podrían verse afectadas si deshabilitas ciertas cookies.</p>
+        <ul>
+          <li><strong>Chrome:</strong> Configuración &gt; Privacidad y seguridad &gt; Cookies y otros datos de sitios.</li>
+          <li><strong>Firefox:</strong> Opciones &gt; Privacidad &amp; Seguridad &gt; Cookies y datos del sitio.</li>
+          <li><strong>Safari:</strong> Preferencias &gt; Privacidad &gt; Gestionar datos de sitios web.</li>
+          <li><strong>Edge:</strong> Configuración &gt; Privacidad, búsqueda y servicios &gt; Cookies.</li>
+        </ul>
+      </section>
+
+      <section class="mt-4">
+        <h5>6. Retención</h5>
+        <p>Las cookies de sesión se eliminan al cerrar el navegador. Las cookies persistentes tienen una duración definida que puede variar según su finalidad.</p>
+      </section>
+
+      <section class="mt-4">
+        <h5>7. Cambios en esta política</h5>
+        <p>Podemos actualizar esta política cuando sea necesario. Te sugerimos revisarla periódicamente para conocer cualquier modificación.</p>
+      </section>
+
+      <section class="mt-4">
+        <h5>8. Contacto</h5>
+        <ul class="list-unstyled mb-0">
+          <li>Correo: <a href="mailto:contacto@dh2o.com.co" class="text-info text-decoration-none">contacto@dh2o.com.co</a></li>
+          <li>Teléfono: 3157484662</li>
+          <li>Dirección: Valledupar, Cesar – Colombia</li>
+        </ul>
+      </section>
+
+      <div class="mt-5">
+        <a href="{{ url_for('main.index') }}" class="btn btn-outline-light"><i class="fas fa-arrow-left me-2"></i>Volver al inicio</a>
+      </div>
+    </main>
+
+    {% include 'sitio/partials/footer.html' %}
+    <!-- Contador de Visitantes -->
+    <script src="{{ url_for('static', filename='js/visitor_counter.js') }}"></script>
+  </body>
+</html>

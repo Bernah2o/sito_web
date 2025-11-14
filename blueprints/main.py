@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, jsonify, send_file, flash
 import os
 import requests
 from openai import OpenAI
+from flask_mail import Message
+from firebase_storage import upload_file, delete_file, is_firebase_available
 
 main_bp = Blueprint('main', __name__)
 
@@ -17,7 +19,16 @@ def get_recaptcha_site_key():
 def inject_recaptcha():
     """Inyectar configuración de reCAPTCHA en todos los templates"""
     return {
-        'recaptcha_site_key': get_recaptcha_site_key()
+        'recaptcha_site_key': get_recaptcha_site_key(),
+        'wompi_checkout_url': current_app.config.get('WOMPI_CHECKOUT_URL'),
+        'nequi_qr_filename': current_app.config.get('NEQUI_QR_FILENAME', 'img/qr_nequi.jpeg'),
+        'breb_qr_filename': current_app.config.get('BREB_QR_FILENAME', 'img/qr_negocios.jpeg'),
+        'nequi_payment_url': current_app.config.get('NEQUI_PAYMENT_URL'),
+        'nequi_phone_number': current_app.config.get('NEQUI_PHONE_NUMBER'),
+        'breb_bank_name': current_app.config.get('BREB_BANK_NAME'),
+        'breb_account_type': current_app.config.get('BREB_ACCOUNT_TYPE'),
+        'breb_account_number': current_app.config.get('BREB_ACCOUNT_NUMBER'),
+        'breb_account_holder': current_app.config.get('BREB_ACCOUNT_HOLDER'),
     }
 
 @main_bp.route('/')
@@ -338,11 +349,17 @@ def contacto():
         telefono = request.form.get('telefono')
         empresa = request.form.get('empresa')
         mensaje = request.form.get('mensaje')
+        acepta_politica = request.form.get('acepta_politica')
         recaptcha_token = request.form.get('recaptcha_token')
         
         # Validar datos básicos
         if not all([nombre, email, mensaje]):
             flash('Por favor completa todos los campos obligatorios', 'error')
+            return redirect(url_for('main.index') + '#contacto')
+
+        # Validar aceptación de Política de Privacidad
+        if not acepta_politica:
+            flash('Debes aceptar la Política de Privacidad y Tratamiento de Datos Personales.', 'error')
             return redirect(url_for('main.index') + '#contacto')
         
         # Verificar reCAPTCHA si está configurado
@@ -659,3 +676,281 @@ def politica_tratamiento_datos():
         print(f"Error sirviendo PDF de política: {e}")
         flash('Error al acceder al documento. Inténtalo nuevamente.', 'error')
         return redirect(url_for('main.index'))
+
+# === Páginas de Políticas ===
+
+@main_bp.route('/terminos-de-uso')
+def terminos_uso():
+    """Página de Términos de Uso"""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT clave, valor FROM configuracion")
+        config_raw = cursor.fetchall()
+        configuracion = {}
+        for config in config_raw:
+            clave = config['clave'] if isinstance(config, dict) else config[0]
+            valor = config['valor'] if isinstance(config, dict) else config[1]
+            configuracion[clave] = valor
+        return render_template('sitio/terminos_uso.html', configuracion=configuracion)
+    except Exception as e:
+        print(f"Error al cargar Términos de Uso: {e}")
+        return render_template('sitio/terminos_uso.html', configuracion={})
+
+@main_bp.route('/politicas-de-privacidad')
+def politicas_privacidad():
+    """Página de Políticas de Privacidad"""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT clave, valor FROM configuracion")
+        config_raw = cursor.fetchall()
+        configuracion = {}
+        for config in config_raw:
+            clave = config['clave'] if isinstance(config, dict) else config[0]
+            valor = config['valor'] if isinstance(config, dict) else config[1]
+            configuracion[clave] = valor
+        return render_template('sitio/politicas_privacidad.html', configuracion=configuracion)
+    except Exception as e:
+        print(f"Error al cargar Políticas de Privacidad: {e}")
+        return render_template('sitio/politicas_privacidad.html', configuracion={})
+
+@main_bp.route('/politicas-de-cookies')
+def politicas_cookies():
+    """Página de Políticas de Cookies"""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT clave, valor FROM configuracion")
+        config_raw = cursor.fetchall()
+        configuracion = {}
+        for config in config_raw:
+            clave = config['clave'] if isinstance(config, dict) else config[0]
+            valor = config['valor'] if isinstance(config, dict) else config[1]
+            configuracion[clave] = valor
+        return render_template('sitio/politicas_cookies.html', configuracion=configuracion)
+    except Exception as e:
+        print(f"Error al cargar Políticas de Cookies: {e}")
+        return render_template('sitio/politicas_cookies.html', configuracion={})
+
+# ============================
+# API: Cotizador (Wizard)
+# ============================
+
+@main_bp.route('/api/quote/params', methods=['GET'])
+def quote_params():
+    """Obtener parámetros de precios desde configuración para permitir ajuste en Admin"""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT clave, valor FROM configuracion WHERE clave LIKE 'quote_%'")
+        rows = cursor.fetchall()
+        params = {}
+        for row in rows:
+            if isinstance(row, dict):
+                params[row['clave']] = row['valor']
+            else:
+                params[row[0]] = row[1]
+        return jsonify({ 'success': True, 'params': params })
+    except Exception as e:
+        print(f"Error obteniendo parámetros de cotización: {e}")
+        return jsonify({ 'success': False, 'message': 'Error de servidor' }), 500
+
+@main_bp.route('/api/quote/upload', methods=['POST'])
+def quote_upload():
+    """Subir imágenes del wizard a Firebase y devolver URLs públicas"""
+    try:
+        if not is_firebase_available():
+            return jsonify({ 'success': False, 'message': 'Firebase no disponible' }), 503
+        files = request.files.getlist('images')
+        if not files:
+            return jsonify({ 'success': True, 'urls': [] })
+        # Usar carpeta de destino (por defecto 'cotizaciones')
+        folder = request.form.get('folder') or 'cotizaciones'
+        urls = []
+        for f in files:
+            url = upload_file(f, folder=folder, optimize_image=True)
+            if url:
+                urls.append(url)
+        return jsonify({ 'success': True, 'urls': urls })
+    except Exception as e:
+        print(f"Error subiendo imágenes de cotización: {e}")
+        return jsonify({ 'success': False, 'message': 'Error al subir imágenes' }), 500
+
+@main_bp.route('/api/quote/delete', methods=['POST'])
+def quote_delete():
+    """Eliminar una imagen subida a Firebase (por URL pública)"""
+    try:
+        if not is_firebase_available():
+            return jsonify({ 'success': False, 'message': 'Firebase no disponible' }), 503
+        data = request.get_json() or {}
+        url = data.get('url') or ''
+        if not url:
+            return jsonify({ 'success': False, 'message': 'URL requerida' }), 400
+        ok = delete_file(url)
+        return jsonify({ 'success': bool(ok) })
+    except Exception as e:
+        print(f"Error eliminando imagen de cotización: {e}")
+        return jsonify({ 'success': False, 'message': 'Error al eliminar imagen' }), 500
+
+@main_bp.route('/api/quote/email', methods=['POST'])
+def quote_email():
+    """Enviar correo con resumen de cotización y adjuntar imágenes si hay URLs"""
+    try:
+        data = request.get_json() or {}
+        servicio = data.get('servicio')
+        datos = data.get('datos', {})
+        estimate = data.get('estimate', {})
+        image_urls = data.get('image_urls', [])
+        recaptcha_token = data.get('recaptcha_token', '')
+
+        # Verificar reCAPTCHA si viene token (coherente con otros endpoints)
+        if recaptcha_token:
+            if not verificar_recaptcha(recaptcha_token):
+                return jsonify({ 'success': False, 'message': 'Verificación de seguridad fallida. Intenta nuevamente.' }), 400
+
+        # Validar campos obligatorios (nombre, teléfono y aceptación de política)
+        nombre_ok = (datos.get('nombreCliente') or '').strip()
+        telefono_ok = (datos.get('telefonoCliente') or '').strip()
+        politica_ok = bool(datos.get('aceptaPolitica') or datos.get('acepta_politica'))
+        if not (nombre_ok and telefono_ok and politica_ok):
+            return jsonify({
+                'success': False,
+                'message': 'Completa Nombre, Teléfono (WhatsApp) y acepta la Política de Privacidad.'
+            }), 400
+
+        # Validar formato de teléfono Colombia (móvil empieza con 3 y tiene 10 dígitos)
+        digits = ''.join(ch for ch in telefono_ok if ch.isdigit())
+        if digits.startswith('57') and len(digits) == 12:
+            digits = digits[2:]
+        if not (len(digits) == 10 and digits.startswith('3')):
+            return jsonify({
+                'success': False,
+                'message': 'Teléfono inválido. Usa un móvil de Colombia (inicia en 3 y tiene 10 dígitos).'
+            }), 400
+
+        # Determinar receptor del correo (admin)
+        admin_email = current_app.config.get('MAIL_DEFAULT_SENDER', 'admin@dh2ocol.com')
+
+        # Construir resumen
+        label_map = {
+            'limpieza': 'Limpieza de tanque',
+            'reparacion': 'Reparación',
+            'instalacion': 'Instalación',
+            'inspeccion': 'Inspección con dron',
+            'otro': 'Otro'
+        }
+        servicio_label = label_map.get(servicio, 'Servicio')
+
+        def safe_get(k, d=''):
+            return (datos.get(k) or d)
+
+        # Construir detalles por servicio (más legible)
+        detalles = []
+        if servicio in ('limpieza', 'instalacion'):
+            if safe_get('tipoTanque'): detalles.append(f"Tipo de tanque: {safe_get('tipoTanque')}")
+            if safe_get('capacidadTanque'): detalles.append(f"Capacidad: {safe_get('capacidadTanque')} L")
+            if safe_get('accesibilidad'): detalles.append(f"Accesibilidad: {safe_get('accesibilidad')}")
+            if servicio == 'instalacion':
+                detalles.append(f"Estructura nueva: {safe_get('requiereEstructura', 'no')}")
+        elif servicio == 'reparacion':
+            if safe_get('tipoDano'): detalles.append(f"Daño reportado: {safe_get('tipoDano')}")
+        else:
+            if safe_get('descripcionOtro'): detalles.append(f"Descripción: {safe_get('descripcionOtro')}")
+
+        # Formatear moneda y tiempo
+        try:
+            valor_estimado = int(estimate.get('valor') or 0)
+        except Exception:
+            valor_estimado = 0
+        horas_estimadas = estimate.get('horas') or ''
+        valor_cop = f"${valor_estimado:,.0f}".replace(',', '.')
+
+        # Texto plano para compatibilidad
+        extra_nota = ''
+        try:
+            if servicio in ('instalacion', 'reparacion'):
+                # Para instalación, condiciona a estructura nueva; reparación no tiene bandera, se menciona en general
+                if servicio == 'instalacion' and (datos.get('requiereEstructura') or '').lower() == 'si':
+                    extra_nota = ' No incluye accesorios ni materiales cuando se requiere de estructura.'
+                else:
+                    extra_nota = ' No incluye accesorios ni materiales cuando se requiere de estructura.'
+        except Exception:
+            pass
+        resumen_texto = (
+            f"Cotización rápida DH2O\n\n"
+            f"Servicio: {servicio_label}\n"
+            + ("\n".join(detalles) + "\n\n" if detalles else "") +
+            f"Cliente: {safe_get('nombreCliente')} | Tel: {safe_get('telefonoCliente')} | Email: {safe_get('correoCliente')}\n"
+            f"Ubicación: {safe_get('barrio')}, {safe_get('ciudad', 'Valledupar')}\nDirección: {safe_get('direccion')}\nReferencia: {safe_get('referencia')}\n"
+            f"Mapa: {safe_get('ubicacionMapa')}\n\n"
+            f"Estimado: {valor_cop} | Tiempo: {horas_estimadas}\n"
+            "Nota: El valor final puede variar tras revisión en sitio." + (extra_nota + "\n" if extra_nota else "\n")
+        )
+
+        # Crear mensaje
+        msg = Message(
+            'Nueva cotización desde wizard - DH2O',
+            sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@dh2ocol.com'),
+            recipients=[admin_email]
+        )
+        # Cuerpo HTML profesional (inline CSS para compatibilidad en clientes de correo)
+        images_html = ''
+        if image_urls:
+            thumbs = []
+            for u in image_urls:
+                thumbs.append(
+                    f'<a href="{u}" target="_blank" style="display:inline-block;margin:6px;text-decoration:none;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;background:#fafafa">'
+                    f'<img src="{u}" alt="Imagen" style="display:block;width:140px;height:100px;object-fit:cover">'
+                    f'</a>'
+                )
+            images_html = ''.join(thumbs)
+        else:
+            images_html = '<p style="color:#666;margin:8px 0">Sin imágenes.</p>'
+
+        msg.html = (
+            "<div style=\"font-family:Segoe UI,Arial,sans-serif;color:#1f2937;\">"
+            "<div style=\"background:linear-gradient(90deg,#2563eb,#0ea5e9);color:#fff;padding:16px 20px;border-radius:10px 10px 0 0;\">"
+            "<h2 style=\"margin:0;font-weight:600;\">Nueva cotización | DH2O</h2>"
+            f"<div style=\"margin-top:6px;font-size:14px;opacity:.9;\">{servicio_label}</div>"
+            "</div>"
+            "<div style=\"border:1px solid #e5e7eb;border-top:none;border-radius:0 0 10px 10px;\">"
+            "<div style=\"padding:18px 20px;\">"
+            "<h3 style=\"margin:0 0 10px;font-size:18px;color:#111827;\">Resumen</h3>"
+            f"<p style=\"margin:0 0 12px;color:#374151;\">{ ' • '.join(detalles) if detalles else 'Sin detalles adicionales.' }</p>"
+            "<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px;\">"
+            f"<div><div style=\"font-weight:600;color:#111827;margin-bottom:6px;\">Cliente</div><div style=\"color:#374151;\">{safe_get('nombreCliente')}<br>Tel: {safe_get('telefonoCliente')}<br>Email: {safe_get('correoCliente')}</div></div>"
+            f"<div><div style=\"font-weight:600;color:#111827;margin-bottom:6px;\">Ubicación</div><div style=\"color:#374151;\">{safe_get('barrio')}, {safe_get('ciudad','Valledupar')}<br>Dirección: {safe_get('direccion')}<br>Referencia: {safe_get('referencia')}<br>Mapa: <a href=\"{safe_get('ubicacionMapa')}\" target=\"_blank\" style=\"color:#2563eb;text-decoration:none;\">Ver enlace</a></div></div>"
+            "</div>"
+            "<hr style=\"border:none;border-top:1px solid #e5e7eb;margin:16px 0\">"
+            f"<div style=\"display:flex;gap:16px;align-items:center;\"><div style=\"font-weight:600;color:#111827;\">Estimado</div><div style=\"background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;color:#111827;\">{valor_cop}</div><div style=\"font-weight:600;color:#111827;\">Tiempo</div><div style=\"background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;color:#111827;\">{horas_estimadas}</div></div>"
+            f"<p style=\"margin-top:10px;color:#6b7280;font-size:12px;\">Nota: El valor final puede variar tras revisión en sitio.{extra_nota}</p>"
+            "<h3 style=\"margin:18px 0 8px;font-size:18px;color:#111827;\">Imágenes</h3>"
+            f"{images_html}"
+            "</div>"
+            "</div>"
+            "</div>"
+        )
+        msg.body = resumen_texto
+
+        # Adjuntar imágenes descargándolas desde las URLs (si existen)
+        for u in image_urls:
+            try:
+                r = requests.get(u, timeout=10)
+                if r.status_code == 200:
+                    # Inferir nombre
+                    nombre = u.split('/')[-1].split('?')[0]
+                    content_type = r.headers.get('Content-Type', 'image/jpeg')
+                    msg.attach(filename=nombre, content_type=content_type, data=r.content)
+            except Exception as e:
+                print(f"No se pudo adjuntar imagen {u}: {e}")
+
+        # Enviar usando la extensión registrada para evitar importaciones circulares
+        mail_ext = current_app.extensions.get('mail')
+        if not mail_ext:
+            raise RuntimeError('Extensión de mail no inicializada')
+        mail_ext.send(msg)
+        return jsonify({ 'success': True })
+    except Exception as e:
+        print(f"Error enviando correo de cotización: {e}")
+        return jsonify({ 'success': False, 'message': 'Error al enviar correo' }), 500

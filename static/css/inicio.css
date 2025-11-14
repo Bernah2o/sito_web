@@ -210,7 +210,7 @@
 .servicio-card {
   background: linear-gradient(145deg, var(--dh2o-blanco) 0%, #fafbfc 100%);
   border-radius: 20px;
-  padding: 2.5rem;
+  padding: 0;
   box-shadow: var(--shadow-md);
   transition: var(--transition-normal);
   border: 1px solid rgba(30, 184, 209, 0.1);
@@ -244,43 +244,73 @@
 }
 
 .servicio-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-8px);
   box-shadow: var(--shadow-xl);
   border-color: var(--dh2o-azul2);
   background: linear-gradient(145deg, #ffffff 0%, #f8fbff 100%);
 }
 
-.servicio-card h4 {
-  color: var(--dh2o-azul);
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  font-weight: 600;
+/* Nuevo diseño con imagen destacada */
+.servicio-image {
   position: relative;
-  z-index: 3;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
 }
 
-.servicio-card p {
+.servicio-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Soporte para video dentro de tarjetas de servicio */
+.servicio-image video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.servicio-image::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60px;
+  background: linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0));
+}
+
+.servicio-precio {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 2;
+  font-size: 0.95rem;
+}
+
+.servicio-content {
+  padding: 1.5rem 1.5rem 1.75rem;
+}
+
+.servicio-title {
+  color: var(--dh2o-azul);
+  margin-bottom: 0.75rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.servicio-descripcion {
   color: var(--dh2o-gris-oscuro);
   line-height: 1.7;
-  font-size: 1.05rem;
-  position: relative;
-  z-index: 3;
+  font-size: 1.02rem;
+  margin-bottom: 1rem;
 }
 
-.servicio-icon {
-  width: 60px;
-  height: 60px;
-  background: var(--gradient-primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  color: var(--dh2o-blanco);
-  font-size: 1.5rem;
-  box-shadow: var(--shadow-md);
-  position: relative;
-  z-index: 3;
+.servicio-actions .btn {
+  border-radius: 8px;
 }
 
 /* Sección de productos */

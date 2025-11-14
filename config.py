@@ -37,12 +37,25 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB máximo
     UPLOAD_FOLDER = 'static/uploads'
     
-    # Configuración de email
+    # Configuración de email (compatibilidad SMTP_* y MAIL_*)
+    # Variables base (posibles nombres en .env)
     SMTP_HOST = os.environ.get('SMTP_HOST')
-    SMTP_PORT = int(os.environ.get('SMTP_PORT'))
+    SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
     SMTP_USERNAME = os.environ.get('SMTP_USERNAME')
     SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
     EMAIL_FROM = os.environ.get('EMAIL_FROM')
+
+    # Mapeo para Flask-Mail
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', SMTP_HOST or 'localhost')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', SMTP_PORT or 25))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS')
+    if MAIL_USE_TLS is None:
+        # Si no se definió, asumir TLS cuando usamos puerto 587
+        MAIL_USE_TLS = MAIL_PORT == 587
+    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL', False)
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME', SMTP_USERNAME)
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', SMTP_PASSWORD)
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', EMAIL_FROM)
     
     # Configuración del sitio web
     WEBSITE_URL = os.environ.get('WEBSITE_URL')
@@ -51,6 +64,24 @@ class Config:
     # Configuración de reCAPTCHA
     RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY')
     RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY')
+
+    # Configuración de pagos (Wompi y códigos QR)
+    # URL de checkout Wompi (puede configurarse por variable de entorno)
+    WOMPI_CHECKOUT_URL = os.environ.get('WOMPI_CHECKOUT_URL')
+    # Rutas de archivos de QR dentro de /static (usar solo el filename para url_for)
+    NEQUI_QR_FILENAME = os.environ.get('NEQUI_QR_FILENAME', 'img/qr_nequi.jpeg')
+    BREB_QR_FILENAME = os.environ.get('BREB_QR_FILENAME', 'img/qr_negocios.jpeg')
+
+    # Enlace directo de pago Nequi (opcional)
+    NEQUI_PAYMENT_URL = os.environ.get('NEQUI_PAYMENT_URL')
+    # Número de Nequi (celular)
+    NEQUI_PHONE_NUMBER = os.environ.get('NEQUI_PHONE_NUMBER')
+
+    # Datos de cuenta Bre-B (opcional)
+    BREB_BANK_NAME = os.environ.get('BREB_BANK_NAME')
+    BREB_ACCOUNT_TYPE = os.environ.get('BREB_ACCOUNT_TYPE')  # Ej: 'Ahorros' o 'Corriente'
+    BREB_ACCOUNT_NUMBER = os.environ.get('BREB_ACCOUNT_NUMBER')
+    BREB_ACCOUNT_HOLDER = os.environ.get('BREB_ACCOUNT_HOLDER')
 
 class DevelopmentConfig(Config):
     """Configuración para desarrollo"""

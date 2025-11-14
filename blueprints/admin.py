@@ -17,6 +17,9 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 # Configuración para subida de imágenes
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+# Extensiones y límite para videos/imágenes en servicios
+ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'webm', 'mov', 'avi'}
+MAX_MEDIA_SIZE = 25 * 1024 * 1024  # 25MB para videos
 
 def allowed_file(filename):
     """Verificar si el archivo tiene una extensión permitida"""
@@ -235,8 +238,8 @@ def delete_media_file(file_id):
         filename = file_data['filename']
         firebase_url = file_data['ruta']
         
-        # Eliminar archivo de Firebase Storage si es una URL de Firebase
-        if firebase_url and 'firebase' in firebase_url:
+        # Eliminar archivo de Firebase Storage
+        if firebase_url:
             if is_firebase_available():
                 success = delete_file(firebase_url)
                 if not success:
@@ -283,9 +286,9 @@ def delete_multiple_media_files():
                 filename = file_data['filename']
                 firebase_url = file_data['ruta']
                 
-                # Eliminar archivo de Firebase Storage si es una URL de Firebase
+                # Eliminar archivo de Firebase Storage
                 firebase_success = True
-                if firebase_url and 'firebase' in firebase_url:
+                if firebase_url:
                     firebase_success = delete_file(firebase_url)
                 
                 if firebase_success:
@@ -795,14 +798,33 @@ def nuevo_servicio():
             nombre = request.form.get('nombre')
             descripcion = request.form.get('descripcion')
             precio_base = float(request.form.get('precio_base', 0))
-            
+            media_url = None
+
             db = get_db()
             cursor = db.cursor()
             
+            # Manejar media (imagen o video) opcional
+            if 'media' in request.files:
+                file = request.files['media']
+                if file and file.filename:
+                    # Validar tamaño
+                    file.seek(0, os.SEEK_END)
+                    file_size = file.tell()
+                    file.seek(0)
+                    if file_size > MAX_MEDIA_SIZE:
+                        flash('El archivo es demasiado grande. Máximo 25MB para videos.', 'error')
+                        return render_template('admin/nuevo_servicio.html')
+                    
+                    # Subir a Firebase (optimiza si es imagen)
+                    media_url = upload_file(file, folder='servicios', optimize_image=True)
+                    if not media_url:
+                        flash('No se pudo subir el archivo a Firebase.', 'error')
+                        return render_template('admin/nuevo_servicio.html')
+            
             cursor.execute("""
-                    INSERT INTO servicios (nombre, descripcion, precio_base, activo)
-                    VALUES (%s, %s, %s, TRUE)
-                """, (nombre, descripcion, precio_base))
+                    INSERT INTO servicios (nombre, descripcion, precio_base, imagen, activo)
+                    VALUES (%s, %s, %s, %s, TRUE)
+                """, (nombre, descripcion, precio_base, media_url))
             
             db.commit()
             flash('Servicio creado exitosamente', 'success')
@@ -1054,14 +1076,64 @@ def editar_servicio(servicio_id):
             nombre = request.form.get('nombre')
             descripcion = request.form.get('descripcion')
             precio_base = float(request.form.get('precio_base', 0))
+            media_url = None
+            previous_media_url = None
             
             db = get_db()
             cursor = db.cursor()
+            # Obtener URL anterior del medio para borrarlo si se reemplaza
+            try:
+                cursor.execute("SELECT imagen FROM servicios WHERE id = %s", (servicio_id,))
+                row = cursor.fetchone()
+                if row:
+                    # Soporta row como dict o tupla
+                    if isinstance(row, dict):
+                        previous_media_url = row.get('imagen')
+                    else:
+                        try:
+                            previous_media_url = row[4] if len(row) > 4 else None
+                        except Exception:
+                            previous_media_url = None
+            except Exception as qerr:
+                print(f"No se pudo obtener medio anterior del servicio {servicio_id}: {qerr}")
             
-            cursor.execute("""
-                    UPDATE servicios SET nombre = %s, descripcion = %s, precio_base = %s
-                    WHERE id = %s
-                """, (nombre, descripcion, precio_base, servicio_id))
+            # Manejar media (imagen o video) opcional
+            if 'media' in request.files:
+                file = request.files['media']
+                if file and file.filename:
+                    # Validar tamaño
+                    file.seek(0, os.SEEK_END)
+                    file_size = file.tell()
+                    file.seek(0)
+                    if file_size > MAX_MEDIA_SIZE:
+                        flash('El archivo es demasiado grande. Máximo 25MB para videos.', 'error')
+                        return redirect(url_for('admin.servicios'))
+                    
+                    # Subir a Firebase (optimiza si es imagen)
+                    media_url = upload_file(file, folder='servicios', optimize_image=True)
+                    if not media_url:
+                        flash('No se pudo subir el archivo a Firebase.', 'error')
+                        return redirect(url_for('admin.servicios'))
+                    # Si se subió nuevo medio, eliminar el anterior para ahorrar espacio
+                    if previous_media_url and is_firebase_available():
+                        try:
+                            if previous_media_url != media_url:
+                                deleted = delete_file(previous_media_url)
+                                if not deleted:
+                                    print(f"Advertencia: No se pudo eliminar el medio anterior en Firebase del servicio {servicio_id}")
+                        except Exception as derr:
+                            print(f"Error al eliminar medio anterior del servicio {servicio_id}: {derr}")
+            
+            if media_url:
+                cursor.execute("""
+                        UPDATE servicios SET nombre = %s, descripcion = %s, precio_base = %s, imagen = %s
+                        WHERE id = %s
+                    """, (nombre, descripcion, precio_base, media_url, servicio_id))
+            else:
+                cursor.execute("""
+                        UPDATE servicios SET nombre = %s, descripcion = %s, precio_base = %s
+                        WHERE id = %s
+                    """, (nombre, descripcion, precio_base, servicio_id))
             
             db.commit()
             flash('Servicio actualizado exitosamente', 'success')
@@ -1080,9 +1152,34 @@ def eliminar_servicio(servicio_id):
     try:
         db = get_db()
         cursor = db.cursor()
+
+        # Obtener URL del medio para eliminarlo de Firebase
+        imagen_url = None
+        try:
+            cursor.execute("SELECT imagen FROM servicios WHERE id = %s", (servicio_id,))
+            row = cursor.fetchone()
+            if row:
+                if isinstance(row, dict):
+                    imagen_url = row.get('imagen')
+                else:
+                    try:
+                        imagen_url = row[4] if len(row) > 4 else None
+                    except Exception:
+                        imagen_url = None
+        except Exception as qerr:
+            print(f"No se pudo obtener imagen del servicio {servicio_id} antes de eliminar: {qerr}")
+
+        # Intentar eliminar archivo en Firebase si existe
+        if imagen_url and is_firebase_available():
+            try:
+                firebase_deleted = delete_file(imagen_url)
+                if not firebase_deleted:
+                    print(f"Advertencia: No se pudo eliminar el archivo en Firebase para servicio {servicio_id}")
+            except Exception as derr:
+                print(f"Error al eliminar archivo de Firebase para servicio {servicio_id}: {derr}")
         
+        # Eliminar registro de BD
         cursor.execute("DELETE FROM servicios WHERE id = %s", (servicio_id,))
-        
         db.commit()
         flash('Servicio eliminado exitosamente', 'success')
         
@@ -1121,7 +1218,21 @@ def editar_producto(producto_id):
             categoria = request.form.get('categoria')
             descripcion = request.form.get('descripcion')
             precio = float(request.form.get('precio', 0))
-            
+
+            # Obtener URL de imagen anterior para eliminarla si se reemplaza
+            imagen_anterior_url = None
+            try:
+                db_prev = get_db()
+                cur_prev = db_prev.cursor()
+                cur_prev.execute("SELECT imagen FROM productos WHERE id = %s", (producto_id,))
+                producto_prev = cur_prev.fetchone()
+                if producto_prev:
+                    imagen_anterior_url = producto_prev['imagen'] if isinstance(producto_prev, dict) else (
+                        producto_prev[4] if len(producto_prev) > 4 else None
+                    )
+            except Exception as e_prev:
+                print(f"No se pudo obtener imagen anterior del producto {producto_id}: {e_prev}")
+
             # Manejar la imagen
             imagen_filename = None
             if 'imagen' in request.files:
@@ -1131,19 +1242,28 @@ def editar_producto(producto_id):
                     file.seek(0, os.SEEK_END)
                     file_size = file.tell()
                     file.seek(0)
-                    
+
                     if file_size > MAX_FILE_SIZE:
                         flash('El archivo es demasiado grande. Máximo 5MB permitido.', 'error')
                         return redirect(url_for('admin.productos'))
-                    
+
                     imagen_filename = save_product_image(file, categoria)
                     if not imagen_filename:
                         flash('Formato de imagen no válido. Use JPG, PNG o GIF.', 'error')
                         return redirect(url_for('admin.productos'))
-            
+                    # Si se subió nueva imagen, eliminar la anterior en Firebase para ahorrar espacio
+                    if imagen_anterior_url and is_firebase_available():
+                        try:
+                            if imagen_anterior_url != imagen_filename:
+                                success_del = delete_file(imagen_anterior_url)
+                                if not success_del:
+                                    print(f"Advertencia: No se pudo eliminar la imagen anterior en Firebase del producto {producto_id}")
+                        except Exception as del_err:
+                            print(f"Error al eliminar imagen anterior del producto {producto_id}: {del_err}")
+
             db = get_db()
             cursor = db.cursor()
-            
+
             # Actualizar producto con o sin imagen
             if imagen_filename:
                 cursor.execute("""
@@ -1155,11 +1275,11 @@ def editar_producto(producto_id):
                         UPDATE productos SET nombre = %s, categoria = %s, descripcion = %s, precio = %s
                         WHERE id = %s
                     """, (nombre, categoria, descripcion, precio, producto_id))
-            
+
             db.commit()
             flash('Producto actualizado exitosamente', 'success')
             return redirect(url_for('admin.productos'))
-            
+
         except Exception as e:
             print(f"Error al actualizar producto: {e}")
             flash('Error al actualizar producto', 'error')
@@ -1185,15 +1305,12 @@ def eliminar_producto(producto_id):
         producto_nombre = producto_data['nombre']
         imagen_url = producto_data['imagen']
         
-        # Eliminar imagen de Firebase Storage si existe y es una URL de Firebase
+        # Eliminar imagen de Firebase Storage si existe
         firebase_success = True
-        if imagen_url and 'firebase' in imagen_url:
-            if is_firebase_available():
-                firebase_success = delete_file(imagen_url)
-                if not firebase_success:
-                    print(f"Advertencia: No se pudo eliminar la imagen de Firebase para el producto {producto_nombre}")
-            else:
-                print("Advertencia: Firebase Storage no está disponible para eliminar la imagen")
+        if imagen_url and is_firebase_available():
+            firebase_success = delete_file(imagen_url)
+            if not firebase_success:
+                print(f"Advertencia: No se pudo eliminar la imagen de Firebase para el producto {producto_nombre}")
         
         # Eliminar producto de la base de datos
         cursor.execute("DELETE FROM productos WHERE id = %s", (producto_id,))

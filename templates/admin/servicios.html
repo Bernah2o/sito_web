@@ -40,7 +40,7 @@
                             ${{ "{:,.0f}".format(precio) if precio else '0' }}
                         </td>
                         <td>
-                            {% set activo = servicio.activo if servicio.activo is defined else servicio[4] %}
+                            {% set activo = servicio.activo if servicio.activo is defined else servicio[5] %}
                             {% if activo %}
                                 <span class="badge bg-success">Activo</span>
                             {% else %}
@@ -50,19 +50,22 @@
                         <td>{{ servicio.fecha_creacion if servicio.fecha_creacion else servicio[5] }}</td>
                         <td>
                             <div class="btn-group" role="group">
+                                {% set activo_val = servicio.activo if servicio.activo is defined else servicio[5] %}
+                                {% set media_url = (servicio.imagen if servicio.imagen is defined and servicio.imagen else (servicio[4] if servicio is sequence and servicio|length > 4 else '')) %}
                                 <button type="button" class="btn btn-sm btn-outline-primary btn-editar" 
                                         data-id="{{ servicio.id if servicio.id else servicio[0] }}"
                                         data-nombre="{{ (servicio.nombre if servicio.nombre else servicio[1])|e }}"
                                         data-descripcion="{{ (servicio.descripcion if servicio.descripcion else servicio[2])|e }}"
                                         data-precio="{{ servicio.precio_base if servicio.precio_base else servicio[3] }}"
-                                        data-activo="{{ 'true' if (servicio.activo if servicio.activo is defined else servicio[4]) else 'false' }}"
+                                        data-activo="{{ 'true' if activo_val else 'false' }}"
+                                        data-media="{{ media_url }}"
                                         title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-warning btn-toggle" 
                                         data-id="{{ servicio.id if servicio.id else servicio[0] }}"
                                         title="Cambiar Estado">
-                                    <i class="fas fa-toggle-{{ 'on' if (servicio.activo if servicio.activo is defined else servicio[4]) else 'off' }}"></i>
+                                    <i class="fas fa-toggle-{{ 'on' if activo_val else 'off' }}"></i>
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar" 
                                         data-id="{{ servicio.id if servicio.id else servicio[0] }}"
@@ -98,7 +101,7 @@
                 <h5 class="modal-title" id="editarModalLabel">Editar Servicio</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editarForm" method="POST">
+            <form id="editarForm" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="editNombre" class="form-label">Nombre del Servicio</label>
@@ -111,6 +114,22 @@
                     <div class="mb-3">
                         <label for="editPrecio" class="form-label">Precio Base</label>
                         <input type="number" class="form-control" id="editPrecio" name="precio_base" step="0.01" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editMedia" class="form-label">Imagen o Video (Firebase)</label>
+                        <input type="file" class="form-control" id="editMedia" name="media" accept="image/*,video/*">
+                        <div class="form-text">Opcional. Dejar vacío para mantener el medio actual. Imágenes hasta 5MB, videos hasta 25MB.</div>
+                        <div class="mt-2" id="editMediaActualWrapper" style="display: none;">
+                            <label class="form-label mb-1">Medio actual</label>
+                            <div id="editMediaActualPreview" class="border rounded p-2 bg-light text-center"></div>
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <a id="editMediaActualLink" class="small" href="#" target="_blank" rel="noopener">Abrir medio actual</a>
+                                <input id="editMediaActualUrl" type="text" class="form-control form-control-sm" readonly style="flex:1;" placeholder="URL del medio">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="copyMediaUrlBtn" title="Copiar URL">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-check">
@@ -184,8 +203,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const descripcion = this.dataset.descripcion;
             const precio = this.dataset.precio;
             const activo = this.dataset.activo === 'true';
+            const media = this.dataset.media || '';
             
-            editarServicio(id, nombre, descripcion, precio, activo);
+            editarServicio(id, nombre, descripcion, precio, activo, media);
         });
     });
     
@@ -209,13 +229,36 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function editarServicio(id, nombre, descripcion, precio, activo) {
+function editarServicio(id, nombre, descripcion, precio, activo, mediaUrl) {
     document.getElementById('editNombre').value = nombre;
     document.getElementById('editDescripcion').value = descripcion;
     document.getElementById('editPrecio').value = precio;
     document.getElementById('editActivo').checked = activo;
     
     document.getElementById('editarForm').action = `/admin/servicios/editar/${id}`;
+
+    // Mostrar medio actual si existe
+    const wrapper = document.getElementById('editMediaActualWrapper');
+    const preview = document.getElementById('editMediaActualPreview');
+    const linkEl = document.getElementById('editMediaActualLink');
+    const urlInput = document.getElementById('editMediaActualUrl');
+    if (mediaUrl && mediaUrl !== 'None') {
+        wrapper.style.display = 'block';
+        linkEl.href = mediaUrl;
+        linkEl.textContent = 'Abrir medio actual';
+        urlInput.value = mediaUrl;
+        if (isVideoUrl(mediaUrl)) {
+            preview.innerHTML = `<video src="${mediaUrl}" controls style="max-height:180px;width:100%;object-fit:contain"></video>`;
+        } else {
+            preview.innerHTML = `<img src="${mediaUrl}" alt="Medio actual" class="img-fluid" style="max-height:180px;object-fit:contain">`;
+        }
+    } else {
+        wrapper.style.display = 'none';
+        linkEl.removeAttribute('href');
+        linkEl.textContent = '';
+        urlInput.value = '';
+        preview.innerHTML = '';
+    }
     
     var modal = new bootstrap.Modal(document.getElementById('editarModal'));
     modal.show();
@@ -250,5 +293,26 @@ function toggleEstado(id, buttonElement) {
     var modal = new bootstrap.Modal(document.getElementById('toggleModal'));
     modal.show();
 }
+
+function isVideoUrl(url) {
+    const u = (url || '').toLowerCase();
+    return /(\.mp4|\.webm|\.mov|\.avi)(\?.*)?$/.test(u);
+}
+
+// Copiar URL del medio actual
+document.addEventListener('DOMContentLoaded', function() {
+    const copyBtn = document.getElementById('copyMediaUrlBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            const input = document.getElementById('editMediaActualUrl');
+            if (input && input.value) {
+                navigator.clipboard.writeText(input.value).then(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => copyBtn.innerHTML = '<i class="fas fa-copy"></i>', 1200);
+                });
+            }
+        });
+    }
+});
 </script>
 {% endblock %}

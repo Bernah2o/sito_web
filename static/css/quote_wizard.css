@@ -1,0 +1,166 @@
+/* DH2O Quote Wizard Styles */
+.cotizacion-wizard { border: none; }
+.wizard-header { background: linear-gradient(90deg, #0d6efd, #0aa0ff); color: #fff; }
+.wizard-header .modal-title { font-weight: 600; color: #fff; }
+.wizard-header .modal-title i { color: #fff; }
+
+.wizard-steps { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.wizard-step { flex: 1 1 auto; min-width: 120px; padding: 8px 10px; border: 1px solid #e5eaf2; border-radius: 8px; background: #f8fbff; color: #0d6efd; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.wizard-step span { display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; border-radius: 50%; background: #0d6efd; color: #fff; font-size: 0.9rem; }
+.wizard-step.active { border-color: #0d6efd; background: #e9f3ff; }
+
+.service-option { width: 100%; padding: 12px; border: 1px solid #e5eaf2; border-radius: 10px; background: #ffffff; color: #0d6efd; font-weight: 600; text-align: left; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.service-option:hover { background: #f0f7ff; }
+.service-option.selected { background: #0d6efd; color: #fff; }
+
+.wizard-pane { animation: fadeIn 0.2s ease-in; }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+.quote-result .display-6 { line-height: 1.1; }
+.quote-result .card-body { padding: 16px; }
+
+#prevStep, #nextStep { min-width: 120px; }
+
+/* Mobile tweaks */
+@media (max-width: 576px) {
+  .wizard-step { min-width: calc(50% - 8px); }
+}
+
+/* Custom dialog (alert/confirm replacement) */
+.dw-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1055; /* above bootstrap modal backdrop */
+}
+
+.dw-dialog {
+  width: min(460px, 92vw);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+  overflow: hidden;
+  background: #121212; /* dark to match browser alert */
+  color: #eaeaea;
+  border: 1px solid #2a2a2a;
+}
+
+.dw-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(90deg, #0d6efd, #0aa0ff);
+  color: #fff;
+}
+.dw-dialog-header .dw-title { font-weight: 600; font-size: 16px; }
+
+.dw-dialog-body {
+  padding: 16px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.dw-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 16px;
+  background: #1a1a1a;
+}
+
+.dw-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dw-btn-primary { background: #7ea6ff; color: #0a0a0a; }
+.dw-btn-primary:hover { background: #a0beff; }
+.dw-btn-secondary { background: #2a2a2a; color: #eaeaea; }
+.dw-btn-secondary:hover { background: #343434; }
+
+.dw-icon {
+  display: inline-flex;
+  width: 28px; height: 28px;
+  align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+}
+
+/* Feedback visual para campos inválidos */
+.input-invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.15);
+}
+.input-valid {
+  border-color: #10b981 !important;
+}
+.field-hint {
+  font-size: 12px;
+  color: #6b7280;
+}
+.field-error {
+  font-size: 12px;
+  color: #ef4444;
+}
+
+/* Miniaturas de imágenes subidas */
+.image-previews {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.image-previews a {
+  display: inline-block;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fafafa;
+}
+.image-previews img {
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  display: block;
+}
+
+.image-previews .thumb {
+  position: relative;
+}
+.image-previews .status-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  backdrop-filter: blur(1px);
+}
+.image-previews .thumb.busy .status-overlay {
+  display: flex;
+}
+.image-previews .del-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px; height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  cursor: pointer;
+  line-height: 22px;
+  text-align: center;
+  font-size: 13px;
+}
+.image-previews .del-btn:hover {
+  background: rgba(239,68,68,0.9);
+}

@@ -287,6 +287,39 @@
     to { transform: rotate(360deg); }
 }
 
+/* Upload Overlay */
+.upload-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000; /* above modals */
+}
+
+.upload-panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    width: min(420px, 92vw);
+    box-shadow: 0 1rem 2rem rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+.upload-panel .upload-title {
+    font-weight: 600;
+}
+
+.upload-panel .progress {
+    height: 8px;
+}
+
+.upload-file-name {
+    color: #6c757d;
+}
+
 /* Custom Scrollbar */
 .sidebar::-webkit-scrollbar {
     width: 6px;

@@ -163,6 +163,21 @@
         </div>
     </div>
 
+    <!-- Overlay de carga para subidas de archivos -->
+    <div id="uploadOverlay" class="upload-overlay" aria-hidden="true">
+        <div class="upload-panel">
+            <div class="mb-2">
+                <i class="fas fa-cloud-upload-alt fa-2x text-primary"></i>
+            </div>
+            <div class="upload-title mb-2">Subiendo archivo...</div>
+            <p class="text-muted mb-3">Esto puede tardar unos segundos. No cierres esta ventana.</p>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+            </div>
+            <small id="uploadFileName" class="upload-file-name d-block mt-2"></small>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
@@ -253,6 +268,43 @@
                     });
                 });
             }
+
+            // Mostrar overlay de carga cuando se envían formularios con archivos
+            const overlay = document.getElementById('uploadOverlay');
+            const fileNameEl = document.getElementById('uploadFileName');
+
+            function showOverlay(fileName) {
+                if (fileNameEl) {
+                    fileNameEl.textContent = fileName ? fileName : '';
+                }
+                overlay.style.display = 'flex';
+            }
+
+            function hasFiles(form) {
+                const inputs = form.querySelectorAll('input[type="file"]');
+                for (const input of inputs) {
+                    if (input.files && input.files.length > 0) {
+                        return input.files[0].name;
+                    }
+                }
+                return null;
+            }
+
+            // Atar a todos los formularios
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function() {
+                    const selectedFile = hasFiles(form);
+                    if (selectedFile) {
+                        showOverlay(selectedFile);
+                    }
+                });
+            });
+
+            // Ocultar overlay cuando la nueva página cargue
+            window.addEventListener('pageshow', function() {
+                if (overlay) overlay.style.display = 'none';
+                if (fileNameEl) fileNameEl.textContent = '';
+            });
         });
     </script>
     
