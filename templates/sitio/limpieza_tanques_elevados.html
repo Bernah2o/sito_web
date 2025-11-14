@@ -24,16 +24,16 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/logo.png') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/logo_4.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/logo_4.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/logo_4.png') }}">
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary-gradient fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top" style="background: rgba(0, 128, 55, 0.95); backdrop-filter: blur(10px)">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="DH2OCOL" height="40" class="me-2">
+            <a class="navbar-brand fw-bold text-white" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/logo_4.png') }}" alt="DH2OCOL" height="40" class="me-2">
                 DH2OCOL
             </a>
             
@@ -44,16 +44,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">Inicio</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('main.index') }}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}#servicios">Servicios</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('main.index') }}#servicios">Servicios</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}#productos">Productos</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('main.index') }}#productos">Productos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.contacto') }}">Contacto</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('main.contacto') }}">Contacto</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-accent text-white px-3 ms-2" href="{{ url_for('main.redirect_app') }}">

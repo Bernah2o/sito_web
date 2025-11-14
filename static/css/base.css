@@ -26,6 +26,9 @@
     --transition-fast: 0.2s ease-in-out;
     --transition-normal: 0.3s ease-in-out;
     --transition-slow: 0.5s ease-in-out;
+
+    /* Altura de la navbar fija */
+    --navbar-height: 80px;
 }
 
 /* Reset y configuración base */
@@ -42,7 +45,7 @@ html {
 
 /* Compensar navbar fija al hacer scroll a anclas de secciones */
 section[id] {
-    scroll-margin-top: 80px; /* ajustar si cambia la altura de la navbar */
+    scroll-margin-top: var(--navbar-height);
 }
 
 body {
@@ -51,6 +54,8 @@ body {
     color: var(--dh2o-negro);
     background-color: var(--dh2o-blanco);
     overflow-x: hidden;
+    /* Compensación por navbar fixed-top para evitar solapamiento del contenido inicial */
+    padding-top: var(--navbar-height);
 }
 
 /* Tipografía */

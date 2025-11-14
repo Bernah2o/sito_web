@@ -178,6 +178,11 @@
 .nosotros-page .card .text-secondary {
   color: var(--muted) !important;
   line-height: 1.7;
+  text-align: justify;             /* justificar texto en bloques de contenido */
+  text-justify: inter-word;        /* mejora la distribución de espacios */
+  hyphens: auto;                   /* guionado automático para evitar ríos */
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
 }
 
 /* Bloques de información (contacto y horarios) */

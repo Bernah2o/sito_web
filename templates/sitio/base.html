@@ -22,21 +22,22 @@
 </head>
 <body>
     {% block header %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg fixed-top" style="background: rgba(0, 128, 55, 0.95); backdrop-filter: blur(10px)">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">DH2OCOL</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBase" aria-controls="navbarBase" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand text-white fw-bold fs-3" href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/logo_4.png') }}" alt="DH2OCOL Logo" style="width: 40px; height: 40px; object-fit: contain" class="me-2" />DH2OCOL
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBase">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarBase">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">Inicio</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('main.index') }}">Inicio</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {% if request.path.startswith('/nosotros') %}active{% endif %}" href="{{ url_for('main.nosotros') }}" id="nosotrosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Nosotros</a>
+                        <a class="nav-link dropdown-toggle text-white fw-semibold {% if request.path.startswith('/nosotros') %}active{% endif %}" href="{{ url_for('main.nosotros') }}" id="nosotrosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Nosotros</a>
                         <ul class="dropdown-menu" aria-labelledby="nosotrosDropdown">
-                             
                             <li><a class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='quienes-somos')) %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='quienes-somos') }}">Quiénes Somos</a></li>
                             <li><a class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='mision-vision')) %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='mision-vision') }}">Misión y Visión</a></li>
                             <li><a class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='nuestra-historia')) %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='nuestra-historia') }}">Nuestra Historia</a></li>
@@ -44,11 +45,26 @@
                             <li><a class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='certificaciones-cumplimientos-cobertura-regional')) %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='certificaciones-cumplimientos-cobertura-regional') }}">Certificaciones y Cumplimientos - Cobertura Regional</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.educagua') }}">EducAgua</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white fw-semibold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">Servicios</a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('main.index') }}#servicios">Nuestros Servicios</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.blog_mantenimiento') }}">Mantenimiento de Tanques</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.limpieza_tanques_elevados') }}">Limpieza de Tanques Elevados</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.accesorios_tanques') }}">Accesorios y Productos</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.accesorios_tanques') }}">Productos</a>
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('main.educagua') }}">EducAgua</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('main.index') }}#testimonios">Testimonios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold" href="{{ url_for('main.index') }}#contacto">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-info text-white px-3 ms-2" href="{{ url_for('main.redirect_app') }}" target="_blank"><i class="fas fa-mobile-alt me-1"></i>App DH2OCOL</a>
                     </li>
                 </ul>
             </div>
