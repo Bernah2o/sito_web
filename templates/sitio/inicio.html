@@ -300,12 +300,45 @@
               >
                 Nosotros
               </a>
-              <ul class="dropdown-menu" aria-labelledby="nosotrosDropdownInicio">
-                <li><a class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='quienes-somos')) %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='quienes-somos') }}">Quiénes Somos</a></li>
-                <li><a class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='mision-vision')) %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='mision-vision') }}">Misión y Visión</a></li>
-                <li><a class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='nuestra-historia')) %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='nuestra-historia') }}">Nuestra Historia</a></li>
-                <li><a class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='compromiso-ambiental-seguridad-calidad')) %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='compromiso-ambiental-seguridad-calidad') }}">Compromiso Ambiental - Seguridad y Calidad</a></li>
-                <li><a class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='certificaciones-cumplimientos-cobertura-regional')) %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='certificaciones-cumplimientos-cobertura-regional') }}">Certificaciones y Cumplimientos - Cobertura Regional</a></li>
+              <ul
+                class="dropdown-menu"
+                aria-labelledby="nosotrosDropdownInicio"
+              >
+                <li>
+                  <a
+                    class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='quienes-somos')) %}active{% endif %}"
+                    href="{{ url_for('main.nosotros_section', slug='quienes-somos') }}"
+                    >Quiénes Somos</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='mision-vision')) %}active{% endif %}"
+                    href="{{ url_for('main.nosotros_section', slug='mision-vision') }}"
+                    >Misión y Visión</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='nuestra-historia')) %}active{% endif %}"
+                    href="{{ url_for('main.nosotros_section', slug='nuestra-historia') }}"
+                    >Nuestra Historia</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='compromiso-ambiental-seguridad-calidad')) %}active{% endif %}"
+                    href="{{ url_for('main.nosotros_section', slug='compromiso-ambiental-seguridad-calidad') }}"
+                    >Compromiso Ambiental - Seguridad y Calidad</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item {% if request.path.startswith(url_for('main.nosotros_section', slug='certificaciones-cumplimientos-cobertura-regional')) %}active{% endif %}"
+                    href="{{ url_for('main.nosotros_section', slug='certificaciones-cumplimientos-cobertura-regional') }}"
+                    >Certificaciones y Cumplimientos - Cobertura Regional</a
+                  >
+                </li>
               </ul>
             </li>
             <li class="nav-item dropdown">
@@ -526,37 +559,40 @@
         <h2 class="text-center mb-5">Nuestros Servicios</h2>
         <div class="section-divider mb-5"></div>
         <div class="servicios-grid">
-          {% if servicios %}
-            {% for servicio in servicios[:3] %}
-              <div class="servicio-card">
-                <div class="servicio-image">
-                  {% if servicio.imagen %}
-                    {% set url = servicio.imagen %}
-                    {% set ext = url.split('.')[-1] | lower %}
-                    {% if ext in ['mp4','webm','mov','avi'] %}
-                      <video src="{{ url }}" playsinline muted loop controls></video>
-                    {% else %}
-                      <img src="{{ url }}" alt="{{ servicio.nombre }}" />
-                    {% endif %}
-                  {% else %}
-                    <img src="{{ url_for('static', filename='img/placeholder-service.jpg') }}" alt="{{ servicio.nombre }}" />
-                  {% endif %}
-                  <span class="servicio-precio badge bg-primary">
-                    Desde ${{ "{:,.0f}".format(servicio.precio_base) if servicio.precio_base else '0' }}
-                  </span>
-                </div>
-                <div class="servicio-content">
-                  <h4 class="servicio-title">{{ servicio.nombre }}</h4>
-                  <p class="servicio-descripcion">
-                    {{ servicio.descripcion[:120] }}{% if servicio.descripcion|length > 120 %}...{% endif %}
-                  </p>
-                  <div class="servicio-actions">
-                    <a href="#contacto" class="btn btn-outline-primary btn-sm">Solicitar cotización</a>
-                  </div>
-                </div>
+          {% if servicios %} {% for servicio in servicios[:3] %}
+          <div class="servicio-card">
+            <div class="servicio-image">
+              {% if servicio.imagen %} {% set url = servicio.imagen %} {% set
+              ext = url.split('.')[-1] | lower %} {% if ext in
+              ['mp4','webm','mov','avi'] %}
+              <video src="{{ url }}" playsinline muted loop controls></video>
+              {% else %}
+              <img src="{{ url }}" alt="{{ servicio.nombre }}" />
+              {% endif %} {% else %}
+              <img
+                src="{{ url_for('static', filename='img/placeholder-service.jpg') }}"
+                alt="{{ servicio.nombre }}"
+              />
+              {% endif %}
+              <span class="servicio-precio badge bg-primary">
+                Desde ${{ "{:,.0f}".format(servicio.precio_base) if
+                servicio.precio_base else '0' }}
+              </span>
+            </div>
+            <div class="servicio-content">
+              <h4 class="servicio-title">{{ servicio.nombre }}</h4>
+              <p class="servicio-descripcion">
+                {{ servicio.descripcion[:120] }}{% if
+                servicio.descripcion|length > 120 %}...{% endif %}
+              </p>
+              <div class="servicio-actions">
+                <a href="#contacto" class="btn btn-outline-primary btn-sm"
+                  >Solicitar cotización</a
+                >
               </div>
-            {% endfor %}
-          {% endif %}
+            </div>
+          </div>
+          {% endfor %} {% endif %}
         </div>
         {% if servicios %}
         <div class="text-center mt-5">
@@ -614,7 +650,9 @@
       <div class="container">
         <h2 class="text-center mb-4">Nuestros clientes confían en DH2OCOL</h2>
         <p class="text-center mb-5">
-          Atendemos a empresas privadas, conjuntos residenciales e instituciones de salud que priorizan la calidad del agua y el cumplimiento sanitario.
+          Atendemos a empresas privadas, conjuntos residenciales e instituciones
+          de salud que priorizan la calidad del agua y el cumplimiento
+          sanitario.
         </p>
         <div class="section-divider mb-5"></div>
 
@@ -648,12 +686,12 @@
               </div>
               <div class="cliente-item">
                 <a
-                  href="https://www.hidrucol.com/"
+                  href="https://www.scotiabankcolpatria.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="cliente-link"
                 >
-                  Hidrucol S.A.S
+                  Scotiabank Colpatria
                 </a>
               </div>
             </div>
@@ -723,7 +761,8 @@
               <span class="marquee-full-item">
                 <span class="destacado-icono">💧</span>
                 <span class="marquee-full-text"
-                  >Confianza, cumplimiento y resultados: los pilares que respaldan cada servicio de DH2OCOL.</span
+                  >Confianza, cumplimiento y resultados: los pilares que
+                  respaldan cada servicio de DH2OCOL.</span
                 >
               </span>
               <span class="marquee-full-spacer"
@@ -741,7 +780,8 @@
               <span class="marquee-full-item">
                 <span class="destacado-icono">💧</span>
                 <span class="marquee-full-text"
-                  >Clientes satisfechos que respaldan nuestro compromiso con la calidad y la salud.</span
+                  >Clientes satisfechos que respaldan nuestro compromiso con la
+                  calidad y la salud.</span
                 >
               </span>
               <span class="marquee-full-spacer"
@@ -750,7 +790,8 @@
               <span class="marquee-full-item">
                 <span class="destacado-icono">💧</span>
                 <span class="marquee-full-text"
-                  >Presencia en empresas e instituciones de Valledupar y el Cesar.</span
+                  >Presencia en empresas e instituciones de Valledupar y el
+                  Cesar.</span
                 >
               </span>
               <span class="marquee-full-spacer"
@@ -759,7 +800,8 @@
               <span class="marquee-full-item">
                 <span class="destacado-icono">💧</span>
                 <span class="marquee-full-text"
-                  >Confianza, cumplimiento y resultados: los pilares que respaldan cada servicio de DH2OCOL.</span
+                  >Confianza, cumplimiento y resultados: los pilares que
+                  respaldan cada servicio de DH2OCOL.</span
                 >
               </span>
             </div>
@@ -936,12 +978,22 @@
                 </small>
               </div>
               <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" id="acepta_politica" name="acepta_politica" required />
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="acepta_politica"
+                  name="acepta_politica"
+                  required
+                />
                 <label class="form-check-label" for="acepta_politica">
                   Acepto la
-                  <a href="{{ url_for('main.politicas_privacidad') }}" target="_blank" class="text-info text-decoration-none">
-                    Política de Privacidad y Tratamiento de Datos Personales
-                  </a>.
+                  <a
+                    href="{{ url_for('main.politicas_privacidad') }}"
+                    target="_blank"
+                    class="text-info text-decoration-none"
+                  >
+                    Política de Privacidad y Tratamiento de Datos Personales </a
+                  >.
                 </label>
               </div>
             </form>
@@ -1202,7 +1254,9 @@
             // Validar aceptación de Política de Privacidad
             const aceptaPoliticaEl = document.getElementById("acepta_politica");
             if (!aceptaPoliticaEl || !aceptaPoliticaEl.checked) {
-              alert("Debes aceptar la Política de Privacidad y Tratamiento de Datos Personales.");
+              alert(
+                "Debes aceptar la Política de Privacidad y Tratamiento de Datos Personales."
+              );
               return false;
             }
 

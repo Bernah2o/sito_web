@@ -39,3 +39,10 @@
 .nosotros-page[data-slug="quienes-somos"] .section-media:hover::after {
   transform: translateX(0%);
 }
+
+@media (max-width: 768px) {
+  .nosotros-page[data-slug="quienes-somos"] .section-card,
+  .nosotros-page[data-slug="quienes-somos"] .section-card.alt {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,4 +1,10 @@
 /* Estilos específicos para Misión y Visión */
+@media (max-width: 768px) {
+  .nosotros-page[data-slug="mision-vision"] .section-card,
+  .nosotros-page[data-slug="mision-vision"] .section-card.alt {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* Protagonismo y efecto innovador para imágenes dentro de tarjetas */
 .nosotros-page[data-slug="mision-vision"] .section-card {

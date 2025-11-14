@@ -1,5 +1,12 @@
 /* Estilos específicos para Certificaciones y Cobertura Regional */
 
+@media (max-width: 768px) {
+  .nosotros-page[data-slug="certificaciones-cumplimientos-cobertura-regional"] .section-card,
+  .nosotros-page[data-slug="certificaciones-cumplimientos-cobertura-regional"] .section-card.alt {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Protagonismo y efecto innovador para imágenes dentro de tarjetas */
 .nosotros-page[data-slug="certificaciones-cumplimientos-cobertura-regional"] .section-card {
   grid-template-columns: 360px 1fr;

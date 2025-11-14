@@ -253,3 +253,30 @@
     aspect-ratio: 4 / 3;
   }
 }
+/* Afinado extra para móviles pequeños */
+@media (max-width: 576px) {
+  .nosotros-page .nosotros-hero {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+  .nosotros-page .nosotros-hero::before {
+    display: none;
+  }
+  .nosotros-page .card-body {
+    padding: 0.75rem;
+  }
+  .nosotros-page .section-card {
+    gap: 12px;
+  }
+  .nosotros-page .card .h4 {
+    font-size: 1.125rem;
+  }
+  .nosotros-page .chip {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+  .nosotros-page .accent-line {
+    width: 48px;
+    margin-top: 8px;
+  }
+}
