@@ -1,0 +1,46 @@
+/* Estilos específicos para Nuestra Historia */
+
+/* Protagonismo y efecto innovador para imágenes dentro de tarjetas */
+.nosotros-page[data-slug="historia"] .section-card {
+  grid-template-columns: 360px 1fr;
+}
+.nosotros-page[data-slug="historia"] .section-card.alt {
+  grid-template-columns: 1fr 360px;
+}
+
+.nosotros-page[data-slug="historia"] .section-media {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  border: 2px solid var(--brand);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+  position: relative;
+  overflow: hidden;
+}
+.nosotros-page[data-slug="historia"] .section-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.nosotros-page[data-slug="historia"] .section-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg,
+    rgba(0,128,55,0.00) 0%,
+    rgba(0,128,55,0.10) 50%,
+    rgba(0,193,106,0.00) 100%);
+  transform: translateX(-100%);
+  transition: transform 600ms ease;
+}
+.nosotros-page[data-slug="historia"] .section-media:hover::after {
+  transform: translateX(0%);
+}
+
+/* Mantener pequeño acento tipo timeline en el texto */
+.nosotros-page .section-card.timeline .section-content {
+  border-left: 4px solid var(--brand);
+  padding-left: 16px;
+}

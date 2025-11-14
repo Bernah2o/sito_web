@@ -1417,6 +1417,316 @@ def backup_db():
     
     return redirect(url_for('admin.configuracion'))
 
+# =====================
+# Contenido Institucional (Nosotros)
+# =====================
+
+def ensure_nosotros_tables(cursor):
+    """Crear tabla de secciones institucionales si no existe"""
+    try:
+        from flask import current_app
+        db_type = current_app.config.get('DATABASE_TYPE', 'mysql').lower()
+
+        if db_type == 'sqlite':
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS institucional_secciones (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    clave VARCHAR(50) UNIQUE NOT NULL,
+                    titulo VARCHAR(255) NOT NULL,
+                    contenido TEXT,
+                    orden INTEGER DEFAULT 0,
+                    activo INTEGER DEFAULT 1,
+                    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+            # Asegurar columna de imagen (SQLite)
+            try:
+                cursor.execute("PRAGMA table_info(institucional_secciones)")
+                cols = cursor.fetchall()
+                col_names = [c['name'] if isinstance(c, dict) else c[1] for c in cols]
+                if 'imagen' not in col_names:
+                    cursor.execute("ALTER TABLE institucional_secciones ADD COLUMN imagen TEXT")
+            except Exception as col_err:
+                print(f"Advertencia al agregar columna imagen (sqlite): {col_err}")
+        else:
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS institucional_secciones (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    clave VARCHAR(50) UNIQUE NOT NULL,
+                    titulo VARCHAR(255) NOT NULL,
+                    contenido TEXT,
+                    orden INT DEFAULT 0,
+                    activo BOOLEAN DEFAULT TRUE,
+                    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                )
+                """
+            )
+            # Asegurar columna de imagen (MySQL)
+            try:
+                cursor.execute("SHOW COLUMNS FROM institucional_secciones LIKE 'imagen'")
+                exists = cursor.fetchone()
+                if not exists:
+                    cursor.execute("ALTER TABLE institucional_secciones ADD COLUMN imagen TEXT NULL")
+            except Exception as col_err:
+                print(f"Advertencia al agregar columna imagen (mysql): {col_err}")
+    except Exception as e:
+        print(f"Error creando tabla institucional_secciones: {e}")
+
+def seed_nosotros_sections(cursor):
+    """Insertar secciones por defecto si no existen"""
+    try:
+        secciones = [
+            ("quienes_somos", "Quiénes Somos", "Somos DH2OCOL, un equipo comprometido con brindar servicios de limpieza y desinfección de tanques elevados con estándares profesionales, seguridad y enfoque al cliente.", 0, 1),
+            ("mision", "Misión", "Nuestra misión es garantizar agua segura mediante la limpieza y desinfección profesional de tanques elevados.", 1, 1),
+            ("vision", "Visión", "Ser la empresa líder en la región en servicios de mantenimiento de tanques, reconocida por calidad, cumplimiento y resultados.", 2, 1),
+            ("historia", "Nuestra Historia", "Nacimos con el propósito de mejorar la salud y bienestar de hogares y empresas, acumulando experiencia y confianza en la comunidad.", 3, 1),
+            ("compromiso_ambiental", "Compromiso Ambiental", "Operamos con procesos responsables, uso eficiente de recursos y productos certificados, minimizando el impacto ambiental.", 4, 1),
+            ("valores", "Nuestros Valores", "Confianza, cumplimiento, responsabilidad, transparencia y servicio al cliente.", 5, 1),
+            ("seguridad_calidad", "Seguridad y Calidad", "Protocolos de bioseguridad, supervisión técnica y estándares de calidad en cada intervención.", 6, 1),
+            ("cobertura_regional", "Cobertura Regional", "Atendemos Valledupar, el Cesar y municipios aledaños.", 7, 1),
+            ("certificaciones", "Certificaciones y Cumplimientos", "Cumplimos normativas sanitarias y buenas prácticas en manejo de agua potable.", 8, 1),
+        ]
+        for clave, titulo, contenido, orden, activo in secciones:
+            cursor.execute("SELECT id FROM institucional_secciones WHERE clave=%s", (clave,))
+            row = cursor.fetchone()
+            if not row:
+                cursor.execute(
+                    """
+                    INSERT INTO institucional_secciones (clave, titulo, contenido, orden, activo)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (clave, titulo, contenido, orden, activo)
+                )
+    except Exception as e:
+        print(f"Error insertando secciones por defecto: {e}")
+
+@admin_bp.route('/nosotros', methods=['GET', 'POST'])
+@login_required
+def admin_nosotros():
+    """Gestión de contenidos institucionales (Nosotros)"""
+    db = get_db()
+    cursor = db.cursor()
+    ensure_nosotros_tables(cursor)
+
+    if request.method == 'POST':
+        try:
+            # Procesar formulario: sections[clave][campo]
+            sections = request.form.getlist('section_keys')
+            for clave in sections:
+                titulo = request.form.get(f'sections[{clave}][titulo]', '').strip()
+                contenido = request.form.get(f'sections[{clave}][contenido]', '').strip()
+                orden = int(request.form.get(f'sections[{clave}][orden]', '0') or 0)
+                activo = True if request.form.get(f'sections[{clave}][activo]') else 0
+
+                # Manejo de imagen opcional por sección
+                imagen_url = None
+                file = request.files.get(f'sections[{clave}][imagen]')
+                if file and file.filename:
+                    # Validar tamaño
+                    file.seek(0, os.SEEK_END)
+                    file_size = file.tell()
+                    file.seek(0)
+                    if file_size > MAX_FILE_SIZE:
+                        flash(f'El archivo para {titulo} es demasiado grande. Máximo 5MB.', 'error')
+                        return redirect(url_for('admin.admin_nosotros'))
+
+                    # Validar extensión
+                    if not allowed_file(file.filename):
+                        flash(f'Formato de imagen no permitido en {titulo}. Usa JPG, PNG o GIF.', 'error')
+                        return redirect(url_for('admin.admin_nosotros'))
+
+                    # Subir a Firebase
+                    imagen_url = upload_file(file, folder='nosotros', optimize_image=True)
+                    if not imagen_url:
+                        flash(f'No se pudo subir la imagen de {titulo} a Firebase.', 'error')
+                        return redirect(url_for('admin.admin_nosotros'))
+
+                cursor.execute("SELECT id FROM institucional_secciones WHERE clave=%s", (clave,))
+                row = cursor.fetchone()
+                if row:
+                    # Eliminar imagen anterior si se subió nueva
+                    if imagen_url:
+                        try:
+                            cursor.execute("SELECT imagen FROM institucional_secciones WHERE clave=%s", (clave,))
+                            prev = cursor.fetchone()
+                            prev_url = None
+                            if prev:
+                                if isinstance(prev, dict):
+                                    prev_url = prev.get('imagen')
+                                else:
+                                    try:
+                                        prev_url = prev[0]
+                                    except Exception:
+                                        prev_url = None
+                            if prev_url and prev_url != imagen_url and is_firebase_available():
+                                delete_file(prev_url)
+                        except Exception as del_err:
+                            print(f"Advertencia al eliminar imagen anterior ({clave}): {del_err}")
+
+                    # Actualizar con o sin imagen
+                    if imagen_url:
+                        cursor.execute(
+                            """
+                            UPDATE institucional_secciones
+                            SET titulo=%s, contenido=%s, orden=%s, activo=%s, imagen=%s
+                            WHERE clave=%s
+                            """,
+                            (titulo, contenido, orden, activo, imagen_url, clave)
+                        )
+                    else:
+                        cursor.execute(
+                            """
+                            UPDATE institucional_secciones
+                            SET titulo=%s, contenido=%s, orden=%s, activo=%s
+                            WHERE clave=%s
+                            """,
+                            (titulo, contenido, orden, activo, clave)
+                        )
+                else:
+                    cursor.execute(
+                        """
+                        INSERT INTO institucional_secciones (clave, titulo, contenido, orden, activo)
+                        VALUES (%s, %s, %s, %s, %s)
+                        """,
+                        (clave, titulo, contenido, orden, activo)
+                    )
+                    # Si hay imagen, actualizar inmediatamente el campo
+                    if imagen_url:
+                        try:
+                            cursor.execute(
+                                "UPDATE institucional_secciones SET imagen=%s WHERE clave=%s",
+                                (imagen_url, clave)
+                            )
+                        except Exception as ins_img_err:
+                            print(f"Error guardando imagen inicial para {clave}: {ins_img_err}")
+
+            db.commit()
+            flash('Contenido institucional actualizado exitosamente', 'success')
+            return redirect(url_for('admin.admin_nosotros'))
+        except Exception as e:
+            db.rollback()
+            print(f"Error actualizando contenido institucional: {e}")
+            flash('Error al actualizar el contenido', 'error')
+
+    # GET: cargar secciones
+    seed_nosotros_sections(cursor)
+    cursor.execute("SELECT * FROM institucional_secciones ORDER BY orden, id")
+    secciones = cursor.fetchall()
+    return render_template('admin/nosotros.html', secciones=secciones)
+
+@admin_bp.route('/nosotros/quienes-somos', methods=['GET', 'POST'])
+@login_required
+def nosotros_quienes_somos():
+    """Gestión dedicada de las secciones 'Quiénes Somos' y 'Nuestros Valores'"""
+    db = get_db()
+    cursor = db.cursor()
+    ensure_nosotros_tables(cursor)
+
+    if request.method == 'POST':
+        try:
+            clave = (request.form.get('clave') or 'quienes_somos').strip()
+            titulo = request.form.get('titulo', '').strip()
+            contenido = request.form.get('contenido', '').strip()
+            orden = int(request.form.get('orden', '0') or 0)
+            activo = True if request.form.get('activo') else 0
+
+            # Manejo de imagen opcional
+            imagen_url = None
+            file = request.files.get('imagen')
+            if file and file.filename:
+                # Validar tamaño
+                file.seek(0, os.SEEK_END)
+                file_size = file.tell()
+                file.seek(0)
+                if file_size > MAX_FILE_SIZE:
+                    flash('La imagen es demasiado grande. Máximo 5MB.', 'error')
+                    return redirect(url_for('admin.nosotros_quienes_somos'))
+
+                # Validar extensión
+                if not allowed_file(file.filename):
+                    flash('Formato de imagen no permitido. Usa JPG, PNG o GIF.', 'error')
+                    return redirect(url_for('admin.nosotros_quienes_somos'))
+
+                imagen_url = upload_file(file, folder='nosotros', optimize_image=True)
+                if not imagen_url:
+                    flash('No se pudo subir la imagen a Firebase.', 'error')
+                    return redirect(url_for('admin.nosotros_quienes_somos'))
+
+            # Buscar sección por clave
+            cursor.execute("SELECT id, imagen FROM institucional_secciones WHERE clave=%s", (clave,))
+            row = cursor.fetchone()
+            if row:
+                # Eliminar imagen anterior si se sube una nueva
+                if imagen_url:
+                    try:
+                        prev_url = None
+                        if isinstance(row, dict):
+                            prev_url = row.get('imagen')
+                        else:
+                            try:
+                                prev_url = row[1]
+                            except Exception:
+                                prev_url = None
+                        if prev_url and prev_url != imagen_url and is_firebase_available():
+                            delete_file(prev_url)
+                    except Exception as del_err:
+                        print(f"Advertencia al eliminar imagen anterior ({clave}): {del_err}")
+
+                # Actualizar sección
+                if imagen_url:
+                    cursor.execute(
+                        """
+                        UPDATE institucional_secciones
+                        SET titulo=%s, contenido=%s, orden=%s, activo=%s, imagen=%s
+                        WHERE clave=%s
+                        """,
+                        (titulo or ('Quiénes Somos' if clave=='quienes_somos' else 'Nuestros Valores'), contenido, orden, activo, imagen_url, clave)
+                    )
+                else:
+                    cursor.execute(
+                        """
+                        UPDATE institucional_secciones
+                        SET titulo=%s, contenido=%s, orden=%s, activo=%s
+                        WHERE clave=%s
+                        """,
+                        (titulo or ('Quiénes Somos' if clave=='quienes_somos' else 'Nuestros Valores'), contenido, orden, activo, clave)
+                    )
+            else:
+                # Insertar nueva sección si no existe
+                cursor.execute(
+                    """
+                    INSERT INTO institucional_secciones (clave, titulo, contenido, orden, activo)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (clave, titulo or ('Quiénes Somos' if clave=='quienes_somos' else 'Nuestros Valores'), contenido, orden, activo)
+                )
+                if imagen_url:
+                    try:
+                        cursor.execute(
+                            "UPDATE institucional_secciones SET imagen=%s WHERE clave=%s",
+                            (imagen_url, clave)
+                        )
+                    except Exception as ins_img_err:
+                        print(f"Error guardando imagen inicial para {clave}: {ins_img_err}")
+            db.commit()
+            flash(('Sección "Quiénes Somos"' if clave=='quienes_somos' else 'Sección "Nuestros Valores"') + ' actualizada', 'success')
+            return redirect(url_for('admin.nosotros_quienes_somos'))
+        except Exception as e:
+            db.rollback()
+            print(f"Error actualizando sección: {e}")
+            flash('Error al actualizar la sección', 'error')
+
+    # GET: asegurar existencia y cargar valores
+    seed_nosotros_sections(cursor)
+    cursor.execute("SELECT * FROM institucional_secciones WHERE clave=%s", ('quienes_somos',))
+    seccion_qs = cursor.fetchone()
+    cursor.execute("SELECT * FROM institucional_secciones WHERE clave=%s", ('valores',))
+    seccion_valores = cursor.fetchone()
+    return render_template('admin/quienes_somos.html', seccion_qs=seccion_qs, seccion_valores=seccion_valores)
+
 # Rutas para gestión de preguntas del quiz
 @admin_bp.route('/quiz')
 @login_required

@@ -216,6 +216,132 @@ def accesorios_tanques():
                              configuracion={},
                              medios=[])
 
+@main_bp.route('/nosotros')
+def nosotros():
+    """Página institucional 'Nosotros' con secciones administrables"""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        # Asegurar tabla (primera vez puede no existir)
+        from flask import current_app
+        db_type = current_app.config.get('DATABASE_TYPE', 'mysql').lower()
+        if db_type == 'sqlite':
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS institucional_secciones (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    clave VARCHAR(50) UNIQUE NOT NULL,
+                    titulo VARCHAR(255) NOT NULL,
+                    contenido TEXT,
+                    orden INTEGER DEFAULT 0,
+                    activo INTEGER DEFAULT 1,
+                    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """
+            )
+        else:
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS institucional_secciones (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    clave VARCHAR(50) UNIQUE NOT NULL,
+                    titulo VARCHAR(255) NOT NULL,
+                    contenido TEXT,
+                    orden INT DEFAULT 0,
+                    activo BOOLEAN DEFAULT TRUE,
+                    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                )
+                """
+            )
+
+        # Configuración general del sitio
+        cursor.execute("SELECT clave, valor FROM configuracion")
+        config_raw = cursor.fetchall()
+        configuracion = {}
+        for config in config_raw:
+            clave = config['clave'] if isinstance(config, dict) else config[0]
+            valor = config['valor'] if isinstance(config, dict) else config[1]
+            configuracion[clave] = valor
+
+        # Secciones activas
+        cursor.execute("SELECT * FROM institucional_secciones WHERE activo = TRUE ORDER BY orden, id")
+        secciones = cursor.fetchall()
+
+        return render_template('sitio/nosotros.html', configuracion=configuracion, secciones=secciones)
+    except Exception as e:
+        print(f"Error al cargar página Nosotros: {e}")
+        return render_template('sitio/nosotros.html', configuracion={}, secciones=[])
+
+
+@main_bp.route('/nosotros/<slug>')
+def nosotros_section(slug):
+    """Subpágina para una sección específica de 'Nosotros' (ej. quienes-somos)."""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        # Configuración general del sitio
+        cursor.execute("SELECT clave, valor FROM configuracion")
+        config_raw = cursor.fetchall()
+        configuracion = {}
+        for config in config_raw:
+            clave = config['clave'] if isinstance(config, dict) else config[0]
+            valor = config['valor'] if isinstance(config, dict) else config[1]
+            configuracion[clave] = valor
+
+        # Normalizar clave (permitir guiones en la URL) y alias amigables
+        section_key = (slug or '').replace('-', '_')
+        alias_map = {
+            'quienes_somos': 'quienes_somos',
+            'mision': 'mision',
+            'vision': 'vision',
+            'mision_vision': 'mision_vision',
+            'nuestra_historia': 'historia',
+            'compromiso_ambiental': 'compromiso_ambiental',
+            'seguridad_calidad': 'seguridad_calidad',
+            'compromiso_ambiental_seguridad_calidad': 'compromiso_ambiental_seguridad_calidad',
+            'cobertura_regional': 'cobertura_regional',
+            'certificaciones_y_cumplimientos': 'certificaciones',
+            'certificaciones_cumplimientos_cobertura_regional': 'certificaciones'
+        }
+        section_key = alias_map.get(section_key, section_key)
+
+        # Cargar todas las secciones activas para subnav
+        cursor.execute("SELECT * FROM institucional_secciones WHERE activo = TRUE ORDER BY orden, id")
+        secciones = cursor.fetchall()
+
+        # Casos combinados
+        if section_key == 'mision_vision':
+            cursor.execute("SELECT * FROM institucional_secciones WHERE clave IN ('mision','vision') AND activo = TRUE ORDER BY orden, id")
+            mv_sections = cursor.fetchall()
+            return render_template('sitio/nosotros_mision_vision.html', configuracion=configuracion, secciones=secciones, mv_sections=mv_sections)
+
+        if section_key == 'certificaciones':
+            cursor.execute("SELECT * FROM institucional_secciones WHERE clave = 'certificaciones' AND activo = TRUE")
+            certificaciones = cursor.fetchone()
+            cursor.execute("SELECT * FROM institucional_secciones WHERE clave = 'cobertura_regional' AND activo = TRUE")
+            cobertura = cursor.fetchone()
+            return render_template('sitio/nosotros_certificaciones.html', configuracion=configuracion, secciones=secciones, certificaciones=certificaciones, cobertura=cobertura)
+
+        if section_key == 'compromiso_ambiental_seguridad_calidad':
+            cursor.execute("SELECT * FROM institucional_secciones WHERE clave IN ('compromiso_ambiental','seguridad_calidad') AND activo = TRUE ORDER BY orden, id")
+            cs_sections = cursor.fetchall()
+            return render_template('sitio/nosotros_compromiso_seguridad.html', configuracion=configuracion, secciones=secciones, cs_sections=cs_sections)
+
+        # Buscar la sección solicitada
+        cursor.execute("SELECT * FROM institucional_secciones WHERE clave = %s AND activo = TRUE", (section_key,))
+        seccion = cursor.fetchone()
+
+        if not seccion:
+            # Fallback: 404 amigable dentro del template
+            return render_template('sitio/nosotros_section.html', configuracion=configuracion, secciones=secciones, seccion=None, section_key=section_key)
+
+        return render_template('sitio/nosotros_section.html', configuracion=configuracion, secciones=secciones, seccion=seccion, section_key=section_key)
+    except Exception as e:
+        print(f"Error al cargar subpágina Nosotros '{slug}': {e}")
+        return render_template('sitio/nosotros_section.html', configuracion={}, secciones=[], seccion=None, section_key=slug)
+
 
 @main_bp.route('/educagua-dh2o-educacion-agua-potable-valledupar/')
 def educagua():

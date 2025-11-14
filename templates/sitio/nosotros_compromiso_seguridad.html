@@ -1,0 +1,62 @@
+{% extends 'sitio/base.html' %}
+{% block title %}Nosotros - Compromiso Ambiental, Seguridad y Calidad{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nosotros.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nosotros_compromiso_seguridad.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="nosotros-page py-5 bg-light" data-slug="compromiso-ambiental-seguridad-calidad">
+  <div class="container">
+    <div class="row mb-5 nosotros-hero">
+      <div class="col-12 text-center">
+        <h1 class="display-5">Compromiso Ambiental, Seguridad y Calidad</h1>
+        <p class="text-muted">Políticas y estándares que guían nuestro trabajo.</p>
+        <div class="accent-line"></div>
+      </div>
+    </div>
+
+    <!-- Subnavegación unificada (5 páginas) -->
+    <div class="row mb-4">
+      <div class="col-12 d-flex flex-wrap gap-2 justify-content-center">
+        <a class="chip" href="{{ url_for('main.nosotros_section', slug='quienes-somos') }}">Quiénes Somos</a>
+        <a class="chip" href="{{ url_for('main.nosotros_section', slug='mision-vision') }}">Misión y Visión</a>
+        <a class="chip" href="{{ url_for('main.nosotros_section', slug='nuestra-historia') }}">Nuestra Historia</a>
+        <a class="chip active" href="{{ url_for('main.nosotros_section', slug='compromiso-ambiental-seguridad-calidad') }}">Compromiso Ambiental - Seguridad y Calidad</a>
+        <a class="chip" href="{{ url_for('main.nosotros_section', slug='certificaciones-cumplimientos-cobertura-regional') }}">Certificaciones y Cumplimientos - Cobertura Regional</a>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      {% for s in cs_sections %}
+      {% set clave = s.get('clave', s[1]) %}
+      {% set titulo = s.get('titulo', s[2]) %}
+      {% set contenido = s.get('contenido', s[3]) %}
+      {% set img_src = s.get('imagen', s[6]) if s|length > 6 else None %}
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <div class="section-card {% if loop.index is even %}alt{% endif %} fade-up" style="animation-delay: {{ (loop.index0 * 0.06)|round(2) }}s;">
+              <div class="section-media">
+                {% if img_src %}
+                  <img src="{{ img_src }}" alt="{{ titulo }}" />
+                {% endif %}
+              </div>
+              <div class="section-content">
+                <h3 class="h4 mb-3"><i class="fas fa-check-circle text-primary me-2"></i>{{ titulo }}</h3>
+                {% if clave == 'seguridad_calidad' %}
+                  <div class="text-secondary" style="white-space: pre-line;">{{ contenido | format_admin }}</div>
+                {% else %}
+                  <div class="text-secondary" style="white-space: pre-line;">{{ contenido | format_admin }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

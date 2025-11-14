@@ -368,6 +368,44 @@ def create_app(config_name='development'):
         if app.config.get('DEBUG', False):
             print(f"DEBUG: URL estática generada: {static_url}")
         return static_url
+
+    # Formateo ligero para contenidos escritos desde el admin
+    # Soporta: ==resaltar==, **negrita**, *cursiva*, __subrayado__
+    @app.template_filter('format_admin')
+    def format_admin(text):
+        """Aplicar marcado ligero a contenido del admin de forma segura.
+
+        Reglas soportadas:
+        - ==texto==  → <mark>texto</mark>
+        - **texto**  → <strong>texto</strong>
+        - *texto*    → <em>texto</em>
+        - __texto__  → <u>texto</u>
+
+        Mantiene saltos de línea (se renderizan con white-space: pre-line en CSS).
+        """
+        try:
+            from markupsafe import Markup, escape
+            import re
+
+            if not text:
+                return ''
+
+            # Normalizar retornos de carro y escapar HTML primero
+            s = escape(str(text).replace('\r', ''))
+
+            # Resaltado (mark) primero para evitar conflictos con otros patrones
+            s = re.sub(r"==(.+?)==", r"<mark>\1</mark>", s)
+            # Negrita doble asterisco
+            s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
+            # Cursiva un asterisco
+            s = re.sub(r"\*(.+?)\*", r"<em>\1</em>", s)
+            # Subrayado doble guion bajo
+            s = re.sub(r"__(.+?)__", r"<u>\1</u>", s)
+
+            return Markup(s)
+        except Exception:
+            # Fallback: devolver texto tal cual si algo falla
+            return text or ''
     
     return app
 

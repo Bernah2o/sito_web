@@ -1,0 +1,82 @@
+{% extends 'sitio/base.html' %}
+{% block title %}Nosotros - Certificaciones y Cumplimientos{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nosotros.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nosotros_certificaciones_cobertura.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="nosotros-page py-5 bg-light" data-slug="certificaciones-cumplimientos-cobertura-regional">
+  <div class="container">
+    <div class="row mb-5 nosotros-hero">
+      <div class="col-12 text-center">
+        <h1 class="display-5">Certificaciones y Cumplimientos</h1>
+        <p class="text-muted">Normativas que cumplimos y nuestra cobertura regional.</p>
+        <div class="accent-line"></div>
+      </div>
+    </div>
+
+    <!-- Subnavegación de secciones -->
+    <div class="row mb-4">
+      <div class="col-12 d-flex flex-wrap gap-2 justify-content-center">
+        <a class="chip" href="{{ url_for('main.nosotros_section', slug='quienes-somos') }}">Quiénes Somos</a>
+        <a class="chip" href="{{ url_for('main.nosotros_section', slug='mision-vision') }}">Misión y Visión</a>
+        <a class="chip" href="{{ url_for('main.nosotros_section', slug='nuestra-historia') }}">Nuestra Historia</a>
+        <a class="chip" href="{{ url_for('main.nosotros_section', slug='compromiso-ambiental-seguridad-calidad') }}">Compromiso Ambiental - Seguridad y Calidad</a>
+        <a class="chip active" href="{{ url_for('main.nosotros_section', slug='certificaciones-cumplimientos-cobertura-regional') }}">Certificaciones y Cumplimientos - Cobertura Regional</a>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      {% if certificaciones %}
+      {% set c_clave = certificaciones.get('clave', certificaciones[1]) %}
+      {% set c_titulo = certificaciones.get('titulo', certificaciones[2]) %}
+      {% set c_contenido = certificaciones.get('contenido', certificaciones[3]) %}
+      {% set c_imagen = certificaciones.get('imagen', certificaciones[6]) %}
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <div class="section-card fade-up">
+              <div class="section-media">
+                {% if c_imagen %}
+                  <img src="{{ c_imagen }}" alt="{{ c_titulo }}" />
+                {% endif %}
+              </div>
+              <div class="section-content">
+                <h3 class="h4 mb-3"><i class="fas fa-check-circle text-primary me-2"></i>{{ c_titulo }}</h3>
+                <div class="text-secondary" style="white-space: pre-line;">{{ c_contenido | format_admin }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if cobertura %}
+      {% set cob_titulo = cobertura.get('titulo', cobertura[2]) %}
+      {% set cob_contenido = cobertura.get('contenido', cobertura[3]) %}
+      {% set cob_imagen = cobertura.get('imagen', cobertura[6]) %}
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <div class="section-card alt fade-up">
+              <div class="section-media">
+                {% if cob_imagen %}
+                  <img src="{{ cob_imagen }}" alt="{{ cob_titulo }}" />
+                {% endif %}
+              </div>
+              <div class="section-content">
+                <h3 class="h4 mb-3"><i class="fas fa-map-marked-alt text-primary me-2"></i>{{ cob_titulo }}</h3>
+                <div class="text-secondary" style="white-space: pre-line;">{{ cob_contenido | format_admin }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

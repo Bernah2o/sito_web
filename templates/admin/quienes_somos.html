@@ -1,0 +1,169 @@
+{% extends 'admin/base.html' %}
+{% block title %}Nosotros - Quiénes Somos y Nuestros Valores{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0"><i class="fas fa-user-friends me-2"></i> Quiénes Somos</h2>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('admin.admin_nosotros') }}" class="btn btn-outline-secondary">
+      <i class="fas fa-list me-2"></i>Ver todas las secciones
+    </a>
+    <a href="{{ url_for('main.nosotros_section', slug='quienes-somos') }}" class="btn btn-outline-primary" target="_blank">
+      <i class="fas fa-external-link-alt me-2"></i>Ver página pública
+    </a>
+  </div>
+  </div>
+
+<p class="text-muted">Edita el contenido de las secciones públicas "Quiénes Somos" y "Nuestros Valores" desde esta página.</p>
+
+<form method="post" enctype="multipart/form-data">
+  {% set qs = seccion_qs %}
+  {% set clave = (qs.get('clave') if qs else 'quienes_somos') %}
+  {% set titulo = (qs.get('titulo') if qs else 'Quiénes Somos') %}
+  {% set contenido = (qs.get('contenido') if qs else '') %}
+  {% set orden = (qs.get('orden') if qs else 0) %}
+  {% set activo = (qs.get('activo') if qs else 1) %}
+  {% set imagen = (qs.get('imagen') if qs else None) %}
+
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>{{ titulo }}</strong>
+      <div class="d-flex align-items-center gap-3">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="activo" name="activo" {% if activo %}checked{% endif %}>
+          <label class="form-check-label" for="activo">Visible</label>
+        </div>
+        <div class="input-group input-group-sm" style="width:140px;">
+          <span class="input-group-text">Orden</span>
+          <input type="number" class="form-control" name="orden" value="{{ orden or 0 }}" min="0">
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <input type="hidden" name="clave" value="quienes_somos">
+      <div class="mb-3">
+        <label class="form-label">Título</label>
+        <input type="text" class="form-control" name="titulo" value="{{ titulo }}" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Contenido</label>
+        <textarea class="form-control" name="contenido" rows="8" placeholder="Describe la esencia de la empresa, equipo y propósito">{{ contenido }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Imagen (opcional)</label>
+        <div class="d-flex align-items-center gap-3">
+          <input type="file" name="imagen" accept="image/*" class="form-control" style="max-width: 360px;">
+          {% if imagen %}
+            <a href="{{ imagen }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+              <i class="fas fa-image me-1"></i>Ver actual
+            </a>
+          {% endif %}
+        </div>
+        <div class="form-text">Se optimiza automáticamente para la web. Máximo 5MB.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex justify-content-end">
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-save me-2"></i>Guardar cambios
+    </button>
+  </div>
+</form>
+
+<hr class="my-5">
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0"><i class="fas fa-heart me-2"></i> Nuestros Valores</h2>
+  <a href="{{ url_for('main.nosotros_section', slug='quienes-somos') }}" class="btn btn-outline-primary" target="_blank">
+    <i class="fas fa-external-link-alt me-2"></i>Ver en página pública
+  </a>
+  </div>
+
+<p class="text-muted">Agrega o edita los valores de la empresa. Cada línea del contenido se muestra como una etiqueta en la página pública.</p>
+
+<form method="post" enctype="multipart/form-data">
+  {% set val = seccion_valores %}
+  {% set v_titulo = (val.get('titulo') if val else 'Nuestros Valores') %}
+  {% set v_contenido = (val.get('contenido') if val else '') %}
+  {% set v_orden = (val.get('orden') if val else 0) %}
+  {% set v_activo = (val.get('activo') if val else 1) %}
+  {% set v_imagen = (val.get('imagen') if val else None) %}
+
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong>{{ v_titulo }}</strong>
+      <div class="d-flex align-items-center gap-3">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="valores_activo" name="activo" {% if v_activo %}checked{% endif %}>
+          <label class="form-check-label" for="valores_activo">Visible</label>
+        </div>
+        <div class="input-group input-group-sm" style="width:140px;">
+          <span class="input-group-text">Orden</span>
+          <input type="number" class="form-control" name="orden" value="{{ v_orden or 0 }}" min="0">
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <input type="hidden" name="clave" value="valores">
+      <div class="mb-3">
+        <label class="form-label">Título</label>
+        <input type="text" class="form-control" name="titulo" value="{{ v_titulo }}" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Contenido (una línea por valor)</label>
+        <textarea class="form-control" name="contenido" rows="8" placeholder="Ejemplo:\nIntegridad\nRespeto\nInnovación\nResponsabilidad">{{ v_contenido }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Imagen (opcional)</label>
+        <div class="d-flex align-items-center gap-3">
+          <input type="file" name="imagen" accept="image/*" class="form-control" style="max-width: 360px;">
+          {% if v_imagen %}
+            <a href="{{ v_imagen }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+              <i class="fas fa-image me-1"></i>Ver actual
+            </a>
+          {% endif %}
+        </div>
+        <div class="form-text">Se optimiza automáticamente para la web. Máximo 5MB.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex justify-content-end">
+    <button type="submit" class="btn btn-primary">
+      <i class="fas fa-save me-2"></i>Guardar cambios
+    </button>
+  </div>
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('form input[type="file"][name="imagen"]').forEach(function(input) {
+      let preview = input.parentNode.querySelector('img.preview');
+      if (!preview) {
+        preview = document.createElement('img');
+        preview.className = 'preview img-thumbnail';
+        preview.style.maxWidth = '120px';
+        preview.style.display = 'none';
+        preview.alt = 'Previsualización';
+        input.parentNode.appendChild(preview);
+      }
+
+      input.addEventListener('change', function() {
+        const file = input.files && input.files[0];
+        if (file) {
+          const url = URL.createObjectURL(file);
+          preview.src = url;
+          preview.style.display = 'block';
+        } else {
+          preview.src = '';
+          preview.style.display = 'none';
+        }
+      });
+    });
+  });
+  </script>
+{% endblock %}

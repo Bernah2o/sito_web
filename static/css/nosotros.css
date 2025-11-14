@@ -1,0 +1,250 @@
+/*
+  Estilos para página Nosotros - DH2OCOL
+  Profesional, moderno e institucional
+*/
+
+.nosotros-page {
+  /* Paleta institucional */
+  --brand: #008037;
+  --brand-dark: #00662b;
+  --brand-accent: #00c16a;
+  --ink: #1f2937;
+  --muted: #4b5563;
+  --surface: #ffffff;
+  --border: rgba(0, 0, 0, 0.06);
+  --shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  --soft-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fondo sutil con textura diagonal */
+.nosotros-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #f6fbf8 0%, #ffffff 100%);
+  pointer-events: none;
+}
+
+/* Encabezado */
+.nosotros-page .display-5 {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: var(--ink);
+}
+
+.nosotros-page .display-5 + .text-muted {
+  max-width: 760px;
+  margin: 0 auto;
+  color: var(--muted) !important;
+}
+
+/* Tarjetas de secciones */
+.nosotros-page .card {
+  position: relative;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--soft-shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  background: var(--surface);
+}
+
+/* Hero moderno con degradado sutil */
+.nosotros-page .nosotros-hero {
+  position: relative;
+  background: linear-gradient(135deg, rgba(0, 128, 55, 0.08), rgba(0, 193, 106, 0.12));
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 24px;
+  box-shadow: var(--soft-shadow);
+}
+
+.nosotros-page .nosotros-hero::before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  right: -40px;
+  top: -40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(0,193,106,0.25), rgba(0,193,106,0) 70%);
+  pointer-events: none;
+}
+
+.nosotros-page .nosotros-hero .display-5 {
+  color: var(--ink);
+}
+
+/* Layout alterno (imagen a la derecha en pares) */
+.nosotros-page .section-card.alt {
+  grid-template-columns: 1fr 160px;
+}
+
+.nosotros-page .section-card.alt .section-media {
+  order: 2;
+}
+
+.nosotros-page .section-card.alt .section-content {
+  order: 1;
+}
+
+/* Variante timeline para Historia */
+.nosotros-page .section-card.timeline .section-content {
+  border-left: 4px solid var(--brand);
+  padding-left: 16px;
+  position: relative;
+}
+
+.nosotros-page .section-card.timeline .section-content::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+/* Animación de entrada */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nosotros-page .fade-up {
+  animation: fadeUp 400ms ease both;
+}
+
+/* Layout de tarjeta con imagen */
+.nosotros-page .section-card {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.nosotros-page .section-media {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.nosotros-page .section-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.nosotros-page .section-content {
+  min-width: 0;
+}
+
+.nosotros-page .card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-accent));
+}
+
+.nosotros-page .card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: rgba(0, 128, 55, 0.15);
+}
+
+.nosotros-page .card .h4 {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.nosotros-page .card .h4 i {
+  color: var(--brand);
+}
+
+.nosotros-page .card .text-secondary {
+  color: var(--muted) !important;
+  line-height: 1.7;
+}
+
+/* Bloques de información (contacto y horarios) */
+.nosotros-page .info-block {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--soft-shadow);
+  background: var(--surface);
+}
+
+.nosotros-page .info-block h4 {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.nosotros-page .info-block ul li {
+  padding: 6px 0;
+  color: var(--muted);
+}
+
+/* Chips para datos destacados */
+.nosotros-page .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #f0faf5;
+  color: var(--brand-dark);
+  font-weight: 600;
+}
+
+/* Chip como enlace en subnavegación */
+.nosotros-page a.chip {
+  text-decoration: none;
+  border: 1px solid var(--border);
+  transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.nosotros-page a.chip:hover {
+  background: #e8f7ef;
+  box-shadow: var(--soft-shadow);
+  transform: translateY(-1px);
+}
+
+/* Decoradores sutiles */
+.nosotros-page .accent-line {
+  width: 64px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-accent));
+  border-radius: 4px;
+  margin: 12px auto 0 auto;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .nosotros-page .display-5 {
+    font-size: 2rem;
+  }
+  .nosotros-page .section-card {
+    grid-template-columns: 1fr;
+  }
+  .nosotros-page .section-card.alt {
+    grid-template-columns: 1fr; /* en móviles, orden natural */
+  }
+  .nosotros-page .section-media {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+}

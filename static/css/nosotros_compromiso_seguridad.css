@@ -1,0 +1,38 @@
+/* Estilos específicos para Compromiso Ambiental - Seguridad y Calidad */
+
+/* Dar protagonismo a las imágenes en esta página */
+.nosotros-page[data-slug="compromiso-ambiental-seguridad-calidad"] .section-card {
+  grid-template-columns: 380px 1fr; /* imagen grande a la izquierda */
+}
+
+.nosotros-page[data-slug="compromiso-ambiental-seguridad-calidad"] .section-card.alt {
+  grid-template-columns: 1fr 380px; /* imagen grande a la derecha en pares */
+  background: #f7fff7;
+}
+
+.nosotros-page[data-slug="compromiso-ambiental-seguridad-calidad"] .section-media {
+  width: 100%;
+  aspect-ratio: 4 / 3; /* 380x285 aprox. con columna de 380px */
+  border-radius: 18px;
+  border: 2px solid var(--brand);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+  overflow: hidden;
+}
+
+.nosotros-page[data-slug="compromiso-ambiental-seguridad-calidad"] .section-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* llena el contenedor para mayor impacto visual */
+  border-radius: 16px;
+}
+
+/* Responsive: en móviles la imagen ocupa todo el ancho arriba */
+@media (max-width: 768px) {
+  .nosotros-page[data-slug="compromiso-ambiental-seguridad-calidad"] .section-card,
+  .nosotros-page[data-slug="compromiso-ambiental-seguridad-calidad"] .section-card.alt {
+    grid-template-columns: 1fr;
+  }
+  .nosotros-page[data-slug="compromiso-ambiental-seguridad-calidad"] .section-media {
+    height: 220px;
+  }
+}

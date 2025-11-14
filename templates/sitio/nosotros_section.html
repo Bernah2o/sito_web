@@ -1,0 +1,134 @@
+{% extends 'sitio/base.html' %}
+{% block title %}Nosotros - {{ seccion.titulo if seccion else 'Sección' }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nosotros.css') }}">
+{% if section_key == 'quienes_somos' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nosotros_quienes_somos.css') }}">
+{% elif section_key == 'historia' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nosotros_historia.css') }}">
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="nosotros-page py-5 bg-light" data-slug="{{ section_key | replace('_','-') }}">
+  <div class="container">
+    <div class="row mb-5 nosotros-hero">
+      <div class="col-12 text-center">
+        <h1 class="display-5">{{ seccion.titulo if seccion else 'Contenido no disponible' }}</h1>
+        <p class="text-muted">Explora nuestras secciones institucionales.</p>
+        <div class="accent-line"></div>
+      </div>
+    </div>
+
+    <!-- Subnavegación de secciones -->
+    <div class="row mb-4">
+      <div class="col-12 d-flex flex-wrap gap-2 justify-content-center">
+        <a class="chip {% if section_key == 'quienes_somos' %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='quienes-somos') }}">Quiénes Somos</a>
+        <a class="chip {% if section_key == 'mision_vision' %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='mision-vision') }}">Misión y Visión</a>
+        <a class="chip {% if section_key == 'historia' %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='nuestra-historia') }}">Nuestra Historia</a>
+        <a class="chip {% if section_key == 'compromiso_ambiental_seguridad_calidad' %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='compromiso-ambiental-seguridad-calidad') }}">Compromiso Ambiental - Seguridad y Calidad</a>
+        <a class="chip {% if section_key == 'certificaciones' %}active{% endif %}" href="{{ url_for('main.nosotros_section', slug='certificaciones-cumplimientos-cobertura-regional') }}">Certificaciones y Cumplimientos - Cobertura Regional</a>
+      </div>
+    </div>
+
+    {% if not seccion %}
+      <div class="alert alert-warning">La sección solicitada no existe o no está activa.</div>
+    {% else %}
+      {% set clave = seccion.get('clave', seccion[1]) %}
+      {% set titulo = seccion.get('titulo', seccion[2]) %}
+      {% set contenido = seccion.get('contenido', seccion[3]) %}
+      {% set imagen = seccion.get('imagen', seccion[6]) if seccion and seccion|length > 6 else None %}
+      {% set img_src = imagen %}
+      {% if not img_src %}
+        {% if clave == 'quienes_somos' %}
+          {% set img_src = url_for('static', filename='img/nosotros/quienes_somos.svg') %}
+        {% elif clave == 'mision' %}
+          {% set img_src = url_for('static', filename='img/nosotros/mision.svg') %}
+        {% elif clave == 'vision' %}
+          {% set img_src = url_for('static', filename='img/nosotros/vision.svg') %}
+        {% elif clave == 'historia' %}
+          {% set img_src = url_for('static', filename='img/nosotros/historia.svg') %}
+        {% elif clave == 'compromiso_ambiental' %}
+          {% set img_src = url_for('static', filename='img/nosotros/compromiso_ambiental.svg') %}
+        {% elif clave == 'valores' %}
+          {% set img_src = url_for('static', filename='img/nosotros/valores.svg') %}
+        {% elif clave == 'seguridad_calidad' %}
+          {% set img_src = url_for('static', filename='img/nosotros/seguridad_calidad.svg') %}
+        {% elif clave == 'cobertura_regional' %}
+          {% set img_src = url_for('static', filename='img/nosotros/cobertura_regional.svg') %}
+        {% elif clave == 'certificaciones' %}
+          {% set img_src = url_for('static', filename='img/nosotros/certificaciones.svg') %}
+        {% else %}
+          {% set img_src = url_for('static', filename='img/logo_4.png') %}
+        {% endif %}
+      {% endif %}
+
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="section-card fade-up">
+                <div class="section-media">
+                  <img src="{{ img_src }}" alt="{{ titulo }}" />
+                </div>
+                <div class="section-content">
+                  <h3 class="h4 mb-3"><i class="fas fa-check-circle text-primary me-2"></i>{{ titulo }}</h3>
+                  {% if clave == 'valores' %}
+                    <div class="d-flex flex-wrap gap-2">
+                      {% for item in (contenido | replace('\r','')).split('\n') %}
+                        {% set val = item.strip() %}
+                        {% if val %}
+                          <span class="chip">{{ val }}</span>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <div class="text-secondary" style="white-space: pre-line;">{{ contenido | format_admin }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if clave == 'quienes_somos' %}
+        {% for v in secciones %}
+          {% set v_clave = v.get('clave', v[1]) %}
+          {% if v_clave == 'valores' %}
+            {% set v_titulo = v.get('titulo', v[2]) %}
+            {% set v_contenido = v.get('contenido', v[3]) %}
+            {% set v_imagen = v.get('imagen', v[6]) if v and v|length > 6 else None %}
+            <div class="col-12">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="section-card alt fade-up">
+                    <div class="section-media">
+                      {% if v_imagen %}
+                        <img src="{{ v_imagen }}" alt="{{ v_titulo }}" />
+                      {% endif %}
+                    </div>
+                    <div class="section-content">
+                      <h3 class="h4 mb-3"><i class="fas fa-star text-primary me-2"></i>Nuestros Valores</h3>
+                      <div class="d-flex flex-wrap gap-2">
+                        {% for item in (v_contenido | replace('\r','')).split('\n') %}
+                          {% set val = item.strip() %}
+                          {% if val %}
+                            <span class="chip">{{ val }}</span>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+        {% endif %}
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}
