@@ -477,10 +477,16 @@ def contacto():
         mensaje = request.form.get('mensaje')
         acepta_politica = request.form.get('acepta_politica')
         recaptcha_token = request.form.get('recaptcha_token')
+        honeypot = request.form.get('website')
         
         # Validar datos básicos
         if not all([nombre, email, mensaje]):
             flash('Por favor completa todos los campos obligatorios', 'error')
+            return redirect(url_for('main.index') + '#contacto')
+
+        # Bloquear si el honeypot se llenó (indicativo de bot)
+        if honeypot:
+            flash('Verificación de seguridad fallida. Inténtalo nuevamente.', 'error')
             return redirect(url_for('main.index') + '#contacto')
 
         # Validar aceptación de Política de Privacidad

@@ -104,7 +104,11 @@
         </div>
       </div>
       <div class="col-md-4 text-end">
-        <p class="text-white">{{ configuracion.direccion or 'Valledupar, Cesar - Colombia' }}</p>
+        <p class="text-white mb-1">{{ configuracion.direccion or 'Valledupar, Cesar - Colombia' }}</p>
+        <small class="text-white geo-country-pill" title="País detectado">
+          <i class="fas fa-location-dot"></i>
+          <span id="visitor-country">Ubicación no disponible</span>
+        </small>
       </div>
     </div>
   </div>

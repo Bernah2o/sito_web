@@ -239,6 +239,7 @@
 
 /* Responsivo */
 @media (max-width: 768px) {
+  .nosotros-page { overflow: visible; }
   .nosotros-page .display-5 {
     font-size: 2rem;
   }

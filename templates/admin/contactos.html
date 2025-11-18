@@ -80,6 +80,11 @@
                                     </button>
                                 </form>
                                 {% endif %}
+                                <form method="POST" action="{{ url_for('admin.eliminar_contacto', contacto_id=contacto.id if contacto.id else contacto[0]) }}" style="display:inline;" onsubmit="return confirmarEliminarContacto('{{ contacto.nombre if contacto.nombre else contacto[1] }}');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -139,6 +144,10 @@ function verMensaje(id, nombre, mensaje) {
     document.getElementById('nombreContacto').textContent = nombre;
     document.getElementById('mensajeContacto').textContent = mensaje;
     new bootstrap.Modal(document.getElementById('modalMensaje')).show();
+}
+
+function confirmarEliminarContacto(nombre) {
+    return confirm(`¿Eliminar el mensaje de "${nombre}"? Esta acción no se puede deshacer.`);
 }
 </script>
 {% endblock %}

@@ -359,6 +359,8 @@
                     {% endwith %}
                     
                     <form action="{{ url_for('main.contacto') }}" method="POST" id="contactForm">
+                        <!-- Honeypot anti-spam: campo invisible que los bots suelen llenar -->
+                        <input type="text" name="website" id="website" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" />
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="nombre" class="form-label">Nombre Completo *</label>

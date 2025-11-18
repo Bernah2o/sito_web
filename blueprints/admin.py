@@ -938,6 +938,24 @@ def marcar_contacto_leido(contacto_id):
     
     return redirect(url_for('admin.contactos'))
 
+@admin_bp.route('/contactos/eliminar/<int:contacto_id>', methods=['POST'])
+@login_required
+def eliminar_contacto(contacto_id):
+    """Eliminar un mensaje de contacto"""
+    try:
+        db = get_db()
+        cursor = db.cursor()
+
+        cursor.execute("DELETE FROM contactos WHERE id = %s", (contacto_id,))
+        db.commit()
+
+        flash('Mensaje de contacto eliminado exitosamente', 'success')
+    except Exception as e:
+        print(f"Error al eliminar contacto: {e}")
+        flash('Error al eliminar el mensaje de contacto', 'error')
+
+    return redirect(url_for('admin.contactos'))
+
 @admin_bp.route('/testimonios')
 @login_required
 def testimonios():

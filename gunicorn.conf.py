@@ -19,9 +19,11 @@ max_requests = 1000
 max_requests_jitter = 100
 
 # Logging
-accesslog = "-"
+# En producción, desactiva el access log para reducir ruido.
+# Si deseas habilitarlo temporalmente, cambia a "-".
+accesslog = None
 errorlog = "-"
-loglevel = os.environ.get('GUNICORN_LOG_LEVEL', 'info')
+loglevel = os.environ.get('GUNICORN_LOG_LEVEL', 'warning')
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" %(D)s'
 
 # Process naming
