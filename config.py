@@ -8,6 +8,8 @@ load_dotenv()
 class Config:
     """Configuración base de la aplicación"""
     SECRET_KEY = os.environ.get('SECRET_KEY')
+    # Cache de archivos servidos por Flask (static)
+    SEND_FILE_MAX_AGE_DEFAULT = timedelta(days=int(os.environ.get('STATIC_MAX_AGE_DAYS', 30)))
     
     # Configuración de base de datos - por defecto MySQL
     DATABASE_TYPE = os.environ.get('DATABASE_TYPE', 'mysql')  # 'mysql' o 'sqlite'
@@ -89,6 +91,8 @@ class DevelopmentConfig(Config):
     TESTING = False
     DATABASE_TYPE = 'sqlite'  # Usar SQLite en desarrollo
     SQLITE_DB_PATH = 'dh2ocol_dev.db'
+    # En desarrollo mantener cache más corta para facilitar iteración
+    SEND_FILE_MAX_AGE_DEFAULT = timedelta(hours=1)
 
 class ProductionConfig(Config):
     """Configuración para producción"""
@@ -96,6 +100,8 @@ class ProductionConfig(Config):
     TESTING = False
     SESSION_COOKIE_SECURE = True
     DATABASE_TYPE = 'mysql'  # Usar MySQL en producción
+    # En producción usar cache larga para assets versionados
+    SEND_FILE_MAX_AGE_DEFAULT = timedelta(days=365)
 
 # Configuración por defecto
 config = {

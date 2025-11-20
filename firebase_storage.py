@@ -366,6 +366,12 @@ class FirebaseStorageManager:
             # Upload to Firebase Storage
             blob = self.bucket.blob(filename)
             blob.upload_from_string(file_data, content_type=file.content_type)
+            # Add long-lived caching for static media assets
+            blob.cache_control = "public, max-age=31536000, immutable"
+            try:
+                blob.patch()
+            except Exception:
+                pass
             print(f"Firebase: File uploaded successfully")
             
             # Make the file publicly accessible
@@ -561,6 +567,12 @@ def upload_file_from_path(local_file_path: str, folder: str = "", optimize_image
         # Upload to Firebase Storage
         blob = firebase_storage.bucket.blob(unique_filename)
         blob.upload_from_string(file_data, content_type=content_type)
+        # Add long-lived caching for static media assets
+        blob.cache_control = "public, max-age=31536000, immutable"
+        try:
+            blob.patch()
+        except Exception:
+            pass
         
         # Make the file publicly accessible
         blob.make_public()
