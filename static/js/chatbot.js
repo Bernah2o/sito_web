@@ -22,22 +22,22 @@ class TanquiBot {
     createChatbotHTML() {
         const chatbotHTML = `
             <div class="chatbot-container">
-                <button class="chatbot-toggle pulse" id="chatbot-toggle">
+                <button class="chatbot-toggle pulse" id="chatbot-toggle" aria-label="Abrir chat" aria-controls="chatbot-window" aria-expanded="false">
                     <i class="fas fa-comments"></i>
                 </button>
                 
-                <div class="chatbot-window" id="chatbot-window">
+                <div class="chatbot-window" id="chatbot-window" role="dialog" aria-label="Chat de soporte DH2OCOL" aria-modal="false">
                     <div class="chatbot-header">
                         <div>
                             <h4>TanquiBot</h4>
-                            <div class="chatbot-status">En línea</div>
+                            <div class="chatbot-status" role="status" aria-live="polite">En línea</div>
                         </div>
-                        <button class="chatbot-close" id="chatbot-close">
+                        <button class="chatbot-close" id="chatbot-close" aria-label="Cerrar chat">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                     
-                    <div class="chatbot-messages" id="chatbot-messages">
+                    <div class="chatbot-messages" id="chatbot-messages" role="log" aria-live="polite" aria-relevant="additions text" aria-atomic="false">
                         <!-- Los mensajes se cargarán aquí -->
                     </div>
                     
@@ -47,8 +47,8 @@ class TanquiBot {
                     
                     <div class="chatbot-input-area">
                         <input type="text" class="chatbot-input" id="chatbot-input" 
-                               placeholder="Escribe tu pregunta..." maxlength="500">
-                        <button class="chatbot-send" id="chatbot-send">
+                               placeholder="Escribe tu pregunta..." maxlength="500" aria-label="Escribe tu pregunta">
+                        <button class="chatbot-send" id="chatbot-send" aria-label="Enviar mensaje">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -98,6 +98,7 @@ class TanquiBot {
         
         window.classList.add('active');
         toggle.classList.remove('pulse');
+        toggle.setAttribute('aria-expanded', 'true');
         this.isOpen = true;
         
         // Focus en el input
@@ -108,8 +109,10 @@ class TanquiBot {
 
     closeChat() {
         const window = document.getElementById('chatbot-window');
+        const toggle = document.getElementById('chatbot-toggle');
         
         window.classList.remove('active');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
         this.isOpen = false;
     }
 
@@ -131,6 +134,7 @@ class TanquiBot {
                 const button = document.createElement('button');
                 button.className = 'quick-option';
                 button.textContent = option.pregunta;
+                button.setAttribute('aria-label', option.pregunta);
                 button.addEventListener('click', () => {
                     this.sendQuickOption(option.pregunta, option.respuesta);
                 });

@@ -183,10 +183,23 @@
         color: #6c757d;
         cursor: pointer;
         transition: color 0.3s ease;
+        /* Aumentar área táctil mínima */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 48px;
+        min-height: 48px;
+        border-radius: 8px;
+        touch-action: manipulation;
       }
 
       .logros-close-btn:hover {
         color: #dc3545;
+      }
+
+      .logros-close-btn:focus-visible {
+        outline: 3px solid #0b6623;
+        outline-offset: 2px;
       }
 
       .logro-item {
@@ -256,30 +269,44 @@
       }
 
       .btn-conocer-mas {
-        background: #228b22;
-        color: white;
+        background: #0b6623; /* Hunter green: alto contraste con blanco */
+        color: #ffffff;
         border: none;
-        padding: 10px 20px;
+        padding: 12px 24px; /* ampliar área táctil */
+        min-height: 44px;
+        min-width: 44px;
         border-radius: 25px;
-        font-weight: 500;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
+        touch-action: manipulation;
+        position: relative;
+        z-index: 2;
       }
 
       .btn-conocer-mas:hover {
-        background: #1e7b1e;
+        background: #095a1f;
         transform: translateY(-2px);
+      }
+
+      .btn-conocer-mas:focus-visible {
+        outline: 3px solid #ffffff;
+        outline-offset: 2px;
+        box-shadow: 0 0 0 3px rgba(11, 102, 35, 0.35);
       }
 
       .btn-mas-tarde {
         background: transparent;
         color: #6c757d;
         border: 1px solid #dee2e6;
-        padding: 10px 20px;
+        padding: 12px 24px; /* ampliar área táctil */
+        min-height: 44px;
+        min-width: 44px;
         border-radius: 25px;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.3s ease;
+        touch-action: manipulation;
       }
 
       .btn-mas-tarde:hover {
@@ -313,6 +340,76 @@
         animation: slideOutRight 0.5s ease-in forwards;
       }
 
+      /* Controles del carrusel: asegurar área táctil mínima */
+      #logrosCarousel .carousel-control-prev,
+      #logrosCarousel .carousel-control-next {
+        min-width: 48px;
+        min-height: 48px;
+        border: none;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent; /* quitar sombra/fondo gris */
+        box-shadow: none;
+        touch-action: manipulation;
+        width: auto; /* evitar área superpuesta grande por defecto */
+        padding: 6px;
+        z-index: 1; /* por debajo del contenido del slide */
+      }
+
+      #logrosCarousel .carousel-control-prev-icon,
+      #logrosCarousel .carousel-control-next-icon {
+        filter: none; /* iconos originales, visibles sin fondo */
+      }
+
+      #logrosCarousel .carousel-control-prev:focus-visible,
+      #logrosCarousel .carousel-control-next:focus-visible {
+        outline: 3px solid #ffffff;
+        outline-offset: 2px;
+      }
+
+      /* Indicadores del carrusel: ampliar objetivo táctil sin cambiar el punto visible */
+      #logrosCarousel .carousel-indicators {
+        gap: 8px;
+        margin-bottom: 1rem;
+        z-index: 1; /* evitar superponer contenido */
+      }
+
+      #logrosCarousel .carousel-indicators button {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin: 4px;
+        touch-action: manipulation;
+      }
+
+      #logrosCarousel .carousel-indicators button::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 12px;
+        height: 12px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background-color: #ffffff;
+        opacity: 0.6;
+      }
+
+      #logrosCarousel .carousel-indicators .active::before {
+        opacity: 1;
+        background-color: #0b6623;
+      }
+
+      #logrosCarousel .carousel-indicators button:focus-visible {
+        outline: 3px solid #ffffff;
+        outline-offset: 2px;
+      }
+
       /* Responsive */
       @media (max-width: 768px) {
         .logros-modal {
@@ -344,6 +441,7 @@
     <nav
       class="navbar navbar-expand-lg fixed-top"
       style="background: rgba(0, 128, 55, 0.95); backdrop-filter: blur(10px)"
+      role="navigation" aria-label="Navegación principal"
     >
       <div class="container">
         <a
@@ -495,6 +593,8 @@
     </nav>
     {% endblock %}
 
+    <!-- Punto de referencia principal -->
+    <main id="main-content" role="main">
     <!-- Hero Section -->
     <section id="inicio" class="hero-section">
       <div class="hero-content">
@@ -527,6 +627,9 @@
         id="carouselDH2O"
         class="carousel slide carousel-container"
         data-bs-ride="carousel"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Carrusel de imágenes de servicios DH2OCOL"
       >
         <div class="carousel-indicators">
           {% for image in carousel_images %}
@@ -537,16 +640,17 @@
             {%
             if
             loop.first
-            %}class="active"
+            %}class="active" aria-current="true"
             {%
             endif
             %}
+            aria-label="Slide {{ loop.index }}"
           ></button>
           {% endfor %}
         </div>
         <div class="carousel-inner">
           {% for image in carousel_images %}
-          <div class="carousel-item {% if loop.first %}active{% endif %}">
+          <div class="carousel-item {% if loop.first %}active{% endif %}" role="group" aria-roledescription="slide" aria-label="Imagen {{ loop.index }} de {{ loop.length }}">
             <img
               src="{{ image.ruta | firebase_url }}"
               class="d-block w-100"
@@ -566,16 +670,20 @@
           type="button"
           data-bs-target="#carouselDH2O"
           data-bs-slide="prev"
+          aria-label="Anterior"
         >
-          <span class="carousel-control-prev-icon"></span>
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Anterior</span>
         </button>
         <button
           class="carousel-control-next"
           type="button"
           data-bs-target="#carouselDH2O"
           data-bs-slide="next"
+          aria-label="Siguiente"
         >
-          <span class="carousel-control-next-icon"></span>
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Siguiente</span>
         </button>
       </div>
       {% endif %}
@@ -663,7 +771,7 @@
               </span>
             </div>
             <div class="servicio-content">
-              <h4 class="servicio-title">{{ servicio.nombre }}</h4>
+              <h3 class="servicio-title">{{ servicio.nombre }}</h3>
               <p class="servicio-descripcion">
                 {{ servicio.descripcion[:120] }}{% if
                 servicio.descripcion|length > 120 %}...{% endif %}
@@ -717,7 +825,7 @@
           <div class="col-12 text-center">
             <div class="py-5">
               <i class="fas fa-comments fa-3x text-muted mb-3"></i>
-              <h5 class="text-muted">No hay testimonios disponibles</h5>
+              <h3 class="text-muted">No hay testimonios disponibles</h3>
               <p class="text-muted">
                 Los testimonios se gestionan desde el panel de administración
               </p>
@@ -903,30 +1011,30 @@
 
         <div class="contacto-info">
           <div class="contacto-item">
-            <h5><i class="fas fa-phone text-info me-2"></i>Teléfono</h5>
+            <h3><i class="fas fa-phone text-info me-2"></i>Teléfono</h3>
             <p>
               {{ configuracion.telefono or configuracion.empresa_telefono or
               '+57 315 748 4662' }}
             </p>
           </div>
           <div class="contacto-item">
-            <h5><i class="fas fa-envelope text-info me-2"></i>Email</h5>
+            <h3><i class="fas fa-envelope text-info me-2"></i>Email</h3>
             <p>
               {{ configuracion.email or configuracion.empresa_email or
               'contacto@dh2o.com.co' }}
             </p>
           </div>
           <div class="contacto-item">
-            <h5>
+            <h3>
               <i class="fas fa-map-marker-alt text-info me-2"></i>Dirección
-            </h5>
+            </h3>
             <p>
               {{ configuracion.direccion or configuracion.empresa_direccion or
               'Valledupar, Colombia' }}
             </p>
           </div>
           <div class="contacto-item">
-            <h5><i class="fas fa-clock text-info me-2"></i>Horarios</h5>
+            <h3><i class="fas fa-clock text-info me-2"></i>Horarios</h3>
             <p>
               {{ configuracion.horarios or 'Lun - Vie: 8:00 AM - 6:00 PM - Sab:
               8:00 AM - 1:00 PM' }}
@@ -1099,12 +1207,13 @@
       </div>
     </div>
 
+    </main>
     {% include 'sitio/partials/footer.html' %}
 
     <!-- Modal Flotante de Logros con Slider -->
     <div id="logrosModal" class="logros-modal">
       <div class="logros-modal-content">
-        <button class="logros-close-btn" onclick="cerrarModal()">
+        <button class="logros-close-btn" onclick="cerrarModal()" aria-label="Cerrar panel de logros">
           &times;
         </button>
 
